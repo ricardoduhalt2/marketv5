@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="https://petgascoin.com/wp-content/uploads/2025/05/Unlockable-Content-Agency.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NFT Boutique Marketplace</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <script>
+      function detectMobile() {
+        if (window.innerWidth <= 768) {
+          document.body.classList.add('mobile-mode');
+        } else {
+          document.body.classList.remove('mobile-mode');
+        }
+      }
+      window.addEventListener('resize', detectMobile);
+      detectMobile(); // Initial check
+    </script>
+  </body>
+</html>
