@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { nftData } from '../data/nftData';
 import './Chatbot.css';
-import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 interface Message {
   text: string;
@@ -11,185 +11,185 @@ interface Message {
 const Chatbot: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
-  const [isOpen, setIsOpen] = useState(false);
-  const [isTyping, setIsTyping] = useState(false); // For bot typing indicator
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+  const [isInputDisabled, setIsInputDisabled] = useState(false);
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const messagesContainerRef = useRef<null | HTMLDivElement>(null);
 
+  // Configuración de Google AI
   const API_KEY = import.meta.env.VITE_GOOGLE_AI_API_KEY;
-  let genAI: GoogleGenerativeAI | null = null;
-  if (API_KEY) {
-    genAI = new GoogleGenerativeAI(API_KEY);
-  } else {
-    console.error("Google AI API Key not found. Please set VITE_GOOGLE_AI_API_KEY in your .env file.");
-  }
-
+  const genAI = API_KEY ? new GoogleGenerativeAI(API_KEY) : null;
   const model = genAI?.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
 
-  const generationConfig = {
-    temperature: 0.7,
-    topK: 1,
-    topP: 1,
-    maxOutputTokens: 2048,
-  };
-
-  const safetySettings = [
-    { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-    { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-    { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-    { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-  ];
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  useEffect(scrollToBottom, [messages]);
-
+  // Focus input when component mounts
   useEffect(() => {
-    if (isOpen) {
-      setMessages([{ sender: 'bot', text: "Hello! I'm your friendly art and NFT assistant. Ask me about the NFTs, the MUSEO DE ARTE CONTEMPORANEO DE QUINTANA ROO, or how to buy digital art!" }]);
-    } else {
-      setMessages([]);
-      setInput('');
+    if (inputRef.current) {
+      inputRef.current.focus();
     }
-  }, [isOpen]);
+  }, []);
 
-  const handleSend = () => {
-    if (input.trim() === '') return;
+  // Scroll to bottom when new messages arrive
+  useEffect(() => {
+    const container = messagesContainerRef.current;
+    if (container && isExpanded) {
+      container.scrollTop = container.scrollHeight;
+    }
+  }, [messages, isExpanded]);
 
-    const userMessage: Message = { text: input, sender: 'user' };
-    setMessages(prevMessages => [...prevMessages, userMessage]);
-    setIsTyping(true);
-    processUserMessage(input);
-    setInput('');
+  // Close messages panel when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const container = document.querySelector('.chatbot-container');
+      if (container && !container.contains(event.target as Node)) {
+        setIsExpanded(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const formatPrice = (price: string | undefined, symbol: string | undefined) => {
+    if (!price || !symbol) return 'Precio no disponible';
+    return `${Number(price).toLocaleString()} ${symbol}`;
+  };
+
+  const getCollectionContext = () => {
+    return nftData.map(nft => `
+      Nombre: ${nft.name}
+      Descripción: ${nft.description || 'No disponible'}
+      Precio: ${formatPrice(nft.price, nft.currencySymbol)}
+      ID: ${nft.id}
+      Contrato: ${nft.editionContractAddress}
+    `).join('\n\n');
+  };
+
+  const processWithAI = async (userInput: string, contextualInfo: string) => {
+    if (!model) {
+      return "Lo siento, no puedo procesar tu pregunta en este momento. ¿Te gustaría ver la información básica de nuestra colección?";
+    }
+
+    try {
+      const prompt = `
+      Eres un asistente especializado en NFTs del Museo de Arte Contemporáneo de Quintana Roo.
+      Aquí está la información de nuestra colección:
+      ${contextualInfo}
+
+      Pregunta del usuario: ${userInput}
+
+      Por favor, responde de manera concisa y específica, usando solo la información proporcionada.
+      Si no tienes la información exacta, indícalo claramente.
+      `;
+
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
+      return text || "No pude generar una respuesta. ¿Te gustaría ver la información básica de nuestra colección?";
+    } catch (error) {
+      console.error('Error al procesar con AI:', error);
+      return "Hubo un error al procesar tu pregunta. ¿Te gustaría ver la información básica de nuestra colección?";
+    }
   };
 
   const processUserMessage = async (userInput: string) => {
-    const lowerInput = userInput.toLowerCase();
-    let rawBotResponseText: string = "";
-    let potentialNftFromInput: typeof nftData[0] | undefined = undefined;
-    let searchStringForNftName = "";
-
-    // Specific pattern match first
-    const priceQuerySpecificPattern = /how much is artwork in usd (.*)/i;
-    const specificMatch = lowerInput.match(priceQuerySpecificPattern);
-
-    if (specificMatch && specificMatch[1]) {
-        searchStringForNftName = specificMatch[1].trim();
-    } else {
-        // Fallback to broader heuristic if specific pattern doesn't match
-        const keywordsToStrip = ["price of", "cost of", "usd price of", "description of", "about", "buy", "how much is", "what is the price of", "tell me about", "artwork", "in usd", "usd", "in", "the", "of", "an", "a", "is"];
-        let tempSearchString = lowerInput;
-        
-        keywordsToStrip.forEach(keyword => {
-            // Using a regex with word boundaries for keywords to avoid partial matches within words
-            // and 'gi' for global, case-insensitive match
-            const regex = new RegExp(`\\b${keyword}\\b`, 'gi');
-            tempSearchString = tempSearchString.replace(regex, "");
-        });
-        searchStringForNftName = tempSearchString.replace(/\s\s+/g, ' ').trim(); // Remove extra spaces
-    }
-
-    if (searchStringForNftName) {
-        potentialNftFromInput = nftData.find(
-            nft => nft.name.toLowerCase().includes(searchStringForNftName) ||
-                   searchStringForNftName.includes(nft.name.toLowerCase()) ||
-                   nft.id.toLowerCase() === searchStringForNftName
-        );
-    }
-    
-    if (potentialNftFromInput) {
-      const nft = potentialNftFromInput;
-      if (lowerInput.includes('price') || lowerInput.includes('cost') || lowerInput.includes('usd') || lowerInput.includes('how much')) {
-        rawBotResponseText = `${nft.name} (${nft.id}) costs ${nft.price} ${nft.currencySymbol}.`;
-      } else if (lowerInput.includes('how to buy') || lowerInput.includes('buy')) {
-        rawBotResponseText = `To buy ${nft.name} (${nft.id}), you'll typically connect your crypto wallet to the marketplace and use MATIC (Polygon) or the equivalent USD value. Specific instructions are usually provided on the NFT's page or the marketplace's help section. General steps: 1. Ensure your wallet is funded. 2. Click the 'Buy' button for ${nft.name}. 3. Approve the transaction in your wallet.`;
-      } else if (lowerInput.includes('description') || lowerInput.includes('about')) {
-        rawBotResponseText = `${nft.name} (${nft.id}): ${nft.description}`;
-      } else {
-        rawBotResponseText = `I have information about ${nft.name} (${nft.id}). You can ask for its description, price, or how to buy it.`;
+    try {
+      const lowerInput = userInput.toLowerCase().trim();
+      
+      // Respuesta a "cómo te llamas"
+      if (lowerInput.includes('como te llamas') || lowerInput.includes('quien eres')) {
+        return "Soy GitHub Copilot, el asistente de MACQ. Estoy aquí para ayudarte con información sobre nuestra colección de NFTs.";
       }
-    }
 
-    if (!rawBotResponseText && (lowerInput.includes('list all nfts') || lowerInput.includes('show all nfts'))) {
-      rawBotResponseText = "Here are all the available NFTs and their IDs: \n" + nftData.map(nft => `- ${nft.name} (${nft.id})`).join('\n');
-    }
-
-    if (!rawBotResponseText) {
-      if (!model) {
-        rawBotResponseText = "I'm having trouble connecting to my knowledge base right now. Please try again later.";
-      } else {
-        try {
-          const chat = model.startChat({
-            generationConfig,
-            safetySettings,
-            history: [
-              { role: "user", parts: [{ text: "You are a friendly and helpful assistant for an NFT marketplace and the MUSEO DE ARTE CONTEMPORANEO DE QUINTANA ROO. Be pleasant and informative. Prioritize information from the provided NFT data if the question is about specific NFTs, their prices, descriptions, or how to buy them. Only use general knowledge for other topics or if local data is insufficient." }] },
-              { role: "model", parts: [{ text: "Understood! I'm ready to help with information about our beautiful NFTs and the wonderful MUSEO DE ARTE CONTEMPORANEO DE QUINTANA ROO. How can I assist you today? I'll use my specific knowledge about the listed NFTs first." }] },
-            ],
-          });
-          const result = await chat.sendMessage(userInput);
-          const response = result.response;
-          rawBotResponseText = response.text();
-        } catch (error) {
-          console.error("Error calling Google AI:", error);
-          rawBotResponseText = "I encountered an issue while trying to get that information. Please try asking in a different way.";
-        }
+      // Si pregunta por la colección completa
+      if (lowerInput.includes('colección') || 
+          lowerInput.includes('nfts') || 
+          lowerInput === 'si' || 
+          lowerInput === 'sí') {
+        const info = `Aquí está la información completa de nuestra colección:\n\n${getCollectionContext()}`;
+        return info;
       }
+
+      // Procesar con AI para otras preguntas
+      return processWithAI(userInput, getCollectionContext());
+    } catch (error) {
+      console.error('Error al procesar mensaje:', error);
+      return "Lo siento, hubo un error al procesar tu mensaje. ¿Te gustaría ver la información básica de nuestra colección?";
     }
-    
-    const finalBotResponseText = rawBotResponseText.replace(/\*/g, ''); 
-    setIsTyping(false);
-    setMessages(prevMessages => [...prevMessages, { text: finalBotResponseText, sender: 'bot' }]);
   };
 
-  if (!isOpen) {
-    return (
-      <button className="chatbot-toggle-button" onClick={() => setIsOpen(true)}>
-        {/* Robot icon SVG from header */}
-        <svg className="chatbot-header-icon" aria-hidden="true" focusable="false" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-          <rect x="20" y="30" width="60" height="50" rx="10" ry="10" className="robot-head" />
-          <rect className="robot-eye robot-eye-left" x="32" y="42" width="12" height="12" rx="3" ry="3" />
-          <rect className="robot-eye robot-eye-right" x="56" y="42" width="12" height="12" rx="3" ry="3" />
-          <line x1="50" y1="30" x2="50" y2="18" className="robot-antenna" strokeWidth="4" />
-          <circle cx="50" cy="12" r="6" className="robot-antenna-light" />
-        </svg>
-      </button>
-    );
-  }
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value);
+  };
+
+  const handleInputKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && input.trim() && !isInputDisabled) {
+      handleSendMessage();
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (!input.trim() || isInputDisabled) return;
+
+    setIsInputDisabled(true);
+    setIsExpanded(true);
+    
+    const userMessage = input.trim();
+    setInput('');
+    setMessages(prev => [...prev, { text: userMessage, sender: 'user' }]);
+    
+    setIsTyping(true);
+    const response = await processUserMessage(userMessage);
+    setIsTyping(false);
+    
+    setMessages(prev => [...prev, { text: response, sender: 'bot' }]);
+    setIsInputDisabled(false);
+  };
 
   return (
-    <div className="chatbot-container">
-      <div className="chatbot-header">
-        <svg className="chatbot-header-icon" aria-hidden="true" focusable="false" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-          <rect x="20" y="30" width="60" height="50" rx="10" ry="10" className="robot-head" />
-          <rect className="robot-eye robot-eye-left" x="32" y="42" width="12" height="12" rx="3" ry="3" />
-          <rect className="robot-eye robot-eye-right" x="56" y="42" width="12" height="12" rx="3" ry="3" />
-          <line x1="50" y1="30" x2="50" y2="18" className="robot-antenna" strokeWidth="4" />
-          <circle cx="50" cy="12" r="6" className="robot-antenna-light" />
-        </svg>
-        <h2>NFT Info Bot</h2>
-        <button onClick={() => setIsOpen(false)} className="chatbot-close-button">X</button>
+    <div className={`chatbot-container ${isExpanded ? 'expanded' : ''}`}>
+      <div className="chatbot-main">
+        <div className="chatbot-input-wrapper">
+          <input
+            ref={inputRef}
+            type="text"
+            className="chatbot-input"
+            placeholder="Pregunta sobre nuestra colección..."
+            value={input}
+            onChange={handleInputChange}
+            onKeyPress={handleInputKeyPress}
+            disabled={isInputDisabled}
+          />
+          <button
+            className="chatbot-send-button"
+            onClick={handleSendMessage}
+            disabled={!input.trim() || isInputDisabled}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </div>
       </div>
-      <div className="chatbot-messages">
-        {messages.map((msg, index) => (
-          <div key={index} className={`message ${msg.sender}`}>
-            <p>{msg.text.split('\n').map((line, i) => <span key={i}>{line}<br/></span>)}</p>
-          </div>
-        ))}
-        {isTyping && <div className="message bot typing-indicator"><p>...</p></div>}
-        <div ref={messagesEndRef} />
-      </div>
-      <div className="chatbot-input">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && !isTyping && handleSend()}
-          placeholder="Ask about NFTs or the Museum..."
-          disabled={isTyping}
-        />
-        <button onClick={handleSend} disabled={isTyping}>Send</button>
+
+      <div className="chatbot-messages-panel">
+        <div ref={messagesContainerRef} className="messages-container">
+          {messages.map((message, index) => (
+            <div key={index} className={`message ${message.sender}`}>
+              <div className="message-content">{message.text}</div>
+            </div>
+          ))}
+          {isTyping && (
+            <div className="typing-indicator">
+              <div className="typing-dot"></div>
+              <div className="typing-dot"></div>
+              <div className="typing-dot"></div>
+            </div>
+          )}
+          <div ref={messagesEndRef} />
+        </div>
       </div>
     </div>
   );

@@ -23,16 +23,17 @@ function App() {
             className="app-logo mobile-logo w-16 h-auto mt-12 mb-2"
           />
           <h1 className="text-3xl md:text-4xl font-semibold mb-4">NFT Boutique Marketplace</h1>
-          <h2 className="text-xl md:text-2xl text-gray-300">Arte Eterno Collection - MACQ</h2>
+          <div className="flex items-center gap-4">
+            <Chatbot />
+            <ConnectButton
+              client={client}
+              chain={polygon}
+              theme="dark"
+              connectModal={{ size: "compact" }}
+            />
+          </div>
+          <h2 className="text-xl md:text-2xl text-gray-300 mt-4">Arte Eterno Collection - MACQ</h2>
           <div className="mobile-mode-indicator">MOBILE MODE</div>
-        </div>
-        <div className="flex justify-center">
-          <ConnectButton
-            client={client}
-            chain={polygon}
-            theme="dark"
-            connectModal={{ size: "compact" }}
-          />
         </div>
       </header>
 
@@ -48,7 +49,6 @@ function App() {
           Arte Eterno Collection - Exhibiting at the Museum of Contemporary Art, Quintana Roo (MACQ)
         </p>
       </footer>
-      <Chatbot />
     </div>
   );
 }

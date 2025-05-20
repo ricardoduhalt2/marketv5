@@ -56,8 +56,6 @@ const DropCard: React.FC<DropCardProps> = ({ nft, client }) => {
     fetchNftDescription();
   }, [nft.editionContractAddress, client]);
 
-  const contractAddressToDisplay = nft.editionContractAddress;
-
   return (
     <div className="card-interactive group">
       <div className="card-content">
@@ -89,9 +87,18 @@ const DropCard: React.FC<DropCardProps> = ({ nft, client }) => {
             </div>
             <div className="metadata-item">
               <span className="metadata-label">Contract</span>
-              <span className="metadata-value contract-address" onClick={() => handleCopy(nft.editionContractAddress)}>
+              <span 
+                className="metadata-value contract-address" 
+                onClick={() => {
+                  handleCopy(nft.editionContractAddress);
+                  const el = document.createElement('div');
+                  el.className = 'copy-feedback';
+                  el.textContent = '¡Copiado!';
+                  document.body.appendChild(el);
+                  setTimeout(() => el.remove(), 2000);
+                }}
+              >
                 {nft.editionContractAddress.slice(0, 6)}...{nft.editionContractAddress.slice(-4)}
-                {isCopied && <span className="copied-tooltip">¡Copiado!</span>}
               </span>
             </div>
           </div>
