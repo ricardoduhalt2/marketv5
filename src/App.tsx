@@ -4,7 +4,8 @@ import { ConnectButton } from 'thirdweb/react';
 import { polygon } from 'thirdweb/chains';
 import { client } from './main'; // Import the initialized client
 import DropCard from './components/DropCard';
-import { nftData, type NftInfo } from './data/nftData'; // Import the actual NFT data and NftInfo type from the correct path
+import { nftData } from './data/nftData'; // Import the actual NFT data from the correct path
+import type { NftData } from './types'; // Import NftData type from types
 import Chatbot from './components/Chatbot'; // Import the Chatbot component
 
 function App() {
@@ -54,7 +55,7 @@ function App() {
           <div className="loading-spinner"></div> // Simple loading spinner
         ) : (
           <div className="nft-cards-container"> {/* Using custom class for layout */}
-            {nftData.map((nft: NftInfo) => ( // Use nftData and add NftInfo type annotation
+            {nftData.map((nft: NftData) => ( // Use nftData and add NftData type annotation
               <div key={nft.name} className="card-base"> {/* Use nft.name as key, Wrap DropCard in a div with .card-base */}
                 <DropCard nft={nft} client={client} />
               </div>

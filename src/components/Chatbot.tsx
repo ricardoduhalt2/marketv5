@@ -94,28 +94,25 @@ const Chatbot: React.FC = () => {
         potentialNftFromInput = nftData.find(
             nft => nft.name.toLowerCase().includes(searchStringForNftName) ||
                    searchStringForNftName.includes(nft.name.toLowerCase()) ||
-                   nft.symbol.toLowerCase() === searchStringForNftName
+                   nft.id.toLowerCase() === searchStringForNftName
         );
     }
     
     if (potentialNftFromInput) {
       const nft = potentialNftFromInput;
       if (lowerInput.includes('price') || lowerInput.includes('cost') || lowerInput.includes('usd') || lowerInput.includes('how much')) {
-        rawBotResponseText = `${nft.name} (${nft.symbol}) costs $${nft.usdPrice} USD.`;
-        if (nft.polPrice) {
-            rawBotResponseText += ` / ${nft.polPrice} POL.`;
-        }
+        rawBotResponseText = `${nft.name} (${nft.id}) costs ${nft.price} ${nft.currencySymbol}.`;
       } else if (lowerInput.includes('how to buy') || lowerInput.includes('buy')) {
-        rawBotResponseText = `To buy ${nft.name} (${nft.symbol}), you'll typically connect your crypto wallet to the marketplace and use MATIC (Polygon) or the equivalent USD value. Specific instructions are usually provided on the NFT's page or the marketplace's help section. General steps: 1. Ensure your wallet is funded. 2. Click the 'Buy' button for ${nft.name}. 3. Approve the transaction in your wallet.`;
+        rawBotResponseText = `To buy ${nft.name} (${nft.id}), you'll typically connect your crypto wallet to the marketplace and use MATIC (Polygon) or the equivalent USD value. Specific instructions are usually provided on the NFT's page or the marketplace's help section. General steps: 1. Ensure your wallet is funded. 2. Click the 'Buy' button for ${nft.name}. 3. Approve the transaction in your wallet.`;
       } else if (lowerInput.includes('description') || lowerInput.includes('about')) {
-        rawBotResponseText = `${nft.name} (${nft.symbol}): ${nft.description}`;
+        rawBotResponseText = `${nft.name} (${nft.id}): ${nft.description}`;
       } else {
-        rawBotResponseText = `I have information about ${nft.name} (${nft.symbol}). You can ask for its description, price in USD, or how to buy it.`;
+        rawBotResponseText = `I have information about ${nft.name} (${nft.id}). You can ask for its description, price, or how to buy it.`;
       }
     }
 
     if (!rawBotResponseText && (lowerInput.includes('list all nfts') || lowerInput.includes('show all nfts'))) {
-      rawBotResponseText = "Here are all the available NFTs and their symbols: \n" + nftData.map(nft => `- ${nft.name} (${nft.symbol})`).join('\n');
+      rawBotResponseText = "Here are all the available NFTs and their IDs: \n" + nftData.map(nft => `- ${nft.name} (${nft.id})`).join('\n');
     }
 
     if (!rawBotResponseText) {
