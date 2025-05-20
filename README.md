@@ -1,8 +1,26 @@
-# React + TypeScript + Vite
+# MACQ NFT Marketplace
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Modern NFT marketplace built with React + TypeScript + Vite featuring a unique design and seamless user experience.
 
-Currently, two official plugins are available:
+## Features
+
+- 🎨 Modern UI with gradient effects and animations
+- 🖼️ Individual NFT pages with detailed views
+- 💫 Interactive elements with smooth transitions
+- 🤖 Integrated chatbot assistant
+- 🔗 Blockchain integration with MetaMask for minting
+- 📱 Responsive design for all devices
+
+## Recent Updates
+
+### UI/UX Improvements (May 2025)
+- Enhanced button styling with modern gradients and animations
+  - Improved Mint button visibility with stronger text shadows and gradient effects
+  - Styled "Back to list" button with matching design
+- Updated collection display to "Arte Eterno Collection #[ID]"
+- Added responsive hover effects and animations
+- Enhanced overall text visibility and contrast
+- Improved mobile responsiveness
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
 - [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
@@ -51,6 +69,29 @@ export default tseslint.config({
     ...reactDom.configs.recommended.rules,
   },
 })
+```
+
+## Technical Stack
+
+- React 18
+- TypeScript
+- Vite
+- Tailwind CSS
+- ThirdWeb SDK
+- Web3 Integration
+- MetaMask Support
+
+## Local Development
+
+```bash
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+
+# Build for production
+npm run build
 ```
 
 ## AI Agent Changelog

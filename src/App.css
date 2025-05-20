@@ -59,6 +59,23 @@ body::before { /* Pseudo-element for background shifting light effect */
   }
 }
 
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient {
+  animation: gradient 3s ease infinite;
+  -webkit-background-clip: text;
+  background-clip: text;
+}
 
 #root {
   width: 100%;
@@ -66,6 +83,274 @@ body::before { /* Pseudo-element for background shifting light effect */
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+}
+
+.nft-list-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 2rem;
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.nft-list-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.3s ease;
+  padding: 1rem;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.nft-list-item:hover {
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.nft-list-thumbnail {
+  width: 100%;
+  height: 200px;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.nft-list-name-container {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  margin-top: 0.5rem;
+  backdrop-filter: blur(4px);
+}
+
+.nft-list-name {
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 0.5rem;
+  line-height: 1.2;
+  color: white;
+  text-shadow: 
+    0 0 10px rgba(106, 17, 203, 0.8),
+    0 0 20px rgba(255, 107, 107, 0.5);
+  width: 100%;
+  display: block;
+  background: linear-gradient(45deg, var(--primary-color), var(--accent-color), var(--primary-color));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: animatedGradient 4s linear infinite;
+}
+
+.nft-detail-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.nft-title-container {
+  position: relative;
+  padding: 2rem;
+  border-radius: 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  isolation: isolate;
+  transition: all 0.5s ease-in-out;
+}
+
+.nft-detail-title {
+  font-size: 3.5rem;
+  font-weight: 900;
+  line-height: 1.2;
+  padding: 1rem;
+  background: linear-gradient(45deg, var(--primary-color), var(--accent-color), var(--neon-pink), var(--primary-color));
+  background-size: 300% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 30px rgba(255, 107, 107, 0.5);
+  animation: animatedGradient 6s linear infinite;
+  letter-spacing: -0.02em;
+  transform: perspective(1000px) translateZ(0);
+  transition: transform 0.3s ease;
+}
+
+.nft-detail-title:hover {
+  transform: perspective(1000px) translateZ(20px);
+}
+
+.collection-badge {
+  position: relative;
+  padding: 0.75rem 2rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  transform-style: preserve-3d;
+  transform: perspective(1000px) translateZ(0);
+}
+
+.collection-badge:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: perspective(1000px) translateZ(10px);
+  box-shadow: 
+    0 0 20px rgba(106, 17, 203, 0.3),
+    0 0 40px rgba(255, 107, 107, 0.2);
+}
+
+.collection-badge-text {
+  font-size: 1.25rem;
+  font-weight: 700;
+  background: linear-gradient(45deg, #fff, var(--neon-pink), #fff);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: animatedGradient 4s linear infinite;
+}
+
+.nft-detail-content {
+  margin-top: 2rem;
+  perspective: 2000px;
+}
+
+.nft-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  padding: 1rem;
+}
+
+@media (max-width: 768px) {
+  .nft-detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.nft-detail-media {
+  position: relative;
+  border-radius: 1rem;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nft-detail-media::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(
+    45deg,
+    var(--primary-color),
+    var(--accent-color),
+    var(--neon-pink),
+    var(--primary-color)
+  );
+  background-size: 400% 400%;
+  border-radius: 1rem;
+  z-index: -1;
+  animation: borderGradient 8s linear infinite;
+  filter: blur(8px);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.nft-detail-media:hover::after {
+  opacity: 0.5;
+}
+
+@keyframes borderGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.nft-detail-media img {
+  border-radius: 1rem;
+  transition: transform 0.3s ease;
+}
+
+.media-shine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: translateY(100%) rotate(45deg);
+  transition: transform 0.6s ease;
+}
+
+.nft-detail-media:hover .media-shine {
+  transform: translateY(-100%) rotate(45deg);
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  color: #ffffff;
+  text-decoration: none;
+  border-radius: 0.5rem;
+  background: linear-gradient(45deg, 
+    var(--primary-color) 0%,
+    #9333ea 50%,
+    var(--accent-color) 100%
+  );
+  border: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 600;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7),
+               0 0 10px rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2),
+              inset 0 2px 4px rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.back-link svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  transition: transform 0.3s ease;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.back-link:hover {
+  background: linear-gradient(45deg, 
+    var(--accent-color) 0%,
+    #f87171 50%,
+    var(--primary-color) 100%
+  );
+  transform: translateY(-2px);
+  box-shadow: 
+    0 0 20px rgba(106, 17, 203, 0.4),
+    0 0 40px rgba(255, 107, 107, 0.2),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2);
+}
+
+.back-link:hover svg {
+  transform: translateX(-3px);
+}
+
+.back-link:active {
+  transform: translateY(0) scale(0.98);
 }
 
 .app-container {
@@ -456,4 +741,199 @@ body.mobile-mode .mobile-logo {
 .crystal-button:hover {
   background-color: rgba(255, 255, 255, 0.2); /* Increase transparency on hover */
   border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Card Interactive Styles */
+.card-interactive {
+  position: relative;
+  padding: 2rem;
+  border-radius: 1rem;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.card-interactive:hover {
+  transform: translateY(-5px);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.card-content {
+  position: relative;
+  z-index: 1;
+}
+
+.info-section {
+  margin-bottom: 2rem;
+}
+
+.description-container {
+  position: relative;
+  padding: 1.5rem;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+  transition: all 0.3s ease;
+  transform: translateZ(0);
+}
+
+.description-container:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 
+    0 0 20px rgba(106, 17, 203, 0.2),
+    0 0 40px rgba(255, 107, 107, 0.1);
+}
+
+.description-text {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: var(--text-color);
+  margin-bottom: 1rem;
+}
+
+.metadata-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.metadata-item {
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.metadata-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px);
+}
+
+.metadata-label {
+  display: block;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 0.5rem;
+}
+
+.metadata-value {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-color);
+  word-break: break-all;
+}
+
+.contract-address {
+  cursor: pointer;
+  transition: color 0.2s ease;
+  position: relative;
+}
+
+.contract-address:hover {
+  color: var(--accent-color);
+}
+
+.copied-tooltip {
+  position: absolute;
+  top: -2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.8rem;
+  pointer-events: none;
+  animation: fadeInOut 2s ease;
+}
+
+.claim-section {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.claim-button {
+  background: linear-gradient(45deg, 
+    var(--primary-color) 0%,
+    #9333ea 50%,
+    var(--accent-color) 100%
+  ) !important;
+  color: #ffffff !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7),
+               0 0 10px rgba(255, 255, 255, 0.3) !important;
+  font-weight: 800 !important;
+  padding: 1rem 2rem !important;
+  letter-spacing: 0.05em !important;
+  border-radius: 0.5rem !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border: none !important;
+  cursor: pointer;
+  width: 100% !important;
+  max-width: 300px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  font-size: 1.1rem !important;
+  position: relative;
+  overflow: hidden;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 auto !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2),
+              inset 0 2px 4px rgba(255, 255, 255, 0.1) !important;
+}
+
+.claim-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(
+    115deg,
+    transparent 0%,
+    transparent 25%,
+    rgba(255, 255, 255, 0.2) 45%,
+    rgba(255, 255, 255, 0.2) 50%,
+    transparent 75%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+}
+
+.claim-button:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 
+    0 0 20px rgba(106, 17, 203, 0.4),
+    0 0 40px rgba(255, 107, 107, 0.2),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2) !important;
+  background: linear-gradient(45deg, 
+    var(--accent-color) 0%,
+    #f87171 50%,
+    var(--primary-color) 100%
+  ) !important;
+}
+
+.claim-button:hover::before {
+  transform: translateX(0);
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0; }
+  10%, 90% { opacity: 1; }
+}
+
+/* Perspective container for 3D effects */
+.perspective {
+  perspective: 2000px;
 }
