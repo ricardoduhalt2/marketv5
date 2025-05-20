@@ -2,9 +2,9 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import type { NftData } from '../types';
 import { ClaimButton, MediaRenderer } from 'thirdweb/react';
-import { type ThirdwebClient, getContract } from 'thirdweb'; // Added getContract
+import { type ThirdwebClient, getContract } from 'thirdweb';
 import { polygon } from 'thirdweb/chains';
-import { getNFT } from "thirdweb/extensions/erc1155"; // Added getNFT
+import { getNFT } from "thirdweb/extensions/erc1155";
 
 interface DropCardProps {
   nft: NftData;
@@ -16,7 +16,7 @@ const DropCard: React.FC<DropCardProps> = ({ nft, client }) => {
   const [isLoadingDescription, setIsLoadingDescription] = useState<boolean>(true);
   const [errorDescription, setErrorDescription] = useState<string | null>(null);
   const [isCopied, setIsCopied] = useState(false);
-  const [showDescription, setShowDescription] = useState(false); // Added state for description visibility
+  const [showInfo, setShowInfo] = useState(false); // State for showing info
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text).then(() => {
@@ -41,10 +41,9 @@ const DropCard: React.FC<DropCardProps> = ({ nft, client }) => {
           chain: polygon,
           address: nft.editionContractAddress,
         });
-        // Assuming tokenId is 0n based on data structure and common practice for these drops
         const nftMetadata = await getNFT({
           contract,
-          tokenId: 0n, 
+          tokenId: 0n,
         });
         setFetchedDescription(nftMetadata.metadata.description || "No description available.");
       } catch (error) {
@@ -61,8 +60,8 @@ const DropCard: React.FC<DropCardProps> = ({ nft, client }) => {
   const contractAddressToDisplay = nft.editionContractAddress;
 
   return (
-    <div className="group overflow-hidden h-[400px] flex flex-col">
-      <div className="aspect-square w-full overflow-hidden rounded-t-lg">
+    <div className="card-base group overflow-hidden h-[400px] flex flex-col"> {/* Reverted to original card-base class */}
+      <div className="w-full overflow-hidden rounded-lg h-[300px]"> {/* Removed aspect-square, changed rounded-t-lg to rounded-lg, added h-[300px] */}
         <MediaRenderer
           client={client}
           src={nft.image}
@@ -74,45 +73,14 @@ const DropCard: React.FC<DropCardProps> = ({ nft, client }) => {
         <h3 className="text-2xl font-bold text-slate-100 mb-2 truncate" title={nft.name}>
           {nft.name}
         </h3>
-        {isLoadingDescription ? (
-          <p className="text-slate-500 text-sm mb-3">Loading description...</p>
-        ) : errorDescription ? (
-          <p className="text-red-500 text-sm mb-3">{errorDescription}</p>
-        ) : (
-          // Conditionally render description and close button based on showDescription state
-          showDescription && fetchedDescription && (
-            <div className="relative"> {/* Added relative positioning for the close button */}
-              <p className="text-slate-300 text-sm mb-3 pr-6 leading-relaxed"> {/* Styled description text */}
-                {fetchedDescription} {/* Show full description */}
-              </p>
-              <button
-                onClick={() => setShowDescription(false)}
-                className="absolute top-2 right-2 text-slate-400 hover:text-slate-200 focus:outline-none p-1 rounded-md border border-slate-600 hover:border-slate-500 transition-colors text-xs font-bold" // Modern styled close button
-                aria-label="Hide description"
-              >
-                X
-              </button>
-            </div>
-          )
-        )}
-        {/* Show Info button */}
-        {/* Show Info button */}
-        {!showDescription && (
-          <button
-            onClick={() => setShowDescription(true)}
-            className="button-primary w-full mt-auto text-xs py-1 px-2" // Styled Show Info button, made smaller
-          >
-            Show Info
-          </button>
-        )}
         <div className="mb-4">
-          <p className="text-lg font-semibold text-cyan-400"> {/* Price color updated */}
+          <p className="text-lg font-semibold text-cyan-400">
             {nft.price ? nft.price : 'N/A'} {nft.currencySymbol}
           </p>
           <div className="text-xs text-slate-400 mt-1 flex items-center" title={`Contract: ${contractAddressToDisplay}`}>
             <span>Contract: {contractAddressToDisplay.substring(0, 6)}...{contractAddressToDisplay.substring(contractAddressToDisplay.length - 4)}</span>
-            <button 
-              onClick={() => handleCopy(contractAddressToDisplay)}
+            <button
+              onClick={(e) => { e.stopPropagation(); handleCopy(contractAddressToDisplay); }}
               className="ml-2 p-1 rounded bg-transparent hover:bg-transparent border border-slate-600 hover:border-slate-500 transition-all shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm"
               aria-label="Copy contract address"
             >
@@ -120,10 +88,21 @@ const DropCard: React.FC<DropCardProps> = ({ nft, client }) => {
             </button>
           </div>
         </div>
-        
-        {/* Spacer div to push button to the bottom */}
-        <div className="flex-grow"></div>
-
+        {showInfo && ( // Conditionally render info section
+          <div className="flex-grow overflow-y-auto mb-4"> {/* Added overflow-y-auto and mb-4 */}
+            <h4 className="text-lg font-bold text-slate-100 mb-2">Description</h4> {/* Changed to h4 */}
+            {isLoadingDescription ? (
+              <p className="text-slate-500 text-sm">Loading description...</p>
+            ) : errorDescription ? (
+              <p className="text-red-500 text-sm">{errorDescription}</p>
+            ) : (
+              <p className="text-slate-300 text-sm leading-relaxed">
+                {fetchedDescription}
+              </p>
+            )}
+          </div>
+        )}
+        <div className="flex-grow"></div> {/* Spacer */}
         <ClaimButton
           contractAddress={nft.editionContractAddress}
           chain={polygon}
@@ -133,13 +112,20 @@ const DropCard: React.FC<DropCardProps> = ({ nft, client }) => {
             tokenId: 0n,
             quantity: 1n,
           }}
-          // onClaimSuccess={(receipt) => alert(`Claimed! Tx: ${receipt.transactionHash}`)}
-          // onClaimError={(err) => alert(`Claim error: ${err.message}`)}
-          // Apply the new button-primary style, keep w-full for layout
-          className="button-primary w-full mt-auto" // Added mt-auto to stick to bottom if content is short
+          className="button-primary w-full mt-auto"
         >
           Claim NFT
         </ClaimButton>
+        <button
+          onClick={(e) => { // Add event parameter
+            e.stopPropagation(); // Stop event propagation
+            setShowInfo(!showInfo);
+            console.log('Show Info toggled:', !showInfo); // Add console log
+          }} // Toggle showInfo state
+          className="crystal-button mt-2"
+        >
+          {showInfo ? 'Hide Info' : 'Show Info'} {/* Button text changes based on state */}
+        </button>
       </div>
     </div>
   );

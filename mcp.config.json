@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "thirdweb-dev Docs": {
+      "url": "https://gitmcp.io/orgs/thirdweb-dev",
+      "disabled": false,
+      "autoApprove": []
+    }
+  }
+}

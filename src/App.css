@@ -416,7 +416,7 @@ body.mobile-mode .mobile-logo {
 
 .nft-cards-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive columns */
+  grid-template-columns: repeat(2, 1fr); /* Two columns */
   gap: 2rem; /* Gap between grid items */
   justify-items: center; /* Center items within the grid */
   padding: 1rem; /* Add some padding around the grid */
@@ -428,7 +428,17 @@ body.mobile-mode .mobile-logo {
   box-sizing: border-box; /* Include padding and border in element's total width and height */
 }
 
-/* No specific media query needed for basic responsiveness with auto-fit */
+/* Responsive adjustment for single column on smaller screens */
+@media (max-width: 768px) {
+  .nft-cards-container {
+    grid-template-columns: 1fr; /* Single column on small screens */
+    gap: 1rem; /* Adjust gap for single column */
+  }
+
+  .nft-cards-container > .card-base {
+    max-width: none; /* Remove max width in single column */
+  }
+}
 
 .crystal-button {
   background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent white */

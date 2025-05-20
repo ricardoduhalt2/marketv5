@@ -55,6 +55,20 @@ export default tseslint.config({
 
 ## AI Agent Changelog
 
+**2025-05-19, 7:56:00 p. m. (America/Cancun, UTC-5:00):**
+- **Implemented Two-Column Layout and Fixed DropCard Buttons:**
+  - Implemented a two-column layout for the NFT cards using direct CSS in `src/App.css` to ensure consistent visibility.
+  - Removed the non-functional "Flip Card" button from `src/components/DropCard.tsx`.
+  - Restored the "Show Info" button in `src/components/DropCard.tsx` to toggle the display of the NFT description.
+  - **Status:** Project is working correctly up to this point. ✅
+
+**2025-05-19, 2:16:16 p. m. (America/Cancun, UTC-5:00):**
+- **Implemented Two-Column Layout and Fixed DropCard Buttons:**
+  - Implemented a two-column layout for the NFT cards using direct CSS in `src/App.css` to ensure consistent visibility.
+  - Removed the non-functional "Flip Card" button from `src/components/DropCard.tsx`.
+  - Restored the "Show Info" button in `src/components/DropCard.tsx` to toggle the display of the NFT description.
+  - **Status:** Project is working correctly up to this point. ✅
+
 **2025-05-19, 10:32:06 a. m. (America/Cancun, UTC-5:00):**
 - **Pushed project to GitHub:** Successfully pushed all project files to the GitHub repository.
 

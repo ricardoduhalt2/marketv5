@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "@react-three/fiber": "^9.1.2",
     "autoprefixer": "^10.4.21",
     "i18next": "^25.1.2",
     "postcss": "^8.5.3",
@@ -18,7 +19,8 @@
     "react-dom": "^19.1.0",
     "react-i18next": "^15.5.1",
     "tailwindcss": "^4.1.6",
-    "thirdweb": "^5.98.0"
+    "thirdweb": "^5.98.0",
+    "three": "^0.176.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
