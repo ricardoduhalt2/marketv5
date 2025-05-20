@@ -2,7 +2,7 @@
   --primary-color: #6a11cb;
   --secondary-color: #2575fc;
   --accent-color: #ff6b6b;
-  --turquoise-glow: #00f2ea; /* New turquoise color for glow */
+  --turquoise-glow: #00ff00; /* Bright green color for glow */
   --neon-pink: #ff00ff;
   --neon-violet: #8f00ff;
   --text-color: #f0f0f0;
@@ -42,7 +42,7 @@ body::before { /* Pseudo-element for background shifting light effect */
   bottom: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle at top left, rgba(var(--turquoise-glow-rgb, 0, 242, 234), 0.1), transparent 40%),
+  background: radial-gradient(circle at top left, rgba(0, 255, 0, 0.1), transparent 40%),
               radial-gradient(circle at bottom right, rgba(var(--primary-color-rgb, 106, 17, 203), 0.15), transparent 50%);
   background-size: 200% 200%;
   animation: backgroundShift 20s linear infinite alternate;
@@ -92,6 +92,16 @@ body::before { /* Pseudo-element for background shifting light effect */
   -webkit-text-fill-color: transparent;
   text-shadow: 0 0 10px rgba(255, 107, 107, 0.3);
   animation: animatedGradient 4s linear infinite; /* Apply animation */
+}
+
+.arte-eterno-gradient {
+  font-weight: bold;
+  background: linear-gradient(45deg, var(--primary-color), var(--accent-color), var(--primary-color));
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 10px rgba(255, 107, 107, 0.3);
+  animation: animatedGradient 4s linear infinite;
 }
 
 @keyframes animatedGradient {
@@ -156,7 +166,7 @@ body::before { /* Pseudo-element for background shifting light effect */
 
 .card-base:hover {
   transform: translateY(-10px) scale(1.02);
-  box-shadow: 0 0 25px 0px var(--turquoise-glow), 0 12px 40px 0 rgba(31, 38, 135, 0.5); /* Added turquoise glow */
+  box-shadow: 0 0 10px 2px var(--turquoise-glow); /* Thin, bright green glow */
 }
 
 /* Animation delay for staggered effect */
@@ -356,4 +366,84 @@ body.mobile-mode .desktop-logo {
 
 body.mobile-mode .mobile-logo {
   display: block; /* Visible in mobile mode */
+}
+/* Card Flip Styles */
+.card-container {
+  width: 100%;
+  height: 400px; /* Fixed height for consistent flip */
+  perspective: 1000px; /* 3D perspective */
+  cursor: pointer; /* Indicate interactivity */
+}
+
+.card-container.flipped .card-inner {
+  transform: rotateY(180deg);
+}
+
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.6s;
+  transform-style: preserve-3d; /* Keep 3D transformations */
+}
+
+.card-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden; /* Hide the back face during flip */
+  backface-visibility: hidden;
+  border-radius: 16px; /* Match card-base border-radius */
+  background: var(--card-bg); /* Apply background from card-base */
+  border: 1px solid var(--card-border); /* Apply border from card-base */
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37); /* Apply shadow from card-base */
+  backdrop-filter: blur(4px); /* Apply backdrop-filter from card-base */
+  -webkit-backdrop-filter: blur(4px); /* Apply backdrop-filter from card-base */
+  overflow: hidden; /* Hide overflowing content during flip */
+}
+
+.card-front {
+  /* Styles for the front of the card */
+}
+
+.card-back {
+  transform: rotateY(180deg); /* Initially rotated for the back face */
+  display: flex; /* Use flexbox for content alignment */
+  flex-direction: column;
+  justify-content: space-between; /* Space out content and button */
+}
+
+.nft-cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive columns */
+  gap: 2rem; /* Gap between grid items */
+  justify-items: center; /* Center items within the grid */
+  padding: 1rem; /* Add some padding around the grid */
+}
+
+.nft-cards-container > .card-base {
+  width: 100%; /* Ensure cards take full width of grid item */
+  max-width: 400px; /* Optional: Limit max width of individual cards */
+  box-sizing: border-box; /* Include padding and border in element's total width and height */
+}
+
+/* No specific media query needed for basic responsiveness with auto-fit */
+
+.crystal-button {
+  background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent white */
+  backdrop-filter: blur(5px); /* Apply blur for crystal effect */
+  -webkit-backdrop-filter: blur(5px); /* Safari support */
+  border: 1px solid rgba(255, 255, 255, 0.2); /* Subtle border */
+  color: var(--text-color); /* Use text color variable */
+  padding: 0.3rem 0.8rem; /* Smaller padding */
+  border-radius: 8px; /* Rounded corners */
+  font-size: 0.8rem; /* Smaller font size */
+  cursor: pointer;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.crystal-button:hover {
+  background-color: rgba(255, 255, 255, 0.2); /* Increase transparency on hover */
+  border-color: rgba(255, 255, 255, 0.3);
 }
