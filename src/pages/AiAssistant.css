@@ -1,0 +1,55 @@
+.glass-button {
+  transition: all 0.3s ease;
+}
+
+.glass-button:hover {
+  box-shadow: 0 0 30px rgba(106, 17, 203, 0.3);
+  transform: translateY(-1px);
+}
+
+.glass-button:active {
+  transform: translateY(1px);
+}
+
+.moving-gradient {
+  position: absolute;
+  inset: -100%;
+  background: linear-gradient(
+    60deg,
+    transparent 20%,
+    rgba(106, 17, 203, 0.1) 25%,
+    rgba(37, 117, 252, 0.1) 30%,
+    transparent 35%
+  );
+  animation: shine 3s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes shine {
+  from {
+    transform: translateX(-100%) rotate(45deg);
+  }
+  to {
+    transform: translateX(100%) rotate(45deg);
+  }
+}
+
+/* Glass effect enhancement for dark backgrounds */
+.glass-button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(106, 17, 203, 0.1) 50%,
+    rgba(37, 117, 252, 0.1) 100%
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}

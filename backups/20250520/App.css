@@ -1,0 +1,939 @@
+:root {
+  --primary-color: #6a11cb;
+  --secondary-color: #2575fc;
+  --accent-color: #ff6b6b;
+  --turquoise-glow: #00ff00; /* Bright green color for glow */
+  --neon-pink: #ff00ff;
+  --neon-violet: #8f00ff;
+  --text-color: #f0f0f0;
+  --bg-color-start: #0a0a14;
+  --bg-color-end: #000000;
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --card-border: rgba(255, 255, 255, 0.1);
+  --input-bg: rgba(255, 255, 255, 0.1);
+  --input-border: rgba(255, 255, 255, 0.2);
+  --button-bg: var(--primary-color);
+  --button-hover-bg: var(--secondary-color);
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: linear-gradient(135deg, var(--bg-color-start), var(--bg-color-end));
+  color: var(--text-color);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding-top: 2rem;
+  overflow-x: hidden; /* Prevent horizontal scroll from animations */
+  position: relative; /* For pseudo-element positioning */
+}
+
+body::before { /* Pseudo-element for background shifting light effect */
+  content: '';
+  position: fixed; /* Fixed to cover viewport */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at top left, rgba(0, 255, 0, 0.1), transparent 40%),
+              radial-gradient(circle at bottom right, rgba(var(--primary-color-rgb, 106, 17, 203), 0.15), transparent 50%);
+  background-size: 200% 200%;
+  animation: backgroundShift 20s linear infinite alternate;
+  z-index: -1; /* Behind all content */
+  opacity: 0.7;
+}
+
+@keyframes backgroundShift {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 100% 100%;
+  }
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient {
+  animation: gradient 3s ease infinite;
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+#root {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.nft-list-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 2rem;
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.nft-list-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.3s ease;
+  padding: 1rem;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.nft-list-item:hover {
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.nft-list-thumbnail {
+  width: 100%;
+  height: 200px;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.nft-list-name-container {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  margin-top: 0.5rem;
+  backdrop-filter: blur(4px);
+}
+
+.nft-list-name {
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 0.5rem;
+  line-height: 1.2;
+  color: white;
+  text-shadow: 
+    0 0 10px rgba(106, 17, 203, 0.8),
+    0 0 20px rgba(255, 107, 107, 0.5);
+  width: 100%;
+  display: block;
+  background: linear-gradient(45deg, var(--primary-color), var(--accent-color), var(--primary-color));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: animatedGradient 4s linear infinite;
+}
+
+.nft-detail-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.nft-title-container {
+  position: relative;
+  padding: 2rem;
+  border-radius: 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  isolation: isolate;
+  transition: all 0.5s ease-in-out;
+}
+
+.nft-detail-title {
+  font-size: 3.5rem;
+  font-weight: 900;
+  line-height: 1.2;
+  padding: 1rem;
+  background: linear-gradient(45deg, var(--primary-color), var(--accent-color), var(--neon-pink), var(--primary-color));
+  background-size: 300% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 30px rgba(255, 107, 107, 0.5);
+  animation: animatedGradient 6s linear infinite;
+  letter-spacing: -0.02em;
+  transform: perspective(1000px) translateZ(0);
+  transition: transform 0.3s ease;
+}
+
+.nft-detail-title:hover {
+  transform: perspective(1000px) translateZ(20px);
+}
+
+.collection-badge {
+  position: relative;
+  padding: 0.75rem 2rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  transform-style: preserve-3d;
+  transform: perspective(1000px) translateZ(0);
+}
+
+.collection-badge:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: perspective(1000px) translateZ(10px);
+  box-shadow: 
+    0 0 20px rgba(106, 17, 203, 0.3),
+    0 0 40px rgba(255, 107, 107, 0.2);
+}
+
+.collection-badge-text {
+  font-size: 1.25rem;
+  font-weight: 700;
+  background: linear-gradient(45deg, #fff, var(--neon-pink), #fff);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: animatedGradient 4s linear infinite;
+}
+
+.nft-detail-content {
+  margin-top: 2rem;
+  perspective: 2000px;
+}
+
+.nft-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  padding: 1rem;
+}
+
+@media (max-width: 768px) {
+  .nft-detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.nft-detail-media {
+  position: relative;
+  border-radius: 1rem;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nft-detail-media::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(
+    45deg,
+    var(--primary-color),
+    var(--accent-color),
+    var(--neon-pink),
+    var(--primary-color)
+  );
+  background-size: 400% 400%;
+  border-radius: 1rem;
+  z-index: -1;
+  animation: borderGradient 8s linear infinite;
+  filter: blur(8px);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.nft-detail-media:hover::after {
+  opacity: 0.5;
+}
+
+@keyframes borderGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.nft-detail-media img {
+  border-radius: 1rem;
+  transition: transform 0.3s ease;
+}
+
+.media-shine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: translateY(100%) rotate(45deg);
+  transition: transform 0.6s ease;
+}
+
+.nft-detail-media:hover .media-shine {
+  transform: translateY(-100%) rotate(45deg);
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  color: #ffffff;
+  text-decoration: none;
+  border-radius: 0.5rem;
+  background: linear-gradient(45deg, 
+    var(--primary-color) 0%,
+    #9333ea 50%,
+    var(--accent-color) 100%
+  );
+  border: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 600;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7),
+               0 0 10px rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2),
+              inset 0 2px 4px rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.back-link svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  transition: transform 0.3s ease;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.back-link:hover {
+  background: linear-gradient(45deg, 
+    var(--accent-color) 0%,
+    #f87171 50%,
+    var(--primary-color) 100%
+  );
+  transform: translateY(-2px);
+  box-shadow: 
+    0 0 20px rgba(106, 17, 203, 0.4),
+    0 0 40px rgba(255, 107, 107, 0.2),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2);
+}
+
+.back-link:hover svg {
+  transform: translateX(-3px);
+}
+
+.back-link:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  width: 90%; /* Reduced width */
+  max-width: 1280px; /* Keep max width */
+  margin: 0 auto; /* Center the container */
+}
+
+.header {
+  margin-bottom: 2rem;
+  animation: fadeInDown 1s ease-out;
+}
+
+.header h1 {
+  /* font-size is now handled by Tailwind utility class in App.tsx */
+  font-weight: bold;
+  background: linear-gradient(45deg, var(--primary-color), var(--accent-color), var(--primary-color)); /* Added third color stop for smoother loop */
+  background-size: 200% auto; /* Make background larger than element to allow movement */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 10px rgba(255, 107, 107, 0.3);
+  animation: animatedGradient 4s linear infinite; /* Apply animation */
+}
+
+.arte-eterno-gradient {
+  font-weight: bold;
+  background: linear-gradient(45deg, var(--primary-color), var(--accent-color), var(--primary-color));
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 10px rgba(255, 107, 107, 0.3);
+  animation: animatedGradient 4s linear infinite;
+}
+
+@keyframes animatedGradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.app-logo { /* New class for the main app logo */
+  transition: filter 0.3s ease-in-out;
+  animation: neonHeartbeat 12s ease-in-out infinite; /* New animation */
+  /* width: 100px; */ /* Removed to restore original size via Tailwind */
+  height: auto;
+}
+
+@keyframes neonHeartbeat {
+  0%, 100% {
+  filter: drop-shadow(0 0 1px #ffffff)
+          drop-shadow(0 0 2px #ffffff);
+  transform: scale(1);
+}
+  50% {
+    filter: drop-shadow(0 0 3px var(--turquoise-glow))
+            drop-shadow(0 0 6px var(--neon-pink));
+    transform: scale(1.05); /* Subtle pulse */
+  }
+}
+
+.logo { /* Existing .logo class, ensure it doesn't conflict or re-style if needed */
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms, transform 300ms ease-in-out;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+  transform: scale(1.1) rotate(5deg);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+  transform: scale(1.1) rotate(-5deg);
+}
+
+.card-base {
+  background: var(--card-bg);
+  border-radius: 16px;
+  padding: 1.5rem; /* Reduced padding from 2rem to 1.5rem */
+  border: 1px solid var(--card-border);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  animation: fadeInUp 0.5s ease-out forwards;
+  opacity: 0; /* Start hidden for animation */
+}
+
+.card-base:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 0 10px 2px var(--turquoise-glow); /* Thin, bright green glow */
+}
+
+/* Animation delay for staggered effect */
+.card-base:nth-child(1) { animation-delay: 0.1s; }
+.card-base:nth-child(2) { animation-delay: 0.2s; }
+.card-base:nth-child(3) { animation-delay: 0.3s; }
+/* Add more if needed */
+
+
+.input-field, .select-field {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  color: var(--text-color);
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.input-field:focus, .select-field:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.3);
+}
+
+.button-primary {
+  background-color: var(--button-bg);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.button-primary:hover {
+  background-color: var(--button-hover-bg);
+  transform: translateY(-2px);
+}
+
+.button-primary:active {
+  transform: translateY(0px);
+}
+
+.results-area {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: var(--card-bg);
+  border-radius: 12px;
+  border: 1px solid var(--card-border);
+  animation: fadeIn 1s ease-out 0.5s; /* Delay fadeIn for results */
+  animation-fill-mode: backwards; /* Apply styles before animation starts */
+  min-height: 100px; /* Ensure it has some height even when empty */
+}
+
+.results-area h3 {
+  color: var(--accent-color);
+  margin-bottom: 1rem;
+}
+
+.loading-spinner {
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-left-color: var(--accent-color);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 2rem auto;
+}
+
+/* Keyframe Animations */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .header h1 {
+    font-size: 2.5rem;
+  }
+  .card-base {
+    padding: 1.5rem;
+  }
+  .input-field, .select-field, .button-primary {
+    font-size: 0.9rem;
+  }
+}
+
+.read-the-docs {
+  color: #aaa; /* Softer color for less important text */
+  margin-top: 2rem;
+  font-size: 0.9em;
+}
+
+/* Marquee styles */
+.marquee-container {
+  width: 100%; /* Or a specific width if you prefer */
+  overflow: hidden;
+  white-space: nowrap;
+  box-sizing: border-box;
+  text-align: center; /* Center the text */
+}
+
+.marquee-text {
+  display: inline-block;
+  /* padding-left: 100%; */ /* Removed padding */
+  animation: marquee 30s linear infinite !important; /* Added !important */
+  white-space: nowrap; /* Crucial for preventing wrap */
+  will-change: transform;
+  color: var(--text-color);
+  margin: 0;
+  /* text-4xl from Tailwind handles font size, Tailwind's mt-4 handles top margin FOR THE CONTAINER */
+}
+
+@keyframes marquee {
+  0%   { transform: translateX(100%); }  /* Start off-screen to the right (of container) */
+  100% { transform: translateX(-100%); } /* End off-screen to the left (of its own width) */
+}
+
+/* Mobile mode indicator styles */
+.mobile-mode-indicator {
+  display: none; /* Hidden by default */
+  color: var(--accent-color); /* Or any color you prefer */
+  font-weight: bold;
+  margin-top: 1rem;
+}
+
+body.mobile-mode .mobile-mode-indicator {
+  display: block; /* Visible in mobile mode */
+}
+
+/* Footer static marquee text styles */
+.footer-marquee-text {
+  display: inline-block;
+  white-space: nowrap;
+  margin: 0;
+  /* Inherit font size from parent or set explicitly if needed */
+  font-weight: bold; /* Added bold font weight */
+  background: linear-gradient(45deg, var(--primary-color), var(--accent-color), var(--primary-color)); /* Added gradient */
+  background-size: 200% auto; /* Make background larger than element to allow movement */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 10px rgba(255, 107, 107, 0.3); /* Added text shadow */
+  animation: animatedGradient 4s linear infinite; /* Apply animation */
+}
+
+/* Logo visibility based on mobile mode */
+.desktop-logo {
+  display: block; /* Visible by default */
+}
+
+.mobile-logo {
+  display: none; /* Hidden by default */
+}
+
+body.mobile-mode .desktop-logo {
+  display: none; /* Hidden in mobile mode */
+}
+
+body.mobile-mode .mobile-logo {
+  display: block; /* Visible in mobile mode */
+}
+/* Card Flip Styles */
+.card-container {
+  width: 100%;
+  height: 400px; /* Fixed height for consistent flip */
+  perspective: 1000px; /* 3D perspective */
+  cursor: pointer; /* Indicate interactivity */
+}
+
+.card-container.flipped .card-inner {
+  transform: rotateY(180deg);
+}
+
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.6s;
+  transform-style: preserve-3d; /* Keep 3D transformations */
+}
+
+.card-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden; /* Hide the back face during flip */
+  backface-visibility: hidden;
+  border-radius: 16px; /* Match card-base border-radius */
+  background: var(--card-bg); /* Apply background from card-base */
+  border: 1px solid var(--card-border); /* Apply border from card-base */
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37); /* Apply shadow from card-base */
+  backdrop-filter: blur(4px); /* Apply backdrop-filter from card-base */
+  -webkit-backdrop-filter: blur(4px); /* Apply backdrop-filter from card-base */
+  overflow: hidden; /* Hide overflowing content during flip */
+}
+
+.card-front {
+  /* Styles for the front of the card */
+}
+
+.card-back {
+  transform: rotateY(180deg); /* Initially rotated for the back face */
+  display: flex; /* Use flexbox for content alignment */
+  flex-direction: column;
+  justify-content: space-between; /* Space out content and button */
+}
+
+.nft-cards-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Two columns */
+  gap: 2rem; /* Gap between grid items */
+  justify-items: center; /* Center items within the grid */
+  padding: 1rem; /* Add some padding around the grid */
+}
+
+.nft-cards-container > .card-base {
+  width: 100%; /* Ensure cards take full width of grid item */
+  max-width: 400px; /* Optional: Limit max width of individual cards */
+  box-sizing: border-box; /* Include padding and border in element's total width and height */
+}
+
+/* Responsive adjustment for single column on smaller screens */
+@media (max-width: 768px) {
+  .nft-cards-container {
+    grid-template-columns: 1fr; /* Single column on small screens */
+    gap: 1rem; /* Adjust gap for single column */
+  }
+
+  .nft-cards-container > .card-base {
+    max-width: none; /* Remove max width in single column */
+  }
+}
+
+.crystal-button {
+  background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent white */
+  backdrop-filter: blur(5px); /* Apply blur for crystal effect */
+  -webkit-backdrop-filter: blur(5px); /* Safari support */
+  border: 1px solid rgba(255, 255, 255, 0.2); /* Subtle border */
+  color: var(--text-color); /* Use text color variable */
+  padding: 0.3rem 0.8rem; /* Smaller padding */
+  border-radius: 8px; /* Rounded corners */
+  font-size: 0.8rem; /* Smaller font size */
+  cursor: pointer;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.crystal-button:hover {
+  background-color: rgba(255, 255, 255, 0.2); /* Increase transparency on hover */
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Card Interactive Styles */
+.card-interactive {
+  position: relative;
+  padding: 2rem;
+  border-radius: 1rem;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.card-interactive:hover {
+  transform: translateY(-5px);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.card-content {
+  position: relative;
+  z-index: 1;
+}
+
+.info-section {
+  margin-bottom: 2rem;
+}
+
+.description-container {
+  position: relative;
+  padding: 1.5rem;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+  transition: all 0.3s ease;
+  transform: translateZ(0);
+}
+
+.description-container:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 
+    0 0 20px rgba(106, 17, 203, 0.2),
+    0 0 40px rgba(255, 107, 107, 0.1);
+}
+
+.description-text {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: var(--text-color);
+  margin-bottom: 1rem;
+}
+
+.metadata-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.metadata-item {
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.metadata-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px);
+}
+
+.metadata-label {
+  display: block;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 0.5rem;
+}
+
+.metadata-value {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-color);
+  word-break: break-all;
+}
+
+.contract-address {
+  cursor: pointer;
+  transition: color 0.2s ease;
+  position: relative;
+}
+
+.contract-address:hover {
+  color: var(--accent-color);
+}
+
+.copied-tooltip {
+  position: absolute;
+  top: -2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.8rem;
+  pointer-events: none;
+  animation: fadeInOut 2s ease;
+}
+
+.claim-section {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.claim-button {
+  background: linear-gradient(45deg, 
+    var(--primary-color) 0%,
+    #9333ea 50%,
+    var(--accent-color) 100%
+  ) !important;
+  color: #ffffff !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7),
+               0 0 10px rgba(255, 255, 255, 0.3) !important;
+  font-weight: 800 !important;
+  padding: 1rem 2rem !important;
+  letter-spacing: 0.05em !important;
+  border-radius: 0.5rem !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border: none !important;
+  cursor: pointer;
+  width: 100% !important;
+  max-width: 300px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  font-size: 1.1rem !important;
+  position: relative;
+  overflow: hidden;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 auto !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2),
+              inset 0 2px 4px rgba(255, 255, 255, 0.1) !important;
+}
+
+.claim-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(
+    115deg,
+    transparent 0%,
+    transparent 25%,
+    rgba(255, 255, 255, 0.2) 45%,
+    rgba(255, 255, 255, 0.2) 50%,
+    transparent 75%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+}
+
+.claim-button:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 
+    0 0 20px rgba(106, 17, 203, 0.4),
+    0 0 40px rgba(255, 107, 107, 0.2),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2) !important;
+  background: linear-gradient(45deg, 
+    var(--accent-color) 0%,
+    #f87171 50%,
+    var(--primary-color) 100%
+  ) !important;
+}
+
+.claim-button:hover::before {
+  transform: translateX(0);
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0; }
+  10%, 90% { opacity: 1; }
+}
+
+/* Perspective container for 3D effects */
+.perspective {
+  perspective: 2000px;
+}

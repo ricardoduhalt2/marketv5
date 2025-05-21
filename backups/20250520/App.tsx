@@ -7,13 +7,11 @@ import NFTList from './components/NFTList';
 import NFTDetail from './components/NFTDetail';
 import AiAssistantButton from './components/AiAssistantButton';
 import AiAssistant from './pages/AiAssistant';
-import ParticlesBackground from './components/ParticlesBackground';
 
 function App() {
   return (
     <div className="app-container">
-      <ParticlesBackground />
-      <header className="header relative z-10 w-full max-w-7xl flex flex-col items-center py-4 mb-6 px-3 sm:py-6 sm:mb-10 sm:px-6 lg:px-8">
+      <header className="header w-full max-w-7xl flex flex-col items-center py-4 mb-6 px-3 sm:py-6 sm:mb-10 sm:px-6 lg:px-8">
         <div className="flex flex-col items-center text-center min-w-0 overflow-hidden w-full">
           <img
             src="https://petgascoin.com/wp-content/uploads/2025/05/UCA-logo-fondo-blanco-horizontal-1-scaled-e1746841493573.png"

@@ -7,10 +7,7 @@ A modern NFT marketplace for the Museum of Contemporary Art, Quintana Roo (MACQ)
 ## ✨ Features
 
 - 🎨 **Modern UI/UX**
-  - Dynamic space-themed particle background
-  - Interactive planets and UFOs with glow effects
-  - Vibrant shooting stars with colorful trails
-  - Smart particle system with variable brightness
+  - Interactive particle background with dynamic colors
   - iOS-optimized animations and effects
   - Gradient effects and smooth animations
   - Responsive design for all devices
@@ -74,39 +71,29 @@ npm run preview
 
 ## 🔄 Latest Updates (May 20, 2025)
 
-### Enhanced Visual Effects
-- 🌠 Added interactive space environment with planets and UFOs
-- ⭐ Enhanced shooting stars with colorful trails
-- 🪐 Implemented rotating planets with dynamic rings
-- 🛸 Added UFOs with pulsating lights
-- ✨ Improved particle glow effects and blending
-- 🌟 Dynamic brightness and opacity transitions
-- 💫 Optimized space object animations
-- 🚀 Enhanced performance for all devices
-
 ### Enhanced UI/UX
+- ✨ Added interactive particle background system
 - 🌈 Multi-color animated particles with blur effects
 - 📱 Improved iOS compatibility and performance
 - 🎨 Modernized button designs with gradient effects
 - 💫 Enhanced animations with hardware acceleration
 - 🔧 Fixed iOS-specific styling issues
 - ⚡️ Optimized background effects for mobile devices
+- 🎨 Improved collection display format
+- 📱 Enhanced mobile responsiveness
+- 💫 Added new animations and transitions
 
-### Performance Improvements
-- ⚡️ Optimized particle system rendering
-- 🔄 Added smart FPS control for mobile devices
-- 📱 Enhanced touch response
-- 🎯 Improved animation timing
+### Technical Improvements
+- 🚀 Upgraded to React 18.2.0
 - 🛠️ Optimized build process
 - 🔧 Fixed dependency conflicts
+- 📦 Improved package management
 
 ### New Features
-- 🤖 AI Chatbot with context-aware responses
-- 🎨 Dynamic particle effects
-- 📱 Intelligent device detection
-- ✨ Advanced animation system
-- 💫 Real-time price updates
+- 🤖 AI Chatbot integration
 - 🔄 Dynamic NFT description loading
+- 📱 Automatic mobile detection
+- ✨ Modern animations system
 
 ## 🔗 Links
 

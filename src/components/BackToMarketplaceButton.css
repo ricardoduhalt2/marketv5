@@ -1,0 +1,103 @@
+.back-marketplace-button {
+  position: relative;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, rgba(106, 17, 203, 0.15) 0%, rgba(37, 117, 252, 0.15) 100%);
+  border: 1px solid rgba(106, 17, 203, 0.25);
+  border-radius: 1rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06),
+    0 0 0 1px rgba(106, 17, 203, 0.1);
+}
+
+.button-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.back-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  transition: transform 0.3s ease;
+}
+
+.back-icon svg {
+  width: 100%;
+  height: 100%;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.button-text {
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.button-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: inherit;
+}
+
+/* Hover effects */
+.back-marketplace-button:hover {
+  transform: translateY(-1px);
+  background: linear-gradient(135deg, rgba(106, 17, 203, 0.2) 0%, rgba(37, 117, 252, 0.2) 100%);
+  border-color: rgba(106, 17, 203, 0.35);
+  box-shadow: 
+    0 4px 15px rgba(106, 17, 203, 0.25),
+    0 0 0 1px rgba(106, 17, 203, 0.2);
+}
+
+.back-marketplace-button:hover .button-glow {
+  opacity: 0.15;
+}
+
+.back-marketplace-button:hover .back-icon {
+  transform: translateX(-2px);
+}
+
+/* Active state */
+.back-marketplace-button:active {
+  transform: translateY(1px);
+  box-shadow: 
+    0 2px 8px rgba(106, 17, 203, 0.2),
+    0 0 0 1px rgba(106, 17, 203, 0.15);
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .back-marketplace-button {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+  }
+  
+  .button-content {
+    gap: 0.5rem;
+  }
+  
+  .back-icon {
+    width: 18px;
+    height: 18px;
+  }
+}

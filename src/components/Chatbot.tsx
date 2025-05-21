@@ -8,10 +8,14 @@ interface Message {
   sender: 'user' | 'bot';
 }
 
-const Chatbot: React.FC = () => {
+interface ChatbotProps {
+  fullPage?: boolean;
+}
+
+const Chatbot: React.FC<ChatbotProps> = ({ fullPage = false }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(fullPage);
   const [isTyping, setIsTyping] = useState(false);
   const [isInputDisabled, setIsInputDisabled] = useState(false);
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
@@ -38,18 +42,27 @@ const Chatbot: React.FC = () => {
     }
   }, [messages, isExpanded]);
 
-  // Close messages panel when clicking outside
+  // Only add click outside listener if not in fullPage mode
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const container = document.querySelector('.chatbot-container');
-      if (container && !container.contains(event.target as Node)) {
-        setIsExpanded(false);
-      }
-    };
+    if (!fullPage) {
+      const handleClickOutside = (event: MouseEvent) => {
+        const container = document.querySelector('.chatbot-container');
+        if (container && !container.contains(event.target as Node)) {
+          setIsExpanded(false);
+        }
+      };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [fullPage]);
+
+  // Focus input on mount for fullPage mode
+  useEffect(() => {
+    if (fullPage && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [fullPage]);
 
   const formatPrice = (price: string | undefined, symbol: string | undefined) => {
     if (!price || !symbol) return 'Precio no disponible';
@@ -133,7 +146,7 @@ const Chatbot: React.FC = () => {
     if (!input.trim() || isInputDisabled) return;
 
     setIsInputDisabled(true);
-    setIsExpanded(true);
+    if (!fullPage) setIsExpanded(true);
     
     const userMessage = input.trim();
     setInput('');
@@ -148,14 +161,32 @@ const Chatbot: React.FC = () => {
   };
 
   return (
-    <div className={`chatbot-container ${isExpanded ? 'expanded' : ''}`}>
+    <div className={`${fullPage ? 'chatbot-fullpage' : `chatbot-container ${isExpanded ? 'expanded' : ''}`}`}>
+      {fullPage && (
+        <div ref={messagesContainerRef} className="messages-container flex-1 mb-4">
+          {messages.map((message, index) => (
+            <div key={index} className={`message ${message.sender}`}>
+              <div className="message-content">{message.text}</div>
+            </div>
+          ))}
+          {isTyping && (
+            <div className="typing-indicator">
+              <div className="typing-dot"></div>
+              <div className="typing-dot"></div>
+              <div className="typing-dot"></div>
+            </div>
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+      )}
+
       <div className="chatbot-main">
         <div className="chatbot-input-wrapper">
           <input
             ref={inputRef}
             type="text"
             className="chatbot-input"
-            placeholder="Pregunta sobre nuestra colección..."
+            placeholder={fullPage ? "Escribe tu pregunta aquí..." : "Pregunta sobre nuestra colección..."}
             value={input}
             onChange={handleInputChange}
             onKeyPress={handleInputKeyPress}
@@ -171,24 +202,6 @@ const Chatbot: React.FC = () => {
               <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
             </svg>
           </button>
-        </div>
-      </div>
-
-      <div className="chatbot-messages-panel">
-        <div ref={messagesContainerRef} className="messages-container">
-          {messages.map((message, index) => (
-            <div key={index} className={`message ${message.sender}`}>
-              <div className="message-content">{message.text}</div>
-            </div>
-          ))}
-          {isTyping && (
-            <div className="typing-indicator">
-              <div className="typing-dot"></div>
-              <div className="typing-dot"></div>
-              <div className="typing-dot"></div>
-            </div>
-          )}
-          <div ref={messagesEndRef} />
         </div>
       </div>
     </div>
