@@ -128,7 +128,7 @@ const ParticlesBackground: React.FC = () => {
 
     // Dibujar planeta con efectos 3D mejorados
     const drawPlanet = (obj: SpaceObject) => {
-      const { x, y, size, color, glowColor, rotation } = obj;
+      const { x, y, size, glowColor, rotation } = obj;
       
       // Efecto de atmósfera exterior
       const atmosphereGradient = ctx.createRadialGradient(
@@ -218,7 +218,7 @@ const ParticlesBackground: React.FC = () => {
 
     // Mejorar visibilidad del OVNI
     const drawUFO = (obj: SpaceObject) => {
-      const { x, y, size, color, rotation, zigzagPhase = 0 } = obj;
+      const { x, y, size, color, rotation } = obj;
       
       // Efecto de luz principal debajo del OVNI
       const beamGradient = ctx.createRadialGradient(x, y + size, 0, x, y + size * 3, size * 3);
@@ -413,7 +413,7 @@ const ParticlesBackground: React.FC = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // Actualizar y dibujar objetos espaciales
-      spaceObjects.forEach((obj, index) => {
+      spaceObjects.forEach(obj => {
         if (obj.type === 'planet') {
           obj.rotation += 0.002;
           drawPlanet(obj);
