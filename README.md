@@ -13,7 +13,9 @@ A modern NFT marketplace for the Museum of Contemporary Art, Quintana Roo (MACQ)
   - Smart particle system with variable brightness
   - iOS-optimized animations and effects
   - Gradient effects and smooth animations
-  - Responsive design for all devices
+  - Advanced loading screen with space theme
+  - Floating UFO with dynamic movement
+  - Robot companion background animation
   - Glass-morphism effects and modern button styles
   - Dynamic hover states and transitions
 
@@ -78,11 +80,13 @@ npm run preview
 - 🌠 Added interactive space environment with planets and UFOs
 - ⭐ Enhanced shooting stars with colorful trails
 - 🪐 Implemented rotating planets with dynamic rings
-- 🛸 Added UFOs with pulsating lights
+- 🛸 Added animated UFO with wave motion and glow effects
+- 🤖 Integrated ambient robot animation background
 - ✨ Improved particle glow effects and blending
 - 🌟 Dynamic brightness and opacity transitions
 - 💫 Optimized space object animations
-- 🚀 Enhanced performance for all devices
+- 🚀 Enhanced loading screen experience
+- 🎆 Added smooth step-by-step loading animations
 
 ### Enhanced UI/UX
 - 🌈 Multi-color animated particles with blur effects

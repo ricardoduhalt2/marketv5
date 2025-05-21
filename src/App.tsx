@@ -8,8 +8,25 @@ import NFTDetail from './components/NFTDetail';
 import AiAssistantButton from './components/AiAssistantButton';
 import AiAssistant from './pages/AiAssistant';
 import ParticlesBackground from './components/ParticlesBackground';
+import LoadingPage from './components/LoadingPage';
+import { useState, useEffect } from 'react';
 
 function App() {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Simular carga de recursos
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 8000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isLoading) {
+    return <LoadingPage />;
+  }
+
   return (
     <div className="app-container">
       <ParticlesBackground />
