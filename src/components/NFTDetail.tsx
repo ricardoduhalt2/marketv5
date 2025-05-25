@@ -3,19 +3,14 @@ import { allNftsData as nftData, type NftData } from '../types';
 import type { NftMetadata } from '../types/nftMetadata';
 import DropCard from './DropCard';
 import { useActiveAccount, useConnect, MediaRenderer } from 'thirdweb/react';
-import { createWallet } from 'thirdweb/wallets';
 import { createThirdwebClient } from 'thirdweb';
+import { createWallet } from 'thirdweb/wallets';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 
 
 
 // Media type detection is handled by checking file extensions
-
-// Client de thirdweb - declarado fuera del componente para evitar recreación
-const client = createThirdwebClient({
-  clientId: import.meta.env.VITE_THIRDWEB_CLIENT_ID || 'YOUR_CLIENT_ID',
-});
 
 const NFTDetail = () => {
   const { id } = useParams();
@@ -138,6 +133,7 @@ const NFTDetail = () => {
     };
   }, [nft]);
 
+  // Inicializar el cliente de thirdweb
   const client = createThirdwebClient({
     clientId: import.meta.env.VITE_THIRDWEB_CLIENT_ID || 'YOUR_CLIENT_ID',
   });
