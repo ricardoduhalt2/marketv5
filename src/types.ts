@@ -9,7 +9,7 @@ export interface NftData {
   price?: string; // Formatted price string, e.g., "10 MATIC"
   currencySymbol?: string; // e.g., "MATIC" / "POL"
   splitContractAddress: string; // Smart contract address of the associated Split contract
-  tokenUri?: string; // IPFS or HTTP URI for metadata
+  tokenUri: string; // IPFS or HTTP URI for metadata (required)
   // sellerAddress (Split) is the splitContractAddress for now, recipient can be fetched
 }
 
@@ -39,6 +39,7 @@ export const allNftsData: NftData[] = [
   {
     id: "GCC",
     name: "Galactic Clean-Up Crew",
+    description: "A cosmic cleanup crew maintaining the balance of the galaxy.",
     image: formatIpfsUri("ipfs://QmNcTwgWp3rMW3RxSbeKArNHiSpA3qZmMYv61m7LKHj4N7/0.jpg"),
     editionContractAddress: "0xBF186Cb90ac092B16c97064046502c695340eEd9",
     splitContractAddress: "0x48791b0D7DD55FB6fde9b2e2F37DDe33507c8275",
@@ -49,6 +50,7 @@ export const allNftsData: NftData[] = [
   {
     id: "EVC",
     name: "C0mMzoVeRLoAD",
+    description: "An abstract digital artwork exploring the boundaries of perception.",
     image: formatIpfsUri("ipfs://QmYpogwdFMRonvU7p26S8JeUcU46TFk6aTBhGyyUEAX8E3/0.jpg"),
     editionContractAddress: "0xd988b058be7F2AfAa5dF95a17527ba14263Da394",
     splitContractAddress: "0xB9dCbBe08c33475C990251B173149bb774916C0B",
@@ -139,6 +141,7 @@ export const allNftsData: NftData[] = [
   {
     id: "FLC",
     name: "Floral Coral by IGLI",
+    description: "A beautiful fusion of floral and coral elements in a digital masterpiece.",
     image: formatIpfsUri("ipfs://QmTEdDpohzRWcpmZdMEGjb58bqs1YpgXR77TyASD7Ty1Ky/0.jpg"),
     editionContractAddress: "0xA57078A4Ad37db2B2da0df0810946d1Acdb4EE29",
     splitContractAddress: "0x1AC6Ef1fED07956Bc5fA3f8A02CC24E9a62AB345",

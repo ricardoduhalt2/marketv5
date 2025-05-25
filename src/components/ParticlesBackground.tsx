@@ -62,7 +62,7 @@ const ParticlesBackground: React.FC = () => {
     const spaceObjects: SpaceObject[] = [];
     const particleCount = isIOS ? 30 : 50;
     const colors = ['#6A11CB', '#2575FC', '#9D50BB', '#6E48AA'];
-    const starColors = ['#FFD700', '#FF8C00', '#FF69B4', '#87CEEB', '#FFF'];
+    const starColors = ['#FFD700', '#FF8C00', '#FF69B4', '#87CEEB', '#FFFFFF'];
     
     let animationFrameId: number;
     let lastTime = 0;
@@ -311,8 +311,15 @@ const ParticlesBackground: React.FC = () => {
             star.x - star.length * Math.cos(star.angle),
             star.y - star.length * Math.sin(star.angle)
           );
+          // Usar rgba para todos los colores del gradiente para mayor compatibilidad
           gradient.addColorStop(0, `rgba(255, 255, 255, ${star.opacity})`);
-          gradient.addColorStop(0.1, `${star.color}${Math.floor(star.opacity * 255).toString(16).padStart(2, '0')}`);
+          
+          // Convertir el color hexadecimal a RGB
+          const r = parseInt(star.color.slice(1, 3), 16);
+          const g = parseInt(star.color.slice(3, 5), 16);
+          const b = parseInt(star.color.slice(5, 7), 16);
+          
+          gradient.addColorStop(0.1, `rgba(${r}, ${g}, ${b}, ${star.opacity * 0.8})`);
           gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
           
           ctx.strokeStyle = gradient;
