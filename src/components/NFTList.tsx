@@ -144,19 +144,26 @@ const NFTList = () => {
   }
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 py-20">
+    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 py-12 sm:py-8 overflow-x-hidden overflow-y-auto">
       {/* Fondos animados */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="stars-container absolute inset-0"></div>
         <div className="ufos-container absolute inset-0"></div>
       </div>
       
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-purple-300">
-          Galería de Arte Digital
-        </h2>
+      <div className="relative z-10 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 min-h-full">
+        <div className="flex justify-center mb-12">
+          <div className="relative group">
+            <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-blue-500 rounded-2xl blur opacity-75 group-hover:opacity-100 transition duration-200 group-hover:duration-200 animate-tilt"></div>
+            <h2 className="relative px-6 py-3 bg-gradient-to-r from-purple-900/80 to-blue-900/80 backdrop-blur-sm text-2xl md:text-3xl font-bold text-center rounded-xl border border-purple-500/30 shadow-xl shadow-purple-500/10 overflow-hidden group">
+              <span className="bg-gradient-to-r from-blue-300 via-purple-400 to-pink-300 bg-clip-text text-transparent bg-300% animate-gradient">
+                Arte Eterno Collection
+              </span>
+            </h2>
+          </div>
+        </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-12">
           <AnimatePresence>
             {nfts.map((nft, index) => (
               <motion.div
@@ -169,9 +176,9 @@ const NFTList = () => {
                 layout
               >
                 <Link to={`/nft/${nft.id}`} className="block">
-                  <div className="relative overflow-hidden rounded-2xl bg-gray-800/50 backdrop-blur-sm border border-gray-700 hover:border-purple-500 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20">
+                  <div className="relative overflow-hidden rounded-2xl bg-gray-800/50 backdrop-blur-sm border border-gray-700 hover:border-purple-500 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20 h-full flex flex-col group" style={{ minHeight: '400px' }}>
                     {/* Imagen del NFT */}
-                    <div className="aspect-square overflow-hidden">
+                    <div className="h-64 overflow-hidden">
                       <img
                         src={nft.image}
                         alt={nft.name}

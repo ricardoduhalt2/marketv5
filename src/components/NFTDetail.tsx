@@ -222,10 +222,8 @@ const NFTDetail = () => {
             to="/" 
             className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
-            <svg className="-ml-1 mr-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
-            </svg>
-            Back to Gallery
+            <span className="hidden sm:inline">Back to Gallery</span>
+            <span className="sm:hidden">Back</span>
           </Link>
         </div>
       </div>
@@ -233,7 +231,7 @@ const NFTDetail = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 py-4 sm:py-8 px-3 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Back Button */}
         <div className="flex items-center mb-8">
@@ -241,18 +239,16 @@ const NFTDetail = () => {
             to="/" 
             className="inline-flex items-center text-gray-300 hover:text-white transition-colors duration-200"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
-            </svg>
-            <span>Back to Gallery</span>
+            <span className="hidden sm:inline">Back to Gallery</span>
+            <span className="sm:hidden">Back</span>
           </Link>
         </div>
 
         {/* NFT Title Section */}
-        <div className="relative mb-12 text-center group">
+        <div className="relative mb-8 md:mb-12 text-center group">
           <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 via-cyan-500/20 to-purple-500/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-          <div className="relative bg-gray-900/80 backdrop-blur-sm rounded-2xl p-8 overflow-hidden">
-            <h1 className="text-4xl md:text-5xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400 mb-4">
+          <div className="relative bg-gray-900/80 backdrop-blur-sm rounded-2xl p-4 md:p-8 overflow-hidden">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400 mb-4">
               {metadata?.name || nft.name}
             </h1>
             <div className="inline-flex items-center px-4 py-2 rounded-full bg-gray-800/80 border border-gray-700/50">
@@ -268,10 +264,10 @@ const NFTDetail = () => {
 
         {/* NFT Content */}
         <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12">
             {/* NFT Media */}
             <div className="group">
-              <div className="relative h-[500px] w-full transform-gpu transition-all duration-700 hover:scale-[1.02] rounded-2xl overflow-hidden">
+              <div className="relative h-[400px] md:h-[600px] w-full transform-gpu transition-all duration-700 hover:scale-[1.02] rounded-2xl overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-purple-900/30 via-gray-900 to-cyan-900/30"></div>
                 <div className="relative h-full w-full flex items-center justify-center p-4 md:p-8">
                   {isLoadingMetadata ? (
@@ -307,7 +303,7 @@ const NFTDetail = () => {
             </div>
 
             {/* NFT Details */}
-            <div className="transform-gpu transition-all duration-500 hover:translate-y-[-5px]">
+            <div className="transform-gpu transition-all duration-500 hover:translate-y-[-5px] mt-6 md:mt-0">
               <DropCard 
                 nft={nft} 
                 metadata={metadata}

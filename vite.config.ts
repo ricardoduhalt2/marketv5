@@ -18,6 +18,7 @@ export default defineConfig({
   },
   css: {
     devSourcemap: true,
+    postcss: './postcss.config.js',
   },
   build: {
     sourcemap: true,
@@ -33,5 +34,8 @@ export default defineConfig({
   },
   define: {
     'process.env': {},
+  },
+  optimizeDeps: {
+    include: ['@emotion/react', '@emotion/styled'],
   },
 });

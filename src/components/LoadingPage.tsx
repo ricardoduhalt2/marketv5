@@ -1,185 +1,165 @@
-import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import Spinner from './Spinner';
+import React, { useState, useEffect, useRef } from 'react';
+import './LoadingPage.css';
 
-interface LoadingPageProps {
-  onLoadingComplete: () => void;
+interface HUDLine {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  id?: string;
+  width?: number;
+  opacity?: number;
+  dashArray?: string;
+  dashOffset?: number;
+  color?: string;
 }
 
-const LoadingPage: React.FC<LoadingPageProps> = ({ onLoadingComplete }) => {
+const LoadingPage: React.FC = () => {
   const [progress, setProgress] = useState(0);
-  const [status, setStatus] = useState('Iniciando plataforma...');
+  const [status, setStatus] = useState('INITIALIZING SYSTEM');
+  const [subStatus, setSubStatus] = useState('Establishing quantum link...');
+  const [hudLines, setHudLines] = useState<HUDLine[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
+  // Removed unused dimensions state
 
+  // Create HUD lines based on dimensions
+  const createHudLines = (width: number, height: number): HUDLine[] => {
+    const lines: HUDLine[] = [];
+    const spacing = 50;
+    
+    // Vertical lines
+    for (let x = 0; x < width; x += spacing) {
+      lines.push({
+        x1: x,
+        y1: 0,
+        x2: x,
+        y2: height,
+        opacity: 0.1,
+        width: 1,
+        dashArray: '5,5',
+        dashOffset: 0
+      });
+    }
+    
+    // Horizontal lines
+    for (let y = 0; y < height; y += spacing) {
+      lines.push({
+        x1: 0,
+        y1: y,
+        x2: width,
+        y2: y,
+        opacity: 0.1,
+        width: 1,
+        dashArray: '5,5',
+        dashOffset: 0
+      });
+    }
+    
+    return lines;
+  };
+
+  // Initialize HUD elements
   useEffect(() => {
-    // Animación de carga simulada
+    const updateDimensions = () => {
+      if (containerRef.current) {
+        const { width, height } = containerRef.current.getBoundingClientRect();
+        setHudLines(createHudLines(width, height));
+      }
+    };
+    
+    // Initial setup
+    updateDimensions();
+    window.addEventListener('resize', updateDimensions);
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener('resize', updateDimensions);
+    };
+  }, []);
+
+  // Simulate loading progress
+  useEffect(() => {
     const timer = setInterval(() => {
       setProgress(prev => {
-        const newProgress = prev + Math.random() * 10;
+        const newProgress = prev + 1;
         
-        // Actualizar estado según el progreso
-        if (newProgress < 20) {
-          setStatus('Conectando a la red Ethereum...');
-        } else if (newProgress < 40) {
-          setStatus('Cargando contratos inteligentes...');
-        } else if (newProgress < 60) {
-          setStatus('Obteniendo activos digitales...');
-        } else if (newProgress < 80) {
-          setStatus('Preparando interfaz de usuario...');
+        // Update status messages based on progress
+        if (newProgress < 30) {
+          setStatus('INITIALIZING SYSTEM');
+          setSubStatus('Booting up quantum processors...');
+        } else if (newProgress < 70) {
+          setStatus('LOADING ASSETS');
+          setSubStatus('Decrypting data streams...');
+        } else if (newProgress < 90) {
+          setStatus('FINALIZING');
+          setSubStatus('Optimizing performance...');
         } else {
-          setStatus('¡Casi listo!');
+          setStatus('READY');
+          setSubStatus('All systems nominal');
         }
         
-        // Completar la carga al llegar al 100%
         if (newProgress >= 100) {
           clearInterval(timer);
-          setTimeout(() => {
-            onLoadingComplete();
-          }, 500);
           return 100;
         }
-        
         return newProgress;
       });
-    }, 300);
-
+    }, 100);
+    
     return () => clearInterval(timer);
-  }, [onLoadingComplete]);
+  }, []);
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: '#0f0e15',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 9999,
-      padding: '20px',
-      textAlign: 'center',
-      background: 'linear-gradient(135deg, #0f0e15 0%, #1e1b2e 100%)',
-      color: 'white',
-      overflow: 'hidden'
-    }}>
-      {/* Logo */}
-      <div style={{
-        marginBottom: '30px',
-        opacity: 0.9
-      }}>
-        <img 
-          src="https://petgascoin.com/wp-content/uploads/2025/05/UCA-logo-fondo-blanco-horizontal-1-scaled-e1746841493573.png" 
-          alt="MACQ Logo" 
-          style={{
-            height: '60px',
-            marginBottom: '20px',
-            filter: 'drop-shadow(0 0 10px rgba(168, 85, 247, 0.5))'
-          }}
-        />
-        <h1 style={{
-          fontSize: '2.5rem',
-          fontWeight: 700,
-          margin: '10px 0',
-          background: 'linear-gradient(90deg, #a855f7, #3b82f6)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text'
-        }}>
-          NFT Boutique Marketplace
-        </h1>
-        <p style={{
-          color: '#a0a0a0',
-          fontSize: '1.1rem',
-          marginTop: '5px'
-        }}>
-          Arte Eterno Collection - MACQ
-        </p>
+    <div className="loading-container" ref={containerRef}>
+      <div className="hud-overlay" />
+      
+      {/* Grid Background */}
+      <svg className="hud-lines" width="100%" height="100%">
+        {hudLines.map((line, index) => (
+          <line
+            key={index}
+            x1={line.x1}
+            y1={line.y1}
+            x2={line.x2}
+            y2={line.y2}
+            stroke={line.color || 'rgba(0, 200, 255, 0.1)'}
+            strokeWidth={line.width || 1}
+            strokeOpacity={line.opacity}
+            strokeDasharray={line.dashArray}
+            strokeDashoffset={line.dashOffset}
+          />
+        ))}
+      </svg>
+      
+      {/* Corner Decorations */}
+      <div className="hud-corner hud-corner-tl" />
+      <div className="hud-corner hud-corner-tr" />
+      <div className="hud-corner hud-corner-bl" />
+      <div className="hud-corner hud-corner-br" />
+      
+      {/* Animated Scan Line */}
+      <div className="hud-scanline" style={{ transform: `translateY(${progress}%)` }} />
+      
+      <div className="hud-content">
+        <div className="status-display">
+          <div className="status-title">System Status</div>
+          <div className="status-value">{status}</div>
+          <div className="status-subtitle">{subStatus}</div>
+        </div>
+        
+        <div className="progress-section">
+          <div className="progress-labels">
+            <span>Loading</span>
+            <span>{Math.round(progress)}%</span>
+          </div>
+          <div className="hud-progress-container">
+            <div 
+              className="hud-progress-bar" 
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        </div>
       </div>
-
-      {/* Spinner */}
-      <div style={{
-        position: 'relative',
-        width: '100%',
-        display: 'flex',
-        justifyContent: 'center',
-        margin: '30px 0',
-        minHeight: '80px'
-      }}>
-        <Spinner />
-      </div>
-
-      {/* Status Text */}
-      <p style={{
-        fontSize: '1.1rem',
-        margin: '20px 0',
-        color: '#e0e0e0',
-        maxWidth: '500px',
-        lineHeight: '1.5'
-      }}>
-        {status}
-      </p>
-
-      {/* Progress Bar */}
-      <div style={{
-        width: '100%',
-        maxWidth: '400px',
-        height: '6px',
-        backgroundColor: 'rgba(255, 255, 255, 0.1)',
-        borderRadius: '3px',
-        margin: '20px 0',
-        overflow: 'hidden'
-      }}>
-        <motion.div 
-          initial={{ width: '0%' }}
-          animate={{ width: `${progress}%` }}
-          transition={{ duration: 0.3, ease: 'easeInOut' }}
-          style={{
-            height: '100%',
-            background: 'linear-gradient(90deg, #a855f7, #3b82f6)',
-            borderRadius: '3px',
-            boxShadow: '0 0 10px rgba(168, 85, 247, 0.5)'
-          }}
-        />
-      </div>
-
-      {/* Progress Percentage */}
-      <p style={{
-        color: '#a0a0a0',
-        fontSize: '0.9rem',
-        marginTop: '10px'
-      }}>
-        {Math.round(progress)}% completado
-      </p>
-
-      {/* Animated background elements */}
-      {Array(20).fill(0).map((_, i) => (
-        <motion.div
-          key={i}
-          style={{
-            position: 'absolute',
-            width: '4px',
-            height: '4px',
-            backgroundColor: 'white',
-            borderRadius: '50%',
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            opacity: 0.7,
-            boxShadow: '0 0 10px 2px rgba(255, 255, 255, 0.8)'
-          }}
-          animate={{
-            opacity: [0.2, 0.8, 0.2],
-            scale: [1, 1.5, 1]
-          }}
-          transition={{
-            duration: 2 + Math.random() * 3,
-            repeat: Infinity,
-            repeatType: 'reverse',
-            delay: Math.random() * 2
-          }}
-        />
-      ))}
     </div>
   );
 };

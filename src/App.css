@@ -404,8 +404,9 @@ body::before { /* Pseudo-element for background shifting light effect */
 .app-logo { /* New class for the main app logo */
   transition: filter 0.3s ease-in-out;
   animation: neonHeartbeat 12s ease-in-out infinite; /* New animation */
-  /* width: 100px; */ /* Removed to restore original size via Tailwind */
-  height: auto;
+  /* Let Tailwind handle the width */
+  height: auto !important; /* Ensure height is auto */
+  max-width: 100%; /* Make sure it's responsive */
 }
 
 @keyframes neonHeartbeat {
@@ -609,18 +610,6 @@ body::before { /* Pseudo-element for background shifting light effect */
   100% { transform: translateX(-100%); } /* End off-screen to the left (of its own width) */
 }
 
-/* Mobile mode indicator styles */
-.mobile-mode-indicator {
-  display: none; /* Hidden by default */
-  color: var(--accent-color); /* Or any color you prefer */
-  font-weight: bold;
-  margin-top: 1rem;
-}
-
-body.mobile-mode .mobile-mode-indicator {
-  display: block; /* Visible in mobile mode */
-}
-
 /* Footer static marquee text styles */
 .footer-marquee-text {
   display: inline-block;
@@ -634,23 +623,6 @@ body.mobile-mode .mobile-mode-indicator {
   -webkit-text-fill-color: transparent;
   text-shadow: 0 0 10px rgba(255, 107, 107, 0.3); /* Added text shadow */
   animation: animatedGradient 4s linear infinite; /* Apply animation */
-}
-
-/* Logo visibility based on mobile mode */
-.desktop-logo {
-  display: block; /* Visible by default */
-}
-
-.mobile-logo {
-  display: none; /* Hidden by default */
-}
-
-body.mobile-mode .desktop-logo {
-  display: none; /* Hidden in mobile mode */
-}
-
-body.mobile-mode .mobile-logo {
-  display: block; /* Visible in mobile mode */
 }
 /* Card Flip Styles */
 .card-container {
