@@ -2,6 +2,7 @@ import type { NftData } from '../types';
 import type { NftMetadata, NftAttribute } from '../types/nftMetadata';
 import { useState } from 'react';
 import './DropCard.css';
+import './NFTDetailCard.css';
 import { useActiveAccount, useSendTransaction } from 'thirdweb/react';
 import { toWei } from 'thirdweb';
 import { polygon } from 'thirdweb/chains';
@@ -142,19 +143,19 @@ const DropCard: React.FC<DropCardProps> = ({
   const nftStandard = (nftProperties.standard || findAttribute('standard') || 'ERC-1155') as string;
 
   return (
-    <div className="card-interactive group w-full h-full">
-      <div className="card-content bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 sm:p-8 border border-gray-700/50 w-full h-full">
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+    <div className="nft-detail-card">
+      <div className="nft-detail-content">
+        <div className="detail-section">
+          <h2 className="text-2xl font-bold mb-2">
             Detalles de la Obra
           </h2>
           <p className="text-gray-300">Información detallada sobre esta pieza única de arte digital.</p>
         </div>
 
         {/* Descripción */}
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold mb-2 flex items-center">
-            <svg className="w-5 h-5 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <div className="detail-section">
+          <h3 className="flex items-center">
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             Descripción
@@ -172,40 +173,40 @@ const DropCard: React.FC<DropCardProps> = ({
         </div>
 
         {/* Detalles Técnicos */}
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold mb-2 flex items-center">
-            <svg className="w-5 h-5 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <div className="detail-section">
+          <h3 className="flex items-center">
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
             Detalles Técnicos
           </h3>
           {isLoadingMetadata ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {[...Array(4)].map((_, i) => (
-                <div key={i}>
-                  <div className="h-4 bg-gray-700 rounded w-1/3 mb-1"></div>
-                  <div className="h-4 bg-gray-700 rounded w-2/3"></div>
-                </div>
-              ))}
-            </div>
+            <div className="attributes-grid">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="attribute-item">
+                <span className="h-4 bg-gray-700 rounded w-1/3 mb-1 inline-block"></span>
+                <span className="h-4 bg-gray-700 rounded w-2/3 inline-block"></span>
+              </div>
+            ))}
+          </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-gray-400">Tamaño</p>
-                <p className="text-white">{nftSize}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-400">Formato</p>
-                <p className="text-white">{nftFormat.toUpperCase()}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-400">Blockchain</p>
-                <p className="text-white">{nftBlockchain}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-400">Token Estándar</p>
-                <p className="text-white">{nftStandard}</p>
-              </div>
+            <div className="attributes-grid">
+            <div className="attribute-item">
+              <span>Tamaño</span>
+              <span>{nftSize}</span>
+            </div>
+            <div className="attribute-item">
+              <span>Formato</span>
+              <span>{nftFormat.toUpperCase()}</span>
+            </div>
+              <div className="attribute-item">
+              <span>Blockchain</span>
+              <span>{nftBlockchain}</span>
+            </div>
+            <div className="attribute-item">
+              <span>Estándar</span>
+              <span>{nftStandard}</span>
+            </div>
             </div>
           )}
         </div>
@@ -231,36 +232,39 @@ const DropCard: React.FC<DropCardProps> = ({
         )}
 
         {/* Botón de Compra */}
-        <div className="mt-8">
+        <div className="detail-section mt-8">
           <button
             onClick={handleMint}
-            disabled={isMinting || !isConnected}
-            className={`mt-4 w-full px-6 py-3 rounded-lg font-medium transition-colors duration-200 ${
-              isMinting || !isConnected
-                ? 'bg-gray-500 cursor-not-allowed'
-                : 'bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white'
+            disabled={isMinting || isLoadingMetadata}
+            className={`w-full py-3 px-6 rounded-xl font-medium transition-all duration-300 ${
+              isMinting || isLoadingMetadata
+                ? 'bg-gray-600 cursor-not-allowed'
+                : 'bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-500 hover:from-blue-700 hover:via-purple-700 hover:to-cyan-600 transform hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-500/30 hover:shadow-cyan-500/20'
             }`}
           >
-            {!isConnected ? 'Connect Wallet to Mint' : isMinting ? 'Minting...' : 'Mint NFT'}
-          </button>
-          <p className="text-xs text-center text-gray-400 mt-2">
-            {isLoadingMetadata ? (
-              <span>Cargando detalles del precio...</span>
+            {isMinting ? (
+              <span className="flex items-center justify-center">
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Procesando...
+              </span>
             ) : isConnected ? (
-              `Precio: ${nft.price} ${nft.currencySymbol || 'MATIC'}`
+              'Adquirir por ' + nft.price + ' ' + nft.currencySymbol
             ) : (
-              'Conecta tu billetera para continuar'
+              'Conectar Billetera'
             )}
-          </p>
-          
-          {!isConnected && (
-            <div className="mt-4 p-3 bg-blue-500/10 rounded-lg border border-blue-500/30">
-              <p className="text-sm text-blue-300 text-center">
-                Necesitas conectar tu billetera para comprar este NFT
-              </p>
-            </div>
-          )}
+          </button>
         </div>
+        
+        {!isConnected && (
+          <div className="mt-4 p-3 bg-blue-500/10 rounded-lg border border-blue-500/30">
+            <p className="text-sm text-blue-300 text-center">
+              Necesitas conectar tu billetera para comprar este NFT
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -76,20 +76,28 @@ npm run preview
 
 ## 🌟 Latest Updates (May 28, 2025)
 
-### Futuristic Loading Experience
-- 🎨 Added futuristic HUD interface with orange/black theme
-- ⚡ Enhanced loading animations with hexagonal grid patterns
-- 🌌 Implemented dynamic scanline effects
-- 🔮 Added glowing UI elements and corner decorations
-- 📱 Optimized for all screen sizes
-- 🛠 Improved performance with optimized animations
+### Mejoras en la Interfaz de Detalles de NFT
+- 🎨 Implementado borde animado con gradiente para las tarjetas de NFT
+- ✨ Efectos de hover mejorados con brillo y sombras
+- 🖼️ Rediseño de la sección de detalles técnicos
+- 🌈 Paleta de colores mejorada con gradientes dinámicos
+- 📱 Diseño completamente responsivo para móviles y escritorio
+- ⚡ Optimización de rendimiento para animaciones suaves
 
-### Visual Enhancements
-- 🎭 Redesigned loading page with sci-fi aesthetics
-- ✨ Added dynamic particle effects
-- 🌈 Improved color scheme and contrast
-- 🖥 Enhanced responsive design
-- 🎮 Interactive elements with hover states
+### Futuristic Loading Experience
+- 🎨 Interfaz HUD futurista con tema naranja/negro
+- ⚡ Animaciones de carga mejoradas con patrones de cuadrícula hexagonal
+- 🌌 Efectos dinámicos de líneas de escaneo
+- 🔮 Elementos de interfaz luminosos y decoraciones de esquina
+- 📱 Optimizado para todos los tamaños de pantalla
+- 🛠 Mejor rendimiento con animaciones optimizadas
+
+### Mejoras Visuales
+- 🎭 Rediseño de la página de carga con estética de ciencia ficción
+- ✨ Efectos de partículas dinámicas
+- 🌈 Esquema de colores mejorado con mejor contraste
+- 🖥 Diseño responsivo mejorado
+- 🎮 Elementos interactivos con estados de hover
 
 ## 🔄 Previous Updates (May 27, 2025)
 
