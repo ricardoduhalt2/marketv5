@@ -1,6 +1,7 @@
 import type { NftData } from '../types';
 import type { NftMetadata, NftAttribute } from '../types/nftMetadata';
 import { useState } from 'react';
+import './DropCard.css';
 import { useActiveAccount, useSendTransaction } from 'thirdweb/react';
 import { toWei } from 'thirdweb';
 import { polygon } from 'thirdweb/chains';

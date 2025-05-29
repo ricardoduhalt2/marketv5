@@ -1,0 +1,74 @@
+/* Estilos para las tarjetas con efecto hover naranja brillante */
+.card-interactive {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.card-content {
+  position: relative;
+  z-index: 1;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: rgba(10, 10, 10, 0.7) !important;
+  border: 1px solid rgba(255, 107, 0, 0.3) !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.card-interactive::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 107, 0, 0.1) 0%, rgba(255, 60, 95, 0.1) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 0;
+}
+
+.card-interactive:hover {
+  transform: translateY(-4px);
+}
+
+.card-interactive:hover .card-content {
+  border-color: #ff6b00 !important;
+  box-shadow: 0 0 15px rgba(255, 107, 0, 0.7), 0 0 30px rgba(255, 140, 26, 0.3) !important;
+}
+
+.card-interactive:hover::before {
+  opacity: 1;
+}
+
+/* Efecto de borde brillante al pasar el mouse */
+.card-content::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #ff6b00, #ff3c5f, #ff6b00);
+  background-size: 200% 200%;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: inherit;
+  animation: borderGlow 3s ease infinite;
+}
+
+.card-interactive:hover .card-content::after {
+  opacity: 0.7;
+}
+
+@keyframes borderGlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}

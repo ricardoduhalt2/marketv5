@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState, useCallback } from 'react';
 import type { NftData } from '../types';
 import { toast } from 'react-hot-toast';
+import './NFTGrid.css';
 
 // Define animation variants for the list items
 const itemVariants = {
@@ -175,14 +176,15 @@ const NFTList = () => {
                 whileHover={{ y: -5, scale: 1.02 }}
                 layout
               >
-                <Link to={`/nft/${nft.id}`} className="block">
-                  <div className="relative overflow-hidden rounded-2xl bg-gray-800/50 backdrop-blur-sm border border-gray-700 hover:border-purple-500 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20 h-full flex flex-col group" style={{ minHeight: '400px' }}>
+                <Link to={`/nft/${nft.id}`} className="block nft-grid-container">
+                  <div className="nft-card">
+                    <div className="nft-card-content">
                     {/* Imagen del NFT */}
-                    <div className="h-64 overflow-hidden">
+                    <div className="nft-image-container">
                       <img
                         src={nft.image}
                         alt={nft.name}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        className="nft-image"
                         onError={(e) => {
                           // Fallback in case the image fails to load
                           const target = e.target as HTMLImageElement;
@@ -190,69 +192,46 @@ const NFTList = () => {
                           target.src = 'https://via.placeholder.com/400';
                         }}
                       />
-                      
-                      {/* Efecto de brillo al hacer hover */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     </div>
                     
                     {/* Información del NFT */}
-                    <div className="p-4">
-                      <h3 className="text-lg font-bold text-white mb-1 truncate">{nft.name}</h3>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium bg-gradient-to-r from-blue-400 to-purple-400 text-transparent bg-clip-text">
-                          {(() => {
-                            // Mapeo completo de IDs de NFT a nombres de artista
-                            const artistMap: {[key: string]: string} = {
-                              'TEM': 'Ms. Cosmic',
-                              'GCC': 'Pinche Chucho',
-                              'EVC': 'Daughter of the Son',
-                              'CMV': 'Pinche Chucho',
-                              'BBB': 'Daveed Benjamin',
-                              'IVT': 'ONA AOÉRA',
-                              'YSL': 'Tania Cuevas Martinez',
-                              'PSA': 'Pinche Chucho',
-                              'PLL': 'Pinche Chucho',
-                              'MOL': 'Char Puravida @peoplesSister',
-                              'HTC': 'Jolted',
-                              'FLC': 'IGLI',
-                              'SWH': 'Fractalicia',
-                              'RAI': 'Samu Gaia',
-                              'TRG': 'Jimi Cohen',
-                              'CHIDO': 'Ricardo Duhalt'
-                            };
-                            
-                            // Intentar obtener el nombre del artista del mapeo
-                            const artist = artistMap[nft.id];
-                            
-                            // Si no se encuentra en el mapeo, intentar extraer de alguna otra manera
-                            if (!artist) {
-                              // Caso 1: El nombre ya incluye "by" (ej: "Floral Coral by IGLI")
-                              if (nft.name.includes(' by ')) {
-                                return nft.name.split(' by ')[1].trim();
-                              }
-                              
-                              // Caso 2: Buscar en la descripción
-                              if (nft.description) {
-                                const byMatch = nft.description.match(/(?:By|Por|Artista|Artist)[\s:]+([^\n\.]+)/i);
-                                if (byMatch && byMatch[1]) {
-                                  return byMatch[1].trim();
-                                }
-                              }
-                              
-                              return <span className="text-gray-300">Artista</span>;
-                            }
-                            
-                            return artist;
-                          })()}
-                        </span>
-                        <span className="text-sm font-medium bg-gradient-to-r from-blue-400 to-purple-400 text-transparent bg-clip-text">
-                          {nft.price} {nft.currencySymbol}
-                        </span>
-                      </div>
+                    <div className="nft-info">
+                      <h3 className="nft-name">{nft.name}</h3>
+                      <p className="nft-artist">
+                        {(() => {
+                          // Mapeo completo de IDs de NFT a nombres de artista
+                          const artistMap: {[key: string]: string} = {
+                            'TEM': 'Ms. Cosmic',
+                            'GCC': 'Pinche Chucho',
+                            'EVC': 'Daughter of the Son',
+                            'CMV': 'Pinche Chucho',
+                            'BBB': 'Daveed Benjamin',
+                            'IVT': 'ONA AOÉRA',
+                            'YSL': 'Tania Cuevas Martinez',
+                            'PSA': 'Pinche Chucho',
+                            'PLL': 'Pinche Chucho',
+                            'MOL': 'Char Puravida',
+                            'HTC': 'Jolted',
+                            'FLC': 'IGLI',
+                            'SWH': 'Fractalicia',
+                            'RAI': 'Samu Gaia',
+                            'TRG': 'Jimi Cohen',
+                            'CHIDO': 'Ricardo Duhalt'
+                          };
+                          
+                          // Obtener el nombre del artista del mapeo
+                          const artist = artistMap[nft.id];
+                          return artist || 'Artista';
+                        })()}
+                      </p>
+                      <p className="nft-price">{nft.price} {nft.currencySymbol}</p>
+                    </div>
+                    
+
                     </div>
                     
                     {/* Badge de colección */}
-                    <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-sm text-white text-xs font-medium px-2.5 py-1 rounded-full border border-white/10">
+                    <div className="nft-badge">
                       #{nft.id}
                     </div>
                     

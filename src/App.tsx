@@ -38,11 +38,14 @@ function App() {
       <Navbar />
       <header className="header relative z-10 w-full max-w-7xl flex flex-col items-center py-2 mb-4 px-3 mx-auto">
         <div className="flex flex-col items-center text-center w-full">
-          <img
-            src="https://petgascoin.com/wp-content/uploads/2025/05/UCA-logo-fondo-blanco-horizontal-1-scaled-e1746841493573.png"
-            alt="UCA Logo"
-            className="app-logo w-16 h-auto mt-4 mb-2"
-          />
+          <div className="relative flex items-center justify-center mt-3 mb-1">
+            <img
+              src="https://petgascoin.com/wp-content/uploads/2025/05/UCA-logo-fondo-blanco-horizontal-1-scaled-e1746841493573.png"
+              alt="UCA Logo"
+              className="app-logo w-14 h-auto relative z-10"
+            />
+            <div className="absolute inset-0 bg-blue-400/20 rounded-full filter blur -z-0 w-20 h-20"></div>
+          </div>
           <h1 className="text-2xl font-semibold mb-2 text-white">
             NFT Boutique Marketplace
           </h1>
