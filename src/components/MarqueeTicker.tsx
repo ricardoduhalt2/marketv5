@@ -39,19 +39,23 @@ const MarqueeTicker: React.FC<MarqueeTickerProps> = ({ nfts }) => {
   const duplicatedItems = [...tickerItems, ...tickerItems];
 
   return (
-    <div className="marquee-container">
-      <div className="marquee-inner">
-        <div className="marquee-gradient-left"></div>
-        <div className="marquee-gradient-right"></div>
-        
-        <div className="marquee-content">
-          {duplicatedItems.map((item, index) => (
-            <div key={`${item.id}-${index}`} className="marquee-item">
-              <span>▶</span>
-              <span className="marquee-item-text">{item.text}</span>
-              <span>◀</span>
-            </div>
-          ))}
+    <div className="w-full overflow-hidden">
+      <div className="marquee-container">
+        <div className="marquee-inner">
+          <div className="marquee-gradient-left"></div>
+          <div className="marquee-gradient-right"></div>
+          
+          <div className="marquee-content">
+            {duplicatedItems.map((item, index) => (
+              <div key={`${item.id}-${index}`} className="marquee-item group">
+                <span className="text-blue-400 group-hover:text-cyan-300 transition-colors duration-300">▶</span>
+                <span className="marquee-item-text bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent group-hover:from-cyan-300 group-hover:to-purple-300 transition-all duration-300">
+                  {item.text}
+                </span>
+                <span className="text-purple-400 group-hover:text-pink-300 transition-colors duration-300">◀</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

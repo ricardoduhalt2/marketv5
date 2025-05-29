@@ -52,7 +52,7 @@ function App() {
           <h2 className="text-lg text-gray-300 mb-2">
             Arte Eterno Collection - MACQ
           </h2>
-          <div className="w-full max-w-4xl px-4">
+          <div className="w-screen overflow-hidden px-0 -mx-4">
             <MarqueeTicker nfts={[
               { id: 'TEM', name: 'Tides of the Eternal Mind' },
               { id: 'GCC', name: 'Galactic Clean-Up Crew' },

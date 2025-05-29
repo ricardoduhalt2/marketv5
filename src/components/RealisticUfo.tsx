@@ -14,7 +14,7 @@ interface TrailPoint {
 
 const UFO_BASE_WIDTH = 200; // Original width before scaling
 const UFO_BASE_HEIGHT = 60; // Original height before scaling
-const UFO_SCALE = 0.595; // Reducido un 15% desde 0.7
+const UFO_SCALE = 0.3; // Reducido aproximadamente un 50% desde el tamaño original
 
 const NORMAL_SPEED = 1.8;
 const HYPERJUMP_SPEED = 60;

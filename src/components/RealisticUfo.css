@@ -61,10 +61,11 @@
   top: -2%; /* Slightly overlapping for smoother connection */
   left: 0;
   background: linear-gradient(to bottom, 
-    rgba(128, 148, 175, 0.45) 0%, /* Lighter top - more translucent */
-    rgba(100, 116, 139, 0.40) 50%, /* Mid tone - more translucent */
-    rgba(51, 65, 85, 0.35) 100%    /* Darker base - more translucent */
+    rgba(128, 148, 175, 0.22) 0%, /* Lighter top - even more transparent */
+    rgba(100, 116, 139, 0.196) 50%, /* Mid tone - even more transparent */
+    rgba(51, 65, 85, 0.172) 100%    /* Darker base - even more transparent */
   );
+  opacity: 0.8;
   border-top-left-radius: 50% 100%; 
   border-top-right-radius: 50% 100%;
   border-bottom-left-radius: 20% 15%; 
@@ -80,12 +81,13 @@
   top: 8%; left: 25%;
   width: 50%; height: 45%;
   background: radial-gradient(ellipse at center, 
-    rgba(190, 220, 255, 0.4) 0%,
-    rgba(120, 170, 230, 0.1) 60%, 
+    rgba(190, 220, 255, 0.2) 0%,  /* Even more transparent */
+    rgba(120, 170, 230, 0.05) 60%,  /* Even more transparent */
     transparent 80%
   );
   border-radius: 50%;
   animation: domeGlow 4.5s infinite alternate ease-in-out;
+  opacity: 0.8;  /* More transparent */
 }
 
 .ufo-dome-highlight {
@@ -172,19 +174,20 @@
 
 .ufo-engine-glow-cone {
   position: absolute;
-  bottom: -35px;
+  bottom: -20px;
   left: 50%;
-  width: 140%;
-  height: 75px;
+  width: 130%;
+  height: 40px;
   background: linear-gradient(to top, 
-    rgba(0, 255, 255, 0.35) 0%,
-    rgba(0, 220, 255, 0.2) 40%,
+    rgba(0, 255, 255, 0.18) 0%,  /* More transparent */
+    rgba(0, 220, 255, 0.1) 40%,  /* More transparent */
     transparent 75%
   );
   border-radius: 50% 50% 35% 35% / 75% 75% 25% 25%; 
-  filter: blur(18px);
+  filter: blur(10px);
   transform: translateX(-50%) translateZ(-6px);
   transition: opacity 0.2s ease-out;
+  opacity: 0.8;
 }
 
 .ufo-thruster-ports {
@@ -226,17 +229,18 @@
 
 .ufo-ambient-aura {
   position: absolute;
-  width: 260px; height: 220px;
+  width: 180px; height: 150px; /* Tamaño reducido */
   background: radial-gradient(circle, 
-    rgba(0, 200, 230, 0.12) 0%, 
-    rgba(0, 130, 190, 0.07) 50%, 
+    rgba(0, 200, 230, 0.08) 0%, /* Menor opacidad */
+    rgba(0, 130, 190, 0.05) 50%, /* Menor opacidad */
     transparent 70%
   );
   border-radius: 50%;
-  filter: blur(30px);
+  filter: blur(20px); /* Menor desenfoque */
   animation: ambientPulse 3.5s infinite alternate ease-in-out;
   pointer-events: none;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%) scale(0.8); /* Escala reducida */
+  opacity: 0.7; /* Menor opacidad general */
 }
 
 /* UFO Laser Beam */

@@ -1,11 +1,61 @@
+/* Estilo para el contenedor principal */
 .marquee-container {
-  width: 100%;
+  position: relative;
+  width: 100vw;
+  left: 0;
+  right: 0;
   overflow: hidden;
-  background: linear-gradient(90deg, rgba(30, 41, 59, 0.3) 0%, rgba(76, 29, 149, 0.3) 50%, rgba(30, 41, 59, 0.3) 100%);
-  border-top: 1px solid rgba(55, 65, 81, 0.5);
-  border-bottom: 1px solid rgba(55, 65, 81, 0.5);
-  padding: 0.5rem 0;
-  margin: 1rem 0;
+  background: rgba(17, 24, 39, 0.9);
+  padding: 1rem 0;
+  margin: 0 !important;
+  z-index: 1;
+  border-radius: 0;
+  box-sizing: border-box;
+  transform: none;
+  max-width: none !important;
+  display: block;
+  min-width: 100vw;
+}
+
+/* Contenedor interno para el contenido */
+.marquee-inner {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0;
+}
+
+/* Reset de márgenes en el body y html para asegurar que no haya scroll horizontal */
+body, html {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  width: 100%;
+}
+
+.marquee-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 2px;
+  background: linear-gradient(90deg, #ff6b00, #ff3c5f, #9d4edd, #4361ee, #4cc9f0, #9d4edd, #ff3c5f, #ff6b00);
+  background-size: 300% 100%;
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  z-index: -1;
+  pointer-events: none;
+  animation: borderGradient 6s linear infinite;
+  border-radius: 0;
 }
 
 .marquee-inner {
@@ -75,6 +125,15 @@
   }
   100% {
     transform: translateX(-50%);
+  }
+}
+
+@keyframes borderGradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 300% 50%;
   }
 }
 
