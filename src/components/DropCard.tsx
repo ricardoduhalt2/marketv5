@@ -141,8 +141,8 @@ const DropCard: React.FC<DropCardProps> = ({
   const nftStandard = (nftProperties.standard || findAttribute('standard') || 'ERC-1155') as string;
 
   return (
-    <div className="card-interactive group">
-      <div className="card-content bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50">
+    <div className="card-interactive group w-full">
+      <div className="card-content bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-gray-700/50 w-full max-w-full">
         <div className="mb-6">
           <h2 className="text-2xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
             Detalles de la Obra
@@ -164,7 +164,9 @@ const DropCard: React.FC<DropCardProps> = ({
               <div className="h-4 bg-gray-700 rounded w-1/2"></div>
             </div>
           ) : (
-            <p className="text-gray-300">{nftDescription}</p>
+            <div className="w-full overflow-x-auto">
+            <p className="text-gray-300 whitespace-pre-line break-words">{nftDescription}</p>
+          </div>
           )}
         </div>
 
