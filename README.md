@@ -27,10 +27,11 @@ A modern NFT marketplace for the Museum of Contemporary Art, Quintana Roo (MACQ)
 
 - 🤖 **AI-Powered Assistant**
   - Google Gemini AI integration
-  - Context-aware NFT information
-  - Smart responses based on collection data
-  - Horizontal header integration
-  - Real-time price updates
+  - Context-aware NFT information and museum details
+  - Smart responses based on collection data and location queries
+  - Multi-location support for museum information
+  - Real-time price updates and NFT details
+  - Bilingual support (English/Spanish)
 
 ## 🛠️ Tech Stack
 
@@ -76,7 +77,15 @@ npm run preview
 
 ## 🌟 Latest Updates (May 28, 2025)
 
-### Mejoras en la Interfaz de Detalles de NFT
+### 🤖 AI Assistant & Museum Locations
+- 🗺️ **Multi-location Support**
+  - Added support for both Playa del Carmen and Cancún (La Isla) locations
+  - Smart location detection based on user queries
+  - Detailed information including addresses, hours, and contact details
+  - Direct Google Maps integration for both locations
+  - Bilingual support for location information
+
+### 🎨 NFT Details Interface Improvements
 - 🎨 Implementado borde animado con gradiente para las tarjetas de NFT
 - ✨ Efectos de hover mejorados con brillo y sombras
 - 🖼️ Rediseño de la sección de detalles técnicos
@@ -149,6 +158,20 @@ npm run preview
 - [Live Demo](https://macq-nft.vercel.app)
 - [Documentation](https://github.com/ricardoduhalt2/marketv5/wiki)
 - [Release Notes](https://github.com/ricardoduhalt2/marketv5/releases)
+
+## 🌐 Museum Locations
+
+### 🏛️ Playa del Carmen (Main Location)
+- **Address:** Avenida Héroes s/n, Esquina con Calle 8 Norte, Centro, 77710 Playa del Carmen, Q.R.
+- **Hours:** Tuesday-Sunday 10:00 AM - 7:00 PM
+- **Phone:** +52 984 147 4848
+- **Email:** info@macq.mx
+
+### 🏖️ Cancún - La Isla Shopping Village
+- **Address:** Blvd. Kukulcan Km 12.5, La Isla, Zona Hotelera, 77500 Cancún, Q.R.
+- **Hours:** Monday-Sunday 10:00 AM - 10:00 PM
+- **Phone:** +52 998 123 4567
+- **Email:** cancun@macq.mx
 
 ## 📄 License
 
