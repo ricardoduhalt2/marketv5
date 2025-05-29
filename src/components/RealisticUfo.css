@@ -78,16 +78,16 @@
 
 .ufo-dome-glow-orb {
   position: absolute;
-  top: 8%; left: 25%;
-  width: 50%; height: 45%;
+  top: 10%; left: 30%;
+  width: 40%; height: 35%;
   background: radial-gradient(ellipse at center, 
-    rgba(190, 220, 255, 0.2) 0%,  /* Even more transparent */
-    rgba(120, 170, 230, 0.05) 60%,  /* Even more transparent */
+    rgba(170, 200, 255, 0.15) 0%,  /* Más sutil */
+    rgba(100, 150, 210, 0.04) 60%,  /* Más sutil */
     transparent 80%
   );
   border-radius: 50%;
-  animation: domeGlow 4.5s infinite alternate ease-in-out;
-  opacity: 0.8;  /* More transparent */
+  animation: domeGlow 5s infinite alternate ease-in-out;
+  opacity: 0.6;  /* Más transparente */
 }
 
 .ufo-dome-highlight {
@@ -229,18 +229,20 @@
 
 .ufo-ambient-aura {
   position: absolute;
-  width: 180px; height: 150px; /* Tamaño reducido */
-  background: radial-gradient(circle, 
-    rgba(0, 200, 230, 0.08) 0%, /* Menor opacidad */
-    rgba(0, 130, 190, 0.05) 50%, /* Menor opacidad */
+  width: 60px; height: 15px; /* Más pequeño y más delgado */
+  background: radial-gradient(ellipse at center, 
+    rgba(0, 200, 230, 0.15) 0%, 
+    rgba(0, 130, 190, 0.1) 50%, 
     transparent 70%
   );
   border-radius: 50%;
-  filter: blur(20px); /* Menor desenfoque */
-  animation: ambientPulse 3.5s infinite alternate ease-in-out;
+  filter: blur(4px); /* Menor desenfoque para un aspecto más definido */
+  animation: ambientPulse 3s infinite alternate ease-in-out;
   pointer-events: none;
-  transform: translate(-50%, -50%) scale(0.8); /* Escala reducida */
-  opacity: 0.7; /* Menor opacidad general */
+  transform: translate(-50%, -30%) scale(0.4); /* Posicionado más cerca del OVNI */
+  opacity: 0.6; /* Opacidad aumentada para mejor visibilidad */
+  bottom: -5px; /* Posición más pegada al OVNI */
+  left: 50%;
 }
 
 /* UFO Laser Beam */
