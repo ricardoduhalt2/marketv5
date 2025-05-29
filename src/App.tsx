@@ -14,6 +14,7 @@ import LoadingPage from './components/LoadingPage';
 import { useState, useEffect } from 'react';
 import RealisticUfo from './components/RealisticUfo';
 import MarqueeTicker from './components/MarqueeTicker';
+import NFTImageExtractor from './components/NFTImageExtractor';
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -28,7 +29,11 @@ function App() {
   }, []);
 
   if (isLoading) {
-    return <LoadingPage />;
+    return (
+      <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 9999, background: '#050505' }}>
+        <LoadingPage />
+      </div>
+    );
   }
 
   return (
@@ -78,6 +83,7 @@ function App() {
           <Route path="/" element={<NFTList />} />
           <Route path="/nft/:id" element={<NFTDetail />} />
           <Route path="/ai-assistant" element={<AiAssistant />} />
+          <Route path="/nft-extractor" element={<NFTImageExtractor />} />
         </Routes>
       </main>
 

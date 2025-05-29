@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './LoadingPage.css';
+import NFTParticleGallery from './NFTParticleGallery';
 
 interface HUDLine {
   x1: number;
@@ -111,26 +112,73 @@ const LoadingPage: React.FC = () => {
 
   return (
     <div className="loading-container" ref={containerRef}>
+      {/* Galería de NFTs con partículas */}
+      <NFTParticleGallery />
+      
+      {/* Imagen de carga */}
+      <div style={{
+        position: 'fixed',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        zIndex: 5,
+        textAlign: 'center'
+      }}>
+        <div style={{
+          width: 'min(80vw, 400px)',
+          height: 'min(60vh, 300px)',
+          margin: '0 auto',
+          position: 'relative'
+        }}>
+          <img 
+            src="https://a37f843ccef648163abc82ab025e7cf7.ipfscdn.io/ipfs/QmfZ3cSxD4Zri5XjCDNEjFyZpnVFa7xPkfYHesKyef3idX/0.jpg" 
+            alt="Loading Artwork"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain',
+              filter: 'drop-shadow(0 0 15px rgba(255, 107, 0, 0.7))',
+              opacity: 0.8,
+              transition: 'all 0.5s ease',
+              animation: 'pulse 3s infinite alternate'
+            }}
+            onLoad={(e) => {
+              (e.target as HTMLImageElement).style.opacity = '0.8';
+            }}
+          />
+          <style dangerouslySetInnerHTML={{
+            __html: `
+              @keyframes pulse {
+                0% { transform: scale(0.95); opacity: 0.7; }
+                100% { transform: scale(1.05); opacity: 0.9; }
+              }
+            `
+          }} />
+        </div>
+      </div>
+      
+      {/* Capa de superposición HUD */}
       <div className="hud-overlay" />
       
-      {/* Grid Background */}
-      <svg className="hud-lines" width="100%" height="100%">
-        {hudLines.map((line, index) => (
-          <line
-            key={index}
-            x1={line.x1}
-            y1={line.y1}
-            x2={line.x2}
-            y2={line.y2}
-            stroke={line.color || 'rgba(0, 200, 255, 0.1)'}
-            strokeWidth={line.width || 1}
-            strokeOpacity={line.opacity}
-            strokeDasharray={line.dashArray}
-            strokeDashoffset={line.dashOffset}
-          />
-        ))}
-      </svg>
-      
+      {/* Líneas de la cuadrícula HUD */}
+      <div className="hud-lines">
+        <svg width="100%" height="100%">
+          {hudLines.map((line, index) => (
+            <line
+              key={index}
+              x1={line.x1}
+              y1={line.y1}
+              x2={line.x2}
+              y2={line.y2}
+              stroke="rgba(255, 107, 0, 0.1)"
+              strokeWidth={line.width || 1}
+              strokeDasharray={line.dashArray}
+              strokeDashoffset={line.dashOffset}
+              opacity={line.opacity}
+            />
+          ))}
+        </svg>
+      </div>
       {/* Corner Decorations */}
       <div className="hud-corner hud-corner-tl" />
       <div className="hud-corner hud-corner-tr" />
@@ -140,26 +188,109 @@ const LoadingPage: React.FC = () => {
       {/* Animated Scan Line */}
       <div className="hud-scanline" style={{ transform: `translateY(${progress}%)` }} />
       
-      <div className="hud-content">
-        <div className="status-display">
-          <div className="status-title">System Status</div>
-          <div className="status-value">{status}</div>
-          <div className="status-subtitle">{subStatus}</div>
+      <div className="hud-content" style={{
+        position: 'fixed',
+        bottom: '20%',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        width: '80%',
+        maxWidth: '600px',
+        zIndex: 100,
+        backgroundColor: 'rgba(5, 5, 10, 0.8)',
+        padding: '2rem',
+        borderRadius: '15px',
+        border: '1px solid rgba(255, 107, 0, 0.5)',
+        boxShadow: '0 0 30px rgba(255, 107, 0, 0.3)'
+      }}>
+        <div className="status-display" style={{
+          textAlign: 'center',
+          marginBottom: '1.5rem'
+        }}>
+          <div className="status-title" style={{
+            color: '#ff6b00',
+            fontSize: '1.2rem',
+            fontWeight: 'bold',
+            marginBottom: '0.5rem',
+            textTransform: 'uppercase',
+            letterSpacing: '2px'
+          }}>System Status</div>
+          <div className="status-value" style={{
+            color: '#fff',
+            fontSize: '1.8rem',
+            fontWeight: 'bold',
+            margin: '0.5rem 0',
+            textShadow: '0 0 10px rgba(255, 107, 0, 0.7)'
+          }}>{status}</div>
+          <div className="status-subtitle" style={{
+            color: 'rgba(255, 255, 255, 0.8)',
+            fontSize: '1rem',
+            fontStyle: 'italic'
+          }}>{subStatus}</div>
         </div>
         
         <div className="progress-section">
-          <div className="progress-labels">
+          <div className="progress-labels" style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            marginBottom: '0.5rem',
+            color: 'rgba(255, 255, 255, 0.8)'
+          }}>
             <span>Loading</span>
             <span>{Math.round(progress)}%</span>
           </div>
-          <div className="hud-progress-container">
+          <div className="hud-progress-container" style={{
+            width: '100%',
+            height: '20px',
+            backgroundColor: 'rgba(255, 107, 0, 0.2)',
+            borderRadius: '10px',
+            overflow: 'hidden',
+            position: 'relative'
+          }}>
             <div 
               className="hud-progress-bar" 
-              style={{ width: `${progress}%` }}
-            />
+              style={{ 
+                width: `${progress}%`,
+                height: '100%',
+                background: 'linear-gradient(90deg, #ff6b00, #00a8ff, #0066ff, #ff6b00)',
+                backgroundSize: '300% 300%',
+                transition: 'width 0.3s ease',
+                position: 'relative',
+                overflow: 'hidden',
+                animation: 'borderShimmer 3s ease infinite',
+                boxShadow: '0 0 10px rgba(0, 168, 255, 0.5)'
+              }}
+            >
+              <div style={{
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent)',
+                animation: 'shimmer 2s infinite',
+                transform: 'translateX(-100%)',
+                animationTimingFunction: 'ease-in-out'
+              }} />
+            </div>
           </div>
         </div>
       </div>
+      
+      {/* Estilos para la animación de brillo */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+          }
+          @keyframes borderShimmer {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+          }
+        `
+      }} />
     </div>
   );
 };

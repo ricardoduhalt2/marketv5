@@ -2,6 +2,62 @@ import type { NftData } from '../types';
 
 export const nftData: NftData[] = [
   {
+    id: "IMG1",
+    name: "NFT Artwork 1",
+    description: "A stunning NFT artwork from the collection.",
+    image: "https://a37f843ccef648163abc82ab025e7cf7.ipfscdn.io/ipfs/QmTyR1C41vBLDRxr4sqgpPSWQBFzFcmofAqpHQtXYuxcsu/0.JPG",
+    editionContractAddress: "",
+    splitContractAddress: "",
+    price: "0",
+    currencySymbol: "ETH",
+    tokenUri: ""
+  },
+  {
+    id: "IMG2",
+    name: "NFT Artwork 2",
+    description: "A stunning NFT artwork from the collection.",
+    image: "https://a37f843ccef648163abc82ab025e7cf7.ipfscdn.io/ipfs/QmWj76x9aEPoeHHYjSKRoSvagbHbhFHf6bLrJsftixqfMH/0.jpg",
+    editionContractAddress: "",
+    splitContractAddress: "",
+    price: "0",
+    currencySymbol: "ETH",
+    tokenUri: ""
+  },
+  {
+    id: "IMG3",
+    name: "NFT Artwork 3",
+    description: "A stunning NFT artwork from the collection.",
+    image: "https://a37f843ccef648163abc82ab025e7cf7.ipfscdn.io/ipfs/Qmc9cJKQVH5vMHzvXHKWSPArjFJiYaG6EweQyDHsStEgzy/0.png",
+    editionContractAddress: "",
+    splitContractAddress: "",
+    price: "0",
+    currencySymbol: "ETH",
+    tokenUri: ""
+  },
+  {
+    id: "IMG4",
+    name: "NFT Artwork 4",
+    description: "A stunning NFT artwork from the collection.",
+    image: "https://a37f843ccef648163abc82ab025e7cf7.ipfscdn.io/ipfs/QmV7oRsZvLCW7hjapbYZeSW9FvarxwqStAwrUNEYUXzzjV/0.gif",
+    editionContractAddress: "",
+    splitContractAddress: "",
+    price: "0",
+    currencySymbol: "ETH",
+    tokenUri: ""
+  },
+  {
+    id: "IMG5",
+    name: "NFT Artwork 5",
+    description: "A stunning NFT artwork from the collection.",
+    image: "https://a37f843ccef648163abc82ab025e7cf7.ipfscdn.io/ipfs/QmfW2F29peaJPKCxYLEjMkFRbeEcRDa3MUFyqoTkjTAYqf/0.jpg",
+    editionContractAddress: "",
+    splitContractAddress: "",
+    price: "0",
+    currencySymbol: "ETH",
+    tokenUri: ""
+  },
+
+  {
     id: "TEM",
     name: "Tides of the Eternal Mind",
     description: "By Ms. Cosmic. Two faces merge with planetary symbols blending the boundless ocean with the vastness of space. This artwork emphasizes our universal interconnectedness inviting contemplation on how each thought and action creates ripples across time and space an eternal dance where every heartbeat can be entangled with another. NFT Purchase unlocks physical art piece ownership.",
@@ -176,5 +232,16 @@ export const nftData: NftData[] = [
     price: "0.5",
     currencySymbol: "POL",
     tokenUri: "QmTxX7kWQQfWzeoTiPuXX51tFM9X24gqBwB36QNze7459N/0"
+  },
+  {
+    id: "NEW",
+    name: "New NFT Artwork",
+    description: "A stunning new addition to the collection.",
+    image: "https://a37f843ccef648163abc82ab025e7cf7.ipfscdn.io/ipfs/QmfZ3cSxD4Zri5XjCDNEjFyZpnVFa7xPkfYHesKyef3idX/0.jpg",
+    editionContractAddress: "",
+    splitContractAddress: "",
+    price: "0",
+    currencySymbol: "ETH",
+    tokenUri: ""
   }
 ];
