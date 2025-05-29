@@ -1,3 +1,56 @@
+/* Estilos para los precios */
+.price-container {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  background: rgba(15, 23, 42, 0.1);
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  margin: 0.5rem 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+}
+
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0.25rem 0;
+}
+
+.price-label {
+  font-weight: 500;
+  color: #e2e8f0;
+  font-size: 0.9em;
+}
+
+.price-value {
+  font-weight: 600;
+  color: #ffffff;
+  font-family: 'Roboto Mono', monospace;
+}
+
+.price-loading,
+.price-error {
+  font-size: 0.85em;
+  font-style: italic;
+  color: #94a3b8;
+  margin-top: 0.25rem;
+}
+
+.price-error {
+  color: #fecaca;
+}
+
+.price-updated {
+  margin-top: 0.5rem;
+  text-align: right;
+}
+
+.price-updated small {
+  font-size: 0.7em;
+  color: #94a3b8;
+  opacity: 0.8;
+}
+
 /* Base container */
 .chatbot-container {
   position: relative;

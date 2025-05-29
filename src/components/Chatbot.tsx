@@ -1,7 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { nftData } from '../data/nftData';
 import './Chatbot.css';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+
+// Función para obtener el precio de MATIC en USD desde CoinGecko
+const fetchMaticPrice = async (): Promise<number> => {
+  try {
+    const response = await fetch(
+      'https://api.coingecko.com/api/v3/simple/price?ids=matic-network&vs_currencies=usd&precision=4'
+    );
+    const data = await response.json();
+    return data['matic-network']?.usd || 0.7; // Valor por defecto en caso de error
+  } catch (error) {
+    console.error('Error fetching MATIC price:', error);
+    return 0.7; // Valor por defecto en caso de error
+  }
+};
 
 interface Message {
   text: string;
@@ -64,9 +79,48 @@ const Chatbot: React.FC<ChatbotProps> = ({ fullPage = false }) => {
     }
   }, [fullPage]);
 
-  const formatPrice = (price: string | undefined, symbol: string | undefined) => {
+  // Obtener el precio de MATIC en USD
+  const { data: maticPrice, isLoading, error } = useQuery({
+    queryKey: ['maticPrice'],
+    queryFn: fetchMaticPrice,
+    staleTime: 5 * 60 * 1000, // 5 minutos hasta que se considere obsoleto
+    refetchInterval: 5 * 60 * 1000, // Actualizar cada 5 minutos
+  });
+
+  const formatPrice = (price: string | undefined, symbol: string | undefined): string => {
     if (!price || !symbol) return 'Precio no disponible';
-    return `${Number(price).toLocaleString()} ${symbol}`;
+    
+    const numericPrice = Number(price);
+    const usdValue = numericPrice * (maticPrice || 0.7);
+    
+    const formattedPolygon = `${numericPrice.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 4
+    })} ${symbol}`;
+    
+    const formattedUsd = usdValue.toLocaleString('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+    
+    const lastUpdated = new Date().toLocaleTimeString();
+    
+    // Mostrar estado de carga si aún no tenemos el precio
+    if (isLoading) {
+      return `${numericPrice.toLocaleString()} ${symbol}\n(Cargando conversión a USD...)`;
+    }
+    
+    // Mostrar error si hay un problema con la API
+    if (error) {
+      return `${numericPrice.toLocaleString()} ${symbol}\n(No se pudo cargar la conversión a USD)`;
+    }
+    
+    // Devolver una cadena de texto formateada
+    return `Precio: ${formattedPolygon}\n` +
+           `En USD: ~ ${formattedUsd}\n` +
+           `(Última actualización: ${lastUpdated})`;
   };
 
   const getCollectionContext = () => {
@@ -106,13 +160,36 @@ const Chatbot: React.FC<ChatbotProps> = ({ fullPage = false }) => {
     }
   };
 
+  // Obtener lista de nombres de NFTs disponibles para sugerencias
+  const getAvailableNftNames = (): string[] => {
+    return nftData.map(nft => nft.name);
+  };
+
+  // Función para encontrar el NFT más similar al texto proporcionado
+  const findClosestNft = (query: string): string | null => {
+    const names = getAvailableNftNames();
+    const lowerQuery = query.toLowerCase();
+    
+    // Buscar coincidencias exactas primero
+    const exactMatch = names.find(name => name.toLowerCase() === lowerQuery);
+    if (exactMatch) return exactMatch;
+    
+    // Buscar coincidencias parciales
+    const partialMatches = names.filter(name => 
+      name.toLowerCase().includes(lowerQuery) || 
+      lowerQuery.includes(name.toLowerCase())
+    );
+    
+    return partialMatches.length > 0 ? partialMatches[0] : null;
+  };
+
   const processUserMessage = async (userInput: string) => {
     try {
       const lowerInput = userInput.toLowerCase().trim();
       
       // Respuesta a "cómo te llamas"
       if (lowerInput.includes('como te llamas') || lowerInput.includes('quien eres')) {
-        return "Soy GitHub Copilot, el asistente de MACQ. Estoy aquí para ayudarte con información sobre nuestra colección de NFTs.";
+        return "Soy el asistente de MACQ. Estoy aquí para ayudarte con información sobre nuestra colección de NFTs.";
       }
 
       // Si pregunta por la colección completa
@@ -122,6 +199,75 @@ const Chatbot: React.FC<ChatbotProps> = ({ fullPage = false }) => {
           lowerInput === 'sí') {
         const info = `Aquí está la información completa de nuestra colección:\n\n${getCollectionContext()}`;
         return info;
+      }
+
+      // Manejar consultas de información general sobre NFTs
+      const infoKeywords = ['información', 'info', 'saber', 'conoce', 'dime', 'cuéntame', 'hablame', 'qué es', 'que es'];
+      const isInfoQuery = infoKeywords.some(keyword => lowerInput.includes(keyword));
+      
+      // Buscar si el usuario está preguntando por un NFT específico
+      let nftQuery = '';
+      const nftIds = nftData.map(nft => nft.id.toLowerCase());
+      const foundId = nftIds.find(id => lowerInput.includes(id.toLowerCase()));
+      
+      if (foundId) {
+        nftQuery = foundId;
+      } else {
+        // Si no se encontró un ID, buscar por nombre
+        const query = userInput.replace(new RegExp([...infoKeywords, 'precio', 'price', 'cuesta', 'costo', 'cost', 'value', 'cuanto'].join('|'), 'gi'), '').trim();
+        const closestNft = findClosestNft(query);
+        if (closestNft) {
+          nftQuery = closestNft;
+        }
+      }
+      
+      // Si encontramos un NFT, mostrar su información
+      if (nftQuery) {
+        const nft = nftData.find(n => 
+          n.id.toLowerCase() === nftQuery.toLowerCase() || 
+          n.name.toLowerCase() === nftQuery.toLowerCase()
+        );
+        
+        if (nft) {
+          const priceDisplay = formatPrice(nft.price, nft.currencySymbol);
+          return `Información sobre ${nft.name} (${nft.id}):\n` +
+                 `Descripción: ${nft.description || 'No disponible'}\n` +
+                 `Precio: ${priceDisplay}\n` +
+                 `Contrato: ${nft.editionContractAddress || 'No disponible'}`;
+        }
+      }
+      
+      // Manejar consultas de precios
+      const priceKeywords = ['precio', 'price', 'cuesta', 'costo', 'cost', 'value', 'cuanto'];
+      const isPriceQuery = priceKeywords.some(keyword => lowerInput.includes(keyword));
+      
+      if (isPriceQuery) {
+        // Si ya encontramos un NFT, mostrar su precio
+        if (nftQuery) {
+          const nft = nftData.find(n => 
+            n.id.toLowerCase() === nftQuery.toLowerCase() || 
+            n.name.toLowerCase() === nftQuery.toLowerCase()
+          );
+          
+          if (nft) {
+            const priceDisplay = formatPrice(nft.price, nft.currencySymbol);
+            return `El precio de ${nft.name} (${nft.id}) es:\n${priceDisplay}`;
+          }
+        }
+        
+        // Si no se encontró coincidencia, mostrar sugerencias
+        const availableNfts = getAvailableNftNames().join(', ');
+        return `No encontré un NFT que coincida con tu búsqueda.\n\n` +
+               `Estos son los NFTs disponibles: ${availableNfts}.\n` +
+               `Puedes preguntar por el precio o información usando el nombre o el ID del NFT.`;
+      }
+      
+      // Si es una consulta de información pero no se encontró un NFT específico
+      if (isInfoQuery) {
+        const availableNfts = getAvailableNftNames().join(', ');
+        return `No encontré un NFT que coincida con tu búsqueda.\n\n` +
+               `Estos son los NFTs disponibles: ${availableNfts}.\n` +
+               `Puedes preguntar por más información usando el nombre o el ID del NFT.`;
       }
 
       // Procesar con AI para otras preguntas
