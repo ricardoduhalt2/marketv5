@@ -231,8 +231,8 @@ const NFTDetail = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 py-4 sm:py-8 px-4 sm:px-6 lg:px-8 w-full">
-      <div className="w-full max-w-full mx-0 px-0 sm:px-4">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 py-4 sm:py-8 px-4 sm:px-6 lg:px-8 w-full flex justify-center">
+      <div className="w-full max-w-[1600px] mx-auto px-0 sm:px-4 lg:px-8">
         {/* Back Button */}
         <div className="flex items-center mb-8">
           <Link 
@@ -264,7 +264,7 @@ const NFTDetail = () => {
 
         {/* NFT Content */}
         <div className="w-full max-w-full mx-0">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 md:gap-8 w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 md:gap-10 w-full">
             {/* NFT Media */}
             <div className="group">
               <div className="relative h-[400px] md:h-[600px] w-full transform-gpu transition-all duration-700 hover:scale-[1.02] rounded-2xl overflow-hidden">
@@ -303,7 +303,7 @@ const NFTDetail = () => {
             </div>
 
             {/* NFT Details */}
-            <div className="transform-gpu transition-all duration-500 hover:translate-y-[-5px] mt-6 md:mt-0 w-full">
+            <div className="transform-gpu transition-all duration-500 hover:translate-y-[-5px] mt-6 md:mt-0 w-full h-full flex">
               <DropCard 
                 nft={nft} 
                 metadata={metadata}

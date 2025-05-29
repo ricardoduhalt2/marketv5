@@ -13,6 +13,7 @@ import ParticlesBackground from './components/ParticlesBackground';
 import LoadingPage from './components/LoadingPage';
 import { useState, useEffect } from 'react';
 import RealisticUfo from './components/RealisticUfo';
+import MarqueeTicker from './components/MarqueeTicker';
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -45,9 +46,27 @@ function App() {
           <h1 className="text-2xl font-semibold mb-2 text-white">
             NFT Boutique Marketplace
           </h1>
-          <h2 className="text-lg text-gray-300">
+          <h2 className="text-lg text-gray-300 mb-2">
             Arte Eterno Collection - MACQ
           </h2>
+          <div className="w-full max-w-4xl px-4">
+            <MarqueeTicker nfts={[
+              { id: 'TEM', name: 'Tides of the Eternal Mind' },
+              { id: 'GCC', name: 'Galactic Clean-Up Crew' },
+              { id: 'EVC', name: 'Entre la Vida y el Plástico' },
+              { id: 'CMV', name: 'C0mMzoVeRLoAD' },
+              { id: 'BBB', name: 'Bit-Beats Bliss' },
+              { id: 'IVT', name: 'I vow to take care of you' },
+              { id: 'YSL', name: 'Yo Soy Libertad' },
+              { id: 'MOL', name: 'MOON LANDING' },
+              { id: 'HTC', name: 'Hydrothermal Camouflage' },
+              { id: 'FLC', name: 'Floral Coral' },
+              { id: 'SWH', name: 'Snail Whale' },
+              { id: 'RAI', name: 'regenAIssance (i.)' },
+              { id: 'TRG', name: 'Treegeneration' },
+              { id: 'CHIDO', name: 'C.H.I.D.O.' }
+            ]} />
+          </div>
         </div>
       </header>
 
