@@ -199,8 +199,51 @@ const NFTList = () => {
                     <div className="p-4">
                       <h3 className="text-lg font-bold text-white mb-1 truncate">{nft.name}</h3>
                       <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-300">
-                          {nft.name.split(' by ')[1] || 'Artista'}
+                        <span className="text-sm font-medium bg-gradient-to-r from-blue-400 to-purple-400 text-transparent bg-clip-text">
+                          {(() => {
+                            // Mapeo completo de IDs de NFT a nombres de artista
+                            const artistMap: {[key: string]: string} = {
+                              'TEM': 'Ms. Cosmic',
+                              'GCC': 'Pinche Chucho',
+                              'EVC': 'Daughter of the Son',
+                              'CMV': 'Pinche Chucho',
+                              'BBB': 'Daveed Benjamin',
+                              'IVT': 'ONA AOÉRA',
+                              'YSL': 'Tania Cuevas Martinez',
+                              'PSA': 'Pinche Chucho',
+                              'PLL': 'Pinche Chucho',
+                              'MOL': 'Char Puravida @peoplesSister',
+                              'HTC': 'Jolted',
+                              'FLC': 'IGLI',
+                              'SWH': 'Fractalicia',
+                              'RAI': 'Samu Gaia',
+                              'TRG': 'Jimi Cohen',
+                              'CHIDO': 'Ricardo Duhalt'
+                            };
+                            
+                            // Intentar obtener el nombre del artista del mapeo
+                            const artist = artistMap[nft.id];
+                            
+                            // Si no se encuentra en el mapeo, intentar extraer de alguna otra manera
+                            if (!artist) {
+                              // Caso 1: El nombre ya incluye "by" (ej: "Floral Coral by IGLI")
+                              if (nft.name.includes(' by ')) {
+                                return nft.name.split(' by ')[1].trim();
+                              }
+                              
+                              // Caso 2: Buscar en la descripción
+                              if (nft.description) {
+                                const byMatch = nft.description.match(/(?:By|Por|Artista|Artist)[\s:]+([^\n\.]+)/i);
+                                if (byMatch && byMatch[1]) {
+                                  return byMatch[1].trim();
+                                }
+                              }
+                              
+                              return <span className="text-gray-300">Artista</span>;
+                            }
+                            
+                            return artist;
+                          })()}
                         </span>
                         <span className="text-sm font-medium bg-gradient-to-r from-blue-400 to-purple-400 text-transparent bg-clip-text">
                           {nft.price} {nft.currencySymbol}
