@@ -28,6 +28,11 @@
   height: 100%; /* 60px */
   transform-style: preserve-3d; /* Essential for 3D children */
   /* transition: transform 0.1s ease-out; Smooth tilt transitions - handled by inline style for stretch */
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
 }
 
 /* Inner Spinner: No longer spins, but groups UFO parts */
@@ -174,20 +179,46 @@
 
 .ufo-engine-glow-cone {
   position: absolute;
-  bottom: -20px;
+  bottom: -10px;
   left: 50%;
-  width: 130%;
-  height: 40px;
-  background: linear-gradient(to top, 
-    rgba(0, 255, 255, 0.18) 0%,  /* More transparent */
-    rgba(0, 220, 255, 0.1) 40%,  /* More transparent */
-    transparent 75%
-  );
+  width: 55%;
+  height: 18px;
+  background: 
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(0, 255, 200, 0.2) 0%,
+      rgba(0, 220, 180, 0.12) 30%,
+      transparent 80%
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 1px,
+      rgba(0, 255, 200, 0.1) 1px,
+      rgba(0, 255, 200, 0.1) 3px
+    );
   border-radius: 50% 50% 35% 35% / 75% 75% 25% 25%; 
-  filter: blur(10px);
+  filter: 
+    blur(4px) 
+    contrast(1.8)
+    drop-shadow(0 0 3px rgba(0, 255, 200, 0.25));
   transform: translateX(-50%) translateZ(-6px);
-  transition: opacity 0.2s ease-out;
-  opacity: 0.8;
+  transition: all 0.3s ease-out;
+  opacity: 0.85;
+  animation: pulseGlow 1.5s infinite alternate;
+}
+
+@keyframes pulseGlow {
+  0% {
+    opacity: 0.75;
+    filter: blur(3px) contrast(1.8) drop-shadow(0 0 3px rgba(0, 255, 200, 0.25));
+    transform: translateX(-50%) translateZ(-6px) scaleY(0.95);
+  }
+  100% {
+    opacity: 0.9;
+    filter: blur(5px) contrast(2) drop-shadow(0 0 4px rgba(0, 255, 200, 0.3));
+    transform: translateX(-50%) translateZ(-6px) scaleY(1.05);
+  }
 }
 
 .ufo-thruster-ports {

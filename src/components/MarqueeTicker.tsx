@@ -1,5 +1,11 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import './MarqueeTicker.css';
+
+interface NftItem {
+  id: string;
+  name: string;
+  artist: string;
+}
 
 interface MarqueeTickerProps {
   nfts: Array<{
@@ -29,14 +35,39 @@ const MarqueeTicker: React.FC<MarqueeTickerProps> = ({ nfts }) => {
     'CHIDO': 'Ricardo Duhalt'
   };
 
-  // Crear una lista de elementos para la marquesina
-  const tickerItems = nfts.flatMap(nft => ({
-    id: nft.id,
-    text: `${nft.name} - ${artistMap[nft.id] || 'Artista'}`
-  }));
+  // Procesar los NFTs para eliminar duplicados y limpiar los nombres
+  const processedItems = useMemo(() => {
+    // Usar un Set para rastrear IDs únicos
+    const uniqueIds = new Set<string>();
+    const result: NftItem[] = [];
 
-  // Duplicar los elementos para un desplazamiento continuo
-  const duplicatedItems = [...tickerItems, ...tickerItems];
+    nfts.forEach(nft => {
+      // Limpiar el nombre para extraer solo el título sin el artista
+      let cleanName = nft.name;
+      if (nft.id === 'EVC') {
+        cleanName = 'Entre la vida y el plástico';
+      } else if (nft.id === 'CMV') {
+        cleanName = 'C0mMzoVeRLoAD';
+      }
+
+      if (!uniqueIds.has(nft.id)) {
+        uniqueIds.add(nft.id);
+        result.push({
+          id: nft.id,
+          name: cleanName,
+          artist: artistMap[nft.id] || 'Artista'
+        });
+      }
+    });
+
+    return result;
+  }, [nfts]);
+
+  // Crear una versión extendida para la animación continua
+  const tickerItems = useMemo(() => {
+    // Duplicar los elementos para permitir un desplazamiento continuo sin saltos
+    return [...processedItems, ...processedItems];
+  }, [processedItems]);
 
   return (
     <div className="w-full overflow-hidden">
@@ -46,13 +77,17 @@ const MarqueeTicker: React.FC<MarqueeTickerProps> = ({ nfts }) => {
           <div className="marquee-gradient-right"></div>
           
           <div className="marquee-content">
-            {duplicatedItems.map((item, index) => (
+            {tickerItems.map((item, index) => (
               <div key={`${item.id}-${index}`} className="marquee-item group">
-                <span className="text-blue-400 group-hover:text-cyan-300 transition-colors duration-300">▶</span>
-                <span className="marquee-item-text bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent group-hover:from-cyan-300 group-hover:to-purple-300 transition-all duration-300">
-                  {item.text}
-                </span>
-                <span className="text-purple-400 group-hover:text-pink-300 transition-colors duration-300">◀</span>
+                <div className="marquee-item-content">
+                  <span className="marquee-item-name" title={item.name}>
+                    {item.name}
+                  </span>
+                  <span className="marquee-item-artist">
+                    by {item.artist}
+                  </span>
+                </div>
+                <div className="marquee-item-divider">•</div>
               </div>
             ))}
           </div>

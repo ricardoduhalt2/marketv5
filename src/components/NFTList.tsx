@@ -154,14 +154,20 @@ const NFTList = () => {
       
       <div className="relative z-10 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 min-h-full">
         <div className="flex justify-center mb-12">
-          <div className="relative group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-blue-500 rounded-2xl blur opacity-75 group-hover:opacity-100 transition duration-200 group-hover:duration-200 animate-tilt"></div>
-            <h2 className="relative px-6 py-3 bg-gradient-to-r from-purple-900/80 to-blue-900/80 backdrop-blur-sm text-2xl md:text-3xl font-bold text-center rounded-xl border border-purple-500/30 shadow-xl shadow-purple-500/10 overflow-hidden group">
-              <span className="bg-gradient-to-r from-blue-300 via-purple-400 to-pink-300 bg-clip-text text-transparent bg-300% animate-gradient">
-                Arte Eterno Collection
-              </span>
-            </h2>
-          </div>
+          <h2 className="relative px-6 py-3 text-2xl md:text-3xl font-bold text-center rounded-lg overflow-hidden group">
+            <span className="relative z-10 bg-gradient-to-r from-blue-300 via-purple-400 to-pink-300 bg-clip-text text-transparent bg-300% animate-gradient">
+              Arte Eterno Collection
+            </span>
+            <div className="absolute inset-0 rounded-lg" style={{
+              background: 'linear-gradient(90deg, #ff6b00, #00a8ff, #0066ff, #ff6b00)',
+              backgroundSize: '300% 300%',
+              animation: 'gradient 8s ease infinite',
+              padding: '1px',
+              WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+              WebkitMaskComposite: 'xor',
+              maskComposite: 'exclude',
+            }}></div>
+          </h2>
         </div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-12">
