@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import RobotHeadIcon from './RobotHeadIcon';
 import { useConnect, useDisconnect, useActiveAccount, useActiveWallet } from 'thirdweb/react';
 import { createWallet } from 'thirdweb/wallets';
 import { toast } from 'react-hot-toast';
@@ -86,31 +87,68 @@ const Navbar: React.FC = () => {
 
 
 
+  // Reusable gradient text style
+  const gradientTextStyle = {
+    background: 'linear-gradient(90deg, #ff6b00, #9d4edd, #4361ee, #4cc9f0, #9d4edd, #ff3c5f)',
+    backgroundSize: '300% 100%',
+    backgroundClip: 'text',
+    WebkitBackgroundClip: 'text',
+    color: 'transparent',
+    WebkitTextFillColor: 'transparent',
+    animation: 'textGradient 8s linear infinite',
+    textShadow: 'none',
+    display: 'inline-block',
+    lineHeight: '1'
+  };
+
   return (
     <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-gray-900/95 backdrop-blur-md shadow-lg' : 'bg-transparent'}`}>
-    
       <div className="max-w-7xl mx-auto px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center space-x-1">
             <Link 
               to="/" 
-              className={navButtonClass('/')}
+              className={`${navButtonClass('/')} nav-link`}
             >
-              HOME
+              <span style={gradientTextStyle}>
+                HOME
+              </span>
             </Link>
             <Link 
               to="/ai-assistant" 
-              className={navButtonClass('/ai-assistant')}
+              className={`${navButtonClass('/ai-assistant')} bot-button`}
+              title="BOT"
             >
-              AI ASSISTANT
+              <RobotHeadIcon />
+              <span 
+                className="font-bold text-sm"
+                style={{
+                  background: 'linear-gradient(90deg, #ff6b00, #9d4edd, #4361ee, #4cc9f0, #9d4edd, #ff3c5f)',
+                  backgroundSize: '300% 100%',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  color: 'transparent',
+                  WebkitTextFillColor: 'transparent',
+                  animation: 'textGradient 8s linear infinite',
+                  textShadow: 'none',
+                  lineHeight: '1',
+                  display: 'inline-block',
+                  padding: '0 2px'
+                }}
+                aria-label="BOT"
+              >
+                BOT
+              </span>
             </Link>
             <a 
               href="https://wealth-protocol.vercel.app/" 
               target="_blank" 
               rel="noopener noreferrer"
-              className={navButtonClass('/ordinal')}
+              className={`${navButtonClass('/ordinal')} nav-link`}
             >
-              ORDINAL
+              <span style={gradientTextStyle}>
+                ORDINAL
+              </span>
             </a>
           </div>
           <div className="flex items-center">
