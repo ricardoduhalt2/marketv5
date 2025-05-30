@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 
 const RobotHeadIcon: React.FC<{ className?: string }> = ({ className = '' }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number | null>(null);
   
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -101,7 +101,7 @@ const RobotHeadIcon: React.FC<{ className?: string }> = ({ className = '' }) => 
     animate();
     
     return () => {
-      if (animationRef.current) {
+      if (animationRef.current !== null) {
         cancelAnimationFrame(animationRef.current);
       }
     };
