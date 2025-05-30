@@ -4,21 +4,16 @@ import {
   INITIAL_TERMINAL_LINES, 
   DEPENDENCIES_TO_INSTALL, 
   FINAL_MESSAGES, 
-  Star,
-  ShootingStar,
   TerminalLine,
   Spark
 } from '@/constants';
+import StarsBackground from './StarsBackground';
 
-const NUM_STARS = 250;
-const NUM_SHOOTING_STARS = 4;
 const SPARK_COUNT = 20;
 const SPARK_LIFESPAN_MIN = 0.3;
 const SPARK_LIFESPAN_MAX = 0.8;
 
 const LoadingPage: React.FC = () => {
-  const [stars, setStars] = useState<Star[]>([]);
-  const [shootingStars, setShootingStars] = useState<ShootingStar[]>([]);
   const [terminalLines, setTerminalLines] = useState<TerminalLine[]>([]);
   const [currentTypedLine, setCurrentTypedLine] = useState<string>("");
   const [isTypingDependency, setIsTypingDependency] = useState<boolean>(false);
@@ -62,7 +57,7 @@ const LoadingPage: React.FC = () => {
 
   useEffect(() => {
     // Generate stars with more vibrant colors and realistic distribution
-    const newStars: Star[] = [];
+    const newStars: any[] = [];
     const starColors = [
       { 
         bg: 'bg-blue-400', 
@@ -102,7 +97,7 @@ const LoadingPage: React.FC = () => {
       }
     ];
 
-    for (let i = 0; i < NUM_STARS; i++) {
+    for (let i = 0; i < 100; i++) {
       const visual = starColors[Math.floor(Math.random() * starColors.length)];
       const size = Math.random() > 0.9 ? 'w-1.5 h-1.5' : 
                   Math.random() > 0.7 ? 'w-1 h-1' : 'w-0.5 h-0.5';
@@ -132,10 +127,10 @@ const LoadingPage: React.FC = () => {
         animationDuration: `${3 + Math.random() * 10}s`,
       });
     }
-    setStars(newStars);
+    // setStars(newStars);
 
     // Generate shooting stars with more realistic and varied trajectories
-    const newShootingStarsData: ShootingStar[] = [];
+    const newShootingStarsData: any[] = [];
     const shootingStarColors = [
       { 
         hex: '#60a5fa', 
@@ -175,7 +170,7 @@ const LoadingPage: React.FC = () => {
       }  // white
     ];
 
-    for (let i = 0; i < NUM_SHOOTING_STARS; i++) {
+    for (let i = 0; i < 10; i++) {
       const visual = shootingStarColors[Math.floor(Math.random() * shootingStarColors.length)];
       // More natural angle range
       const angleDeg = -20 - Math.random() * 50; 
@@ -224,7 +219,52 @@ const LoadingPage: React.FC = () => {
         gradient: gradient,
       });
     }
-    setShootingStars(newShootingStarsData);
+    // setShootingStars(newShootingStarsData);
+  }, []);
+
+  // Generate sparks effect
+  useEffect(() => {
+    const generateSparks = () => {
+      const newSparks: Spark[] = [];
+      
+      for (let i = 0; i < SPARK_COUNT; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const distance = 30 + Math.random() * 20; // Distance from center
+        const dx = Math.cos(angle) * distance;
+        const dy = Math.sin(angle) * distance;
+        
+        // Añadir coordenadas x, y para cumplir con el tipo Spark
+        newSparks.push({
+          id: `spark-${Date.now()}-${i}`,
+          x: 0, // Se posicionarán en el centro y se animarán con transform
+          y: 0,
+          dx,
+          dy,
+          size: 1 + Math.random() * 2, // 1-3px
+          duration: SPARK_LIFESPAN_MIN + Math.random() * (SPARK_LIFESPAN_MAX - SPARK_LIFESPAN_MIN),
+          delay: Math.random() * 0.5,
+          color: ['bg-yellow-300', 'bg-orange-400', 'bg-red-500'][Math.floor(Math.random() * 3)]
+        });
+      }
+      
+      setSparks(newSparks);
+      
+      // Schedule next spark generation
+      const timeout = 1000 + Math.random() * 2000; // 1-3 seconds
+      const timer = setTimeout(() => {
+        generateSparks();
+      }, timeout);
+      
+      return () => clearTimeout(timer);
+    };
+    
+    // Initial spark generation
+    const cleanup = generateSparks();
+    
+    // Cleanup on unmount
+    return () => {
+      if (cleanup) cleanup();
+    };
   }, []);
 
   // Función para generar chispas
@@ -353,40 +393,8 @@ const LoadingPage: React.FC = () => {
 
   return (
     <div className="loading-page-container">
-      {/* Background Stars */}
-      {stars.map((star) => (
-        <div
-          key={star.id}
-          className={`star-element ${star.sizeClass} ${star.colorClass} ${star.shadowClass}`}
-          style={{
-            left: `${star.x}%`,
-            top: `${star.y}%`,
-            animationDuration: star.animationDuration,
-            animationDelay: star.animationDelay,
-          }}
-        />
-      ))}
-
-      {/* Realistic Shooting Stars */}
-      {shootingStars.map((star) => (
-        <div
-          key={star.id}
-          className="shooting-star-element"
-          style={{
-            width: '80px',
-            background: star.gradient,
-            filter: `drop-shadow(0 0 6px ${star.headColorHex}) drop-shadow(0 0 10px ${star.headColorHex})`,
-            animationDuration: star.animationDuration,
-            animationDelay: star.animationDelay,
-            // @ts-ignore
-            '--start-x': star.startX,
-            '--start-y': star.startY,
-            '--travel-x': star.travelX,
-            '--travel-y': star.travelY,
-            '--angle': star.angle,
-          }}
-        />
-      ))}
+      {/* Stars Background */}
+      <StarsBackground />
 
       {/* Titles */}
       <div className="titles-container">

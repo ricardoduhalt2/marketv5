@@ -37,6 +37,15 @@ A modern NFT marketplace built with React, Web3, and AI technologies. This platf
 - **AI:** Google's Generative AI
 - **Authentication:** MetaMask
 - **Deployment:** Vercel, Netlify, or any Node.js compatible hosting
+- **Animations:** Canvas-based particle effects, Custom shaders
+
+## ✨ Latest Updates
+
+### v1.1.0 - Stars Background Update
+- Added high-performance canvas-based starfield background
+- Improved loading screen animations and transitions
+- Optimized rendering performance
+- Enhanced visual effects with smooth animations
 
 ## 🚀 Quick Start
 
@@ -152,6 +161,13 @@ npm run preview
 - ⭐ Enhanced shooting stars with colorful trails
 - 🪐 Implemented rotating planets with dynamic rings
 - 🛸 Added animated UFO with wave motion and glow effects
+- 🌟 **New Stars Background**
+  - High-performance canvas-based starfield animation
+  - Smooth twinkling effects with varying opacity
+  - Optimized rendering for all screen sizes
+  - Seamless integration with existing UI components
+  - Memory-efficient implementation with React hooks
+
 - 🤖 Integrated ambient robot animation background
 - ✨ Improved particle glow effects and blending
 - 🌟 Dynamic brightness and opacity transitions
