@@ -1,36 +1,32 @@
-# Arte Eterno NFT Marketplace - MACQ
+# Unlockable Content Agency Marketplace
 
-A modern NFT marketplace for the Museum of Contemporary Art, Quintana Roo (MACQ), built with React and Web3 technologies.
+A modern NFT marketplace built with React, Web3, and AI technologies. This platform showcases digital art collections with interactive features and a seamless user experience.
 
-![MACQ Marketplace](public/macq_logo_black.png)
+![UCA Marketplace](https://petgascoin.com/wp-content/uploads/2025/05/UCA-logo-fondo-blanco-horizontal-1-scaled-e1748567694616.png)
 
 ## ✨ Features
 
 - 🎨 **Modern UI/UX**
   - Dynamic space-themed particle background
-  - Interactive planets and UFOs with glow effects
-  - Vibrant shooting stars with colorful trails
-  - Smart particle system with variable brightness
-  - iOS-optimized animations and effects
-  - Gradient effects and smooth animations
-  - Advanced loading screen with space theme
-  - Floating UFO with dynamic movement
-  - Robot companion background animation
-  - Glass-morphism effects and modern button styles
-  - Dynamic hover states and transitions
+  - Interactive UFO with animated glow effects
+  - Vibrant gradient animations and smooth transitions
+  - Responsive design for all devices
+  - Advanced loading screen with HUD elements
+  - Glass-morphism effects and modern UI components
+  - Animated gradient borders and hover effects
 
 - 🖼️ **NFT Features**
   - Individual detailed NFT pages
   - Dynamic metadata loading
   - Secure minting process
-  - "Arte Eterno Collection" showcase
+  - Animated NFT showcase with marquee ticker
+  - Collection filtering and search functionality
 
 - 🤖 **AI-Powered Assistant**
   - Google Gemini AI integration
-  - Context-aware NFT information and museum details
-  - Smart responses based on collection data and location queries
-  - Multi-location support for museum information
-  - Real-time price updates and NFT details
+  - Context-aware NFT information
+  - Smart responses based on collection data
+  - Real-time updates and NFT details
   - Bilingual support (English/Spanish)
 
 ## 🛠️ Tech Stack
@@ -40,6 +36,7 @@ A modern NFT marketplace for the Museum of Contemporary Art, Quintana Roo (MACQ)
 - **Blockchain:** ThirdWeb SDK, Web3
 - **AI:** Google's Generative AI
 - **Authentication:** MetaMask
+- **Deployment:** Vercel, Netlify, or any Node.js compatible hosting
 
 ## 🚀 Quick Start
 
@@ -51,7 +48,32 @@ npm install
 ```
 
 2. **Environment Setup**
-Create a `.env` file:
+   - Copy `.env.example` to `.env`
+   - Add your ThirdWeb client ID and other environment variables
+
+3. **Run Development Server**
+```bash
+npm run dev
+```
+
+4. **Build for Production**
+```bash
+npm run build
+npm run preview
+```
+
+## 🌟 Recent Updates
+
+- 🎨 Added animated gradient border effects
+- 🚀 Improved loading performance
+- ✨ Enhanced UI with modern glass-morphism effects
+- 🌈 Updated logo and branding
+- 🛠️ Fixed various bugs and improved stability
+
+## 🔧 Environment Variables
+
+Create a `.env` file based on `.env.example` with the following variables:
+
 ```env
 VITE_GOOGLE_AI_API_KEY=your_api_key
 VITE_THIRDWEB_CLIENT_ID=your_client_id
