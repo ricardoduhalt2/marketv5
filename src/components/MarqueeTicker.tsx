@@ -18,14 +18,14 @@ const MarqueeTicker: React.FC<MarqueeTickerProps> = ({ nfts }) => {
   // Mapeo de IDs de NFT a nombres de artista
   const artistMap: {[key: string]: string} = {
     'TEM': 'Ms. Cosmic',
-    'GCC': 'Pinche Chucho',
+    'GCC': '$Pinche $Chucho',
     'EVC': 'Daughter of the Son',
-    'CMV': 'Pinche Chucho',
+    'CMV': '$Pinche $Chucho',
     'BBB': 'Daveed Benjamin',
     'IVT': 'ONA AOÉRA',
     'YSL': 'Tania Cuevas Martinez',
-    'PSA': 'Pinche Chucho',
-    'PLL': 'Pinche Chucho',
+    'PSA': '$Pinche $Chucho',
+    'PLL': '$Pinche $Chucho',
     'MOL': 'Char Puravida',
     'HTC': 'Jolted',
     'FLC': 'IGLI',

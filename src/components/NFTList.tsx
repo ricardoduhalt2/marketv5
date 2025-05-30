@@ -155,17 +155,26 @@ const NFTList = () => {
       <div className="relative z-10 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 min-h-full">
         <div className="flex justify-center mb-12">
           <h2 className="relative px-6 py-3 text-2xl md:text-3xl font-bold text-center rounded-lg overflow-hidden group">
-            <span className="relative z-10 bg-gradient-to-r from-blue-300 via-purple-400 to-pink-300 bg-clip-text text-transparent bg-300% animate-gradient">
+            <span className="relative z-10" style={{
+              background: 'linear-gradient(90deg, #ff6b00, #9d4edd, #4361ee, #4cc9f0, #9d4edd, #ff3c5f)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundSize: '300% 100%',
+              animation: 'textGradientStroke 8s linear infinite',
+              textShadow: '0 0 0.3px #ff6b00, 0 0 0.3px #9d4edd, 0 0 0.3px #4361ee, 0 0 0.3px #4cc9f0',
+              WebkitTextStroke: '0.2px transparent'
+            }}>
               Arte Eterno Collection
             </span>
             <div className="absolute inset-0 rounded-lg" style={{
-              background: 'linear-gradient(90deg, #ff6b00, #00a8ff, #0066ff, #ff6b00)',
-              backgroundSize: '300% 300%',
-              animation: 'gradient 8s ease infinite',
+              background: 'linear-gradient(90deg, #ff6b00, #9d4edd, #4361ee, #4cc9f0, #9d4edd, #ff3c5f)',
+              backgroundSize: '300% 100%',
+              animation: 'gradient 8s linear infinite',
               padding: '1px',
               WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
               WebkitMaskComposite: 'xor',
               maskComposite: 'exclude',
+              opacity: '0.8',
             }}></div>
           </h2>
         </div>
@@ -208,14 +217,14 @@ const NFTList = () => {
                           // Mapeo completo de IDs de NFT a nombres de artista
                           const artistMap: {[key: string]: string} = {
                             'TEM': 'Ms. Cosmic',
-                            'GCC': 'Pinche Chucho',
+                            'GCC': '$Pinche $Chucho',
                             'EVC': 'Daughter of the Son',
-                            'CMV': 'Pinche Chucho',
+                            'CMV': '$Pinche $Chucho',
                             'BBB': 'Daveed Benjamin',
                             'IVT': 'ONA AOÉRA',
                             'YSL': 'Tania Cuevas Martinez',
-                            'PSA': 'Pinche Chucho',
-                            'PLL': 'Pinche Chucho',
+                            'PSA': '$Pinche $Chucho',
+                            'PLL': '$Pinche $Chucho',
                             'MOL': 'Char Puravida',
                             'HTC': 'Jolted',
                             'FLC': 'IGLI',

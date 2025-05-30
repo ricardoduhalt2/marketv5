@@ -12,7 +12,7 @@ Tides of the Eternal Mind by Ms. Cosmic. In Tides of the Eternal Mind two faces 
 
 ## Galactic Clean-Up Crew
 ![Galactic Clean-Up Crew](ipfs://QmNcTwgWp3rMW3RxSbeKArNHiSpA3qZmMYv61m7LKHj4N7/0.jpg)
-Galactic Clean-Up Crew by Pinche Chucho. The Galactic Clean-Up Crew is on an epic mission to rescue Earth from plastic pollution! These pixel-art eco-guardians fly advanced UFOs using cutting-edge Petgas Sequestration Rays to beam up plastic waste and transform it into clean ready to use non-fossil fuel energy. Together they prove that innovation teamwork and intergalactic magic can clean up our planet. As futuristic eco-warriors the Petgaseritos inspire communities worldwide to embrace a circular economy and work toward a plastic-neutral Earth. Ready to join the mission? Cleaning the planet is a job for heroes no matter the galaxy!
+Galactic Clean-Up Crew by $Pinche $Chucho. The Galactic Clean-Up Crew is on an epic mission to rescue Earth from plastic pollution! These pixel-art eco-guardians fly advanced UFOs using cutting-edge Petgas Sequestration Rays to beam up plastic waste and transform it into clean ready to use non-fossil fuel energy. Together they prove that innovation teamwork and intergalactic magic can clean up our planet. As futuristic eco-warriors the Petgaseritos inspire communities worldwide to embrace a circular economy and work toward a plastic-neutral Earth. Ready to join the mission? Cleaning the planet is a job for heroes no matter the galaxy!
 
 ---
 
@@ -24,7 +24,7 @@ C0mMzoVeRLoAD by Daughter of the Son. Earth is ghetto. Comms can be intense. How
 
 ## Entre la Vida y el Plástico
 ![Entre la Vida y el Plástico](ipfs://Qmant6X4GE4o7bMDuYDCyGr3wRwUpTejAzBjgDJucWR6H5/0.jpg)
-Entre la Vida y el Plastico por Pinche Chucho. En el corazon de Sian Kaan esta imagen poderosa captura el contraste entre la vida marina y el devastador impacto de la contaminacion oceanica. En una mano abierta descansa una cria de tortuga marina sin vida junto a una tapa de botella verde una representando la vida fragil la otra una amenaza persistente. Con el mar y el cielo como telon de fondo Entre la Vida y el Plastico es un recordatorio impactante de la huella humana en esta preciosa biosfera y la urgente necesidad de tomar accion por el medio ambiente. La compra de este NFT 1 de 1 incluye una pieza de arte fotografico impresa. La compra de NFT desbloquea la propiedad de obras de arte fisicas.
+Entre la Vida y el Plastico por $Pinche $Chucho. En el corazon de Sian Kaan esta imagen poderosa captura el contraste entre la vida marina y el devastador impacto de la contaminacion oceanica. En una mano abierta descansa una cria de tortuga marina sin vida junto a una tapa de botella verde una representando la vida fragil la otra una amenaza persistente. Con el mar y el cielo como telon de fondo Entre la Vida y el Plastico es un recordatorio impactante de la huella humana en esta preciosa biosfera y la urgente necesidad de tomar accion por el medio ambiente. La compra de este NFT 1 de 1 incluye una pieza de arte fotografico impresa. La compra de NFT desbloquea la propiedad de obras de arte fisicas.
 
 ---
 
@@ -48,13 +48,13 @@ Yo Soy Libertad by Tania Cuevas Martinez. Captured during Mexico’s historic In
 
 ## Pirolisaurio: Born from the Fossil Age
 ![Pirolisaurio: Born from the Fossil Age](ipfs://QmRJ6B6FHAH8rvuyvRDFZFnT8btdfniDJpBpiNnPwXK1Mm/0.jpg)
-Pirolisaurio: Born from the Fossil Age by Pinche Chucho. Millions of years ago dinosaurs became the fossil fuels that power our world today. The Pirolisaurio created by Pinche Chucho and Petgas rises as a mythical guardian of transformation turning plastic waste into clean energy. This unique NFT includes an exclusive bold sculpture merging technology sustainability and art a powerful statement on regeneration and the future of energy.
+Pirolisaurio: Born from the Fossil Age by $Pinche $Chucho. Millions of years ago dinosaurs became the fossil fuels that power our world today. The Pirolisaurio created by Pinche Chucho and Petgas rises as a mythical guardian of transformation turning plastic waste into clean energy. This unique NFT includes an exclusive bold sculpture merging technology sustainability and art a powerful statement on regeneration and the future of energy.
 
 ---
 
 ## Petgaserito Laser Luca
 ![Petgaserito Laser Luca](ipfs://QmcxLvSAnCXH3DBiYm6ipTto2PWHxJuzadpJDAyUZ32Zr7/0.jpg)
-Petgaserito Laser Luca by Pinche Chucho. Petgaserito Laser Luca the plastic alchemist with laser-focused vision on ending poverty! Rocking his Plastic to Fuel cap Luca is on a mission to zap waste into wealth turning plastic into clean energy while championing SDG 1 – No Poverty. As a fearless Petgaserito he’s out in the world and the metaverse rewarding plastic miners and driving real-world impact through Web3 innovation. NFT Purchase unlocks physical art piece ownership. Own Laser Luca and fuel the movement towards a cleaner wealthier future!
+Petgaserito Laser Luca by $Pinche $Chucho. Petgaserito Laser Luca the plastic alchemist with laser-focused vision on ending poverty! Rocking his Plastic to Fuel cap Luca is on a mission to zap waste into wealth turning plastic into clean energy while championing SDG 1 – No Poverty. As a fearless Petgaserito he’s out in the world and the metaverse rewarding plastic miners and driving real-world impact through Web3 innovation. NFT Purchase unlocks physical art piece ownership. Own Laser Luca and fuel the movement towards a cleaner wealthier future!
 
 ---
 

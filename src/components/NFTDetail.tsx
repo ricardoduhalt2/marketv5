@@ -230,6 +230,17 @@ const NFTDetail = () => {
     );
   }
 
+  // Reusable style for gradient text
+  const gradientTextStyle = {
+    background: 'linear-gradient(90deg, #ff6b00, #9d4edd, #4361ee, #4cc9f0, #9d4edd, #ff3c5f)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    backgroundSize: '300% 100%',
+    animation: 'textGradientStroke 8s linear infinite',
+    textShadow: '0 0 0.3px #ff6b00, 0 0 0.3px #9d4edd, 0 0 0.3px #4361ee, 0 0 0.3px #4cc9f0',
+    WebkitTextStroke: '0.2px transparent'
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 py-4 sm:py-8 px-4 sm:px-6 lg:px-8 w-full flex justify-center">
       <div className="w-full max-w-[1600px] mx-auto px-0 sm:px-4 lg:px-8">
@@ -248,11 +259,23 @@ const NFTDetail = () => {
         <div className="relative mb-8 md:mb-12 text-center group">
           <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 via-cyan-500/20 to-purple-500/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
           <div className="relative bg-gray-900/80 backdrop-blur-sm rounded-2xl p-4 md:p-8 overflow-hidden">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400 mb-4">
+            <h1 
+              className="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-4"
+              style={gradientTextStyle}
+            >
               {metadata?.name || nft.name}
             </h1>
             <div className="inline-flex items-center px-4 py-2 rounded-full bg-gray-800/80 border border-gray-700/50">
-              <span className="text-sm font-medium text-cyan-300">
+              <span 
+                className="text-sm font-medium"
+                style={{
+                  ...gradientTextStyle,
+                  background: 'linear-gradient(90deg, #9d4edd, #4cc9f0, #9d4edd)',
+                  backgroundSize: '200% 100%',
+                  fontSize: '0.9rem',
+                  WebkitTextStroke: '0.15px transparent'
+                }}
+              >
                 Arte Eterno Collection • #{nft.id}
               </span>
             </div>

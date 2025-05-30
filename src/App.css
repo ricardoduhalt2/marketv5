@@ -389,6 +389,44 @@ body::before { /* Pseudo-element for background shifting light effect */
   animation: animatedGradient 4s linear infinite;
 }
 
+@keyframes textGradientStroke {
+  0% {
+    text-shadow: 
+      0 0 0.3px #ff6b00,
+      0 0 0.3px #9d4edd,
+      0 0 0.3px #4361ee,
+      0 0 0.3px #4cc9f0;
+  }
+  25% {
+    text-shadow: 
+      0 0 0.3px #9d4edd,
+      0 0 0.3px #4361ee,
+      0 0 0.3px #4cc9f0,
+      0 0 0.3px #ff3c5f;
+  }
+  50% {
+    text-shadow: 
+      0 0 0.3px #4361ee,
+      0 0 0.3px #4cc9f0,
+      0 0 0.3px #ff3c5f,
+      0 0 0.3px #ff6b00;
+  }
+  75% {
+    text-shadow: 
+      0 0 0.3px #4cc9f0,
+      0 0 0.3px #ff3c5f,
+      0 0 0.3px #ff6b00,
+      0 0 0.3px #9d4edd;
+  }
+  100% {
+    text-shadow: 
+      0 0 0.3px #ff3c5f,
+      0 0 0.3px #ff6b00,
+      0 0 0.3px #9d4edd,
+      0 0 0.3px #4361ee;
+  }
+}
+
 @keyframes animatedGradient {
   0% {
     background-position: 0% 50%;

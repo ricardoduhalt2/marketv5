@@ -71,7 +71,7 @@ export const nftData: NftData[] = [
   {
     id: "GCC",
     name: "Galactic Clean-Up Crew",
-    description: "By Pinche Chucho. These pixel-art eco-guardians are on an epic mission to rescue Earth from plastic pollution! Flying advanced UFOs with cutting-edge Petgas Sequestration Rays to beam up plastic waste and transform it into clean ready to use non-fossil fuel energy. Together they prove that innovation teamwork and intergalactic magic can clean up our planet.",
+    description: "By $Pinche $Chucho. These pixel-art eco-guardians are on an epic mission to rescue Earth from plastic pollution! Flying advanced UFOs with cutting-edge Petgas Sequestration Rays to beam up plastic waste and transform it into clean ready to use non-fossil fuel energy. Together they prove that innovation teamwork and intergalactic magic can clean up our planet.",
     image: "ipfs://QmNcTwgWp3rMW3RxSbeKArNHiSpA3qZmMYv61m7LKHj4N7/0.jpg",
     editionContractAddress: "0xBF186Cb90ac092B16c97064046502c695340eEd9",
     splitContractAddress: "0x48791b0D7DD55FB6fde9b2e2F37DDe33507c8275",
@@ -93,7 +93,7 @@ export const nftData: NftData[] = [
   {
     id: "CMV",
     name: "Entre la Vida y el Plástico",
-    description: "Por Pinche Chucho. En el corazon de Sian Kaan esta imagen poderosa captura el contraste entre la vida marina y el devastador impacto de la contaminacion oceanica.",
+    description: "Por $Pinche $Chucho. En el corazon de Sian Kaan esta imagen poderosa captura el contraste entre la vida marina y el devastador impacto de la contaminacion oceanica.",
     image: "ipfs://Qmant6X4GE4o7bMDuYDCyGr3wRwUpTejAzBjgDJucWR6H5/0.jpg",
     editionContractAddress: "0xDCfeBA9001D7296790ed2c5ea6d38B528BAB4d1c",
     splitContractAddress: "0xA74645BFe396Fe28FF1B8C0218277fb77FE6e717",
@@ -137,7 +137,7 @@ export const nftData: NftData[] = [
   {
     id: "PSA",
     name: "Pirolisaurio: Born from the Fossil Age",
-    description: "By Pinche Chucho. A mythical guardian of transformation turning plastic waste into clean energy.",
+    description: "By $Pinche $Chucho. A mythical guardian of transformation turning plastic waste into clean energy.",
     image: "https://petgascoin.com/wp-content/uploads/2025/05/Pirolisaurio_-Born-from-the-Fossil-Age.mp4",
     editionContractAddress: "0xD7544C4d10a1EC19eD81F88E26ef49DC95c13994",
     splitContractAddress: "0xe2902e12B2C1284606beAfdb2B00608fD50970E5",
@@ -148,7 +148,7 @@ export const nftData: NftData[] = [
   {
     id: "PLL",
     name: "Petgaserito Laser Luca",
-    description: "By Pinche Chucho. The plastic alchemist with laser-focused vision on ending poverty!",
+    description: "By $Pinche $Chucho. The plastic alchemist with laser-focused vision on ending poverty!",
     image: "ipfs://QmcxLvSAnCXH3DBiYm6ipTto2PWHxJuzadpJDAyUZ32Zr7/0.jpg",
     editionContractAddress: "0x554f00371855B4181383a81D755670D84F7A8F9a",
     splitContractAddress: "0x8b829772C0FfBE94636EbB21EA66DEEB130b97Ba",

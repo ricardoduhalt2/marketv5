@@ -41,6 +41,13 @@ A modern NFT marketplace built with React, Web3, and AI technologies. This platf
 
 ## ✨ Latest Updates
 
+### v1.2.0 - UI/UX Enhancements (May 30, 2025)
+- 🎨 Added animated gradient text effects to all titles
+- ✨ Enhanced NFT detail page with dynamic gradient animations
+- 🖌️ Improved text visibility with subtle stroke effects
+- 🌈 Updated color schemes to match brand identity
+- 🔄 Synchronized animations across components for consistency
+
 ### v1.1.0 - Stars Background Update
 - Added high-performance canvas-based starfield background
 - Improved loading screen animations and transitions
