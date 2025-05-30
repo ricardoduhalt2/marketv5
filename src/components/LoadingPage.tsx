@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './LoadingPage.css';
-import NFTParticleGallery from './NFTParticleGallery';
 
 interface HUDLine {
   x1: number;
@@ -113,7 +112,6 @@ const LoadingPage: React.FC = () => {
   return (
     <div className="loading-container" ref={containerRef}>
       {/* Galería de NFTs con partículas */}
-      <NFTParticleGallery />
       
       {/* Imagen de carga */}
       <div style={{
@@ -158,7 +156,9 @@ const LoadingPage: React.FC = () => {
       </div>
       
       {/* Capa de superposición HUD */}
-      <div className="hud-overlay" />
+      <div className="hud-overlay">
+        {/* Particle gallery removed */}
+      </div>
       
       {/* Líneas de la cuadrícula HUD */}
       <div className="hud-lines">

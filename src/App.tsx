@@ -14,7 +14,6 @@ import LoadingPage from './components/LoadingPage';
 import { useState, useEffect } from 'react';
 import RealisticUfo from './components/RealisticUfo';
 import MarqueeTicker from './components/MarqueeTicker';
-import NFTImageExtractor from './components/NFTImageExtractor';
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -129,7 +128,6 @@ function App() {
           <Route path="/" element={<NFTList />} />
           <Route path="/nft/:id" element={<NFTDetail />} />
           <Route path="/ai-assistant" element={<AiAssistant />} />
-          <Route path="/nft-extractor" element={<NFTImageExtractor />} />
         </Routes>
       </main>
 
