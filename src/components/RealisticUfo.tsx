@@ -10,6 +10,7 @@ interface TrailPoint {
   scaleX?: number; // For hyperjump stretching
   color?: string; // For hyperjump color change
   id: string;
+  type?: 'normal' | 'laser';
 }
 
 const UFO_BASE_WIDTH = 200; // Original width before scaling
@@ -33,6 +34,7 @@ type LaserShotStep = 'idle' | 'prepareShot' | 'firingActive' | 'shotCooldown';
 const RealisticUfo = (): React.ReactElement => {
   const [ufoPosition, setUfoPosition] = useState({ x: -UFO_BASE_WIDTH * 1.5 * UFO_SCALE, y: 150 });
   const [trail, setTrail] = useState<TrailPoint[]>([]);
+  const [laserTrail, setLaserTrail] = useState<{x: number, y: number, opacity: number, id: string}[]>([]);
   const [tilt, setTilt] = useState({ x: 0, z: 0 });
   const [engineGlowOpacity, setEngineGlowOpacity] = useState(0.7);
 
@@ -118,12 +120,38 @@ const RealisticUfo = (): React.ReactElement => {
 
   const handleFiringLaser = useCallback(() => {
     if (laserActive) {
-      const visualUfoBottomY = ufoPosition.y + (UFO_BASE_HEIGHT * UFO_SCALE / 2);
-      setLaserHeight(window.innerHeight - visualUfoBottomY ); 
+      const visualUfoBottomY = ufoPosition.y + (UFO_BASE_HEIGHT * UFO_SCALE);
+      setLaserHeight(window.innerHeight - visualUfoBottomY);
+      
+      // Agregar punto a la estela del láser
+      setLaserTrail(prev => [
+        ...prev.slice(-5), // Mantener solo los últimos 5 puntos para la estela
+        { 
+          x: ufoPosition.x + (UFO_BASE_WIDTH * UFO_SCALE / 2) - 4, // Centrado
+          y: visualUfoBottomY,
+          opacity: 1,
+          id: `laser-trail-${Date.now()}`
+        }
+      ]);
     } else {
-      setLaserHeight(0); 
+      setLaserHeight(0);
+      // Desvanecer gradualmente la estela
+      const fadeInterval = setInterval(() => {
+        setLaserTrail(prev => {
+          const updated = prev.map(point => ({
+            ...point,
+            opacity: point.opacity - 0.02
+          }));
+          return updated.filter(p => p.opacity > 0);
+        });
+      }, 30);
+      
+      setTimeout(() => {
+        clearInterval(fadeInterval);
+        setLaserTrail([]);
+      }, 1000);
     }
-  }, [laserActive, ufoPosition.y]);
+  }, [laserActive, ufoPosition.x, ufoPosition.y]);
 
   const handlePostLaserMove = useCallback(() => {
     setUfoPosition(prev => ({ x: prev.x + currentSpeed, y: prev.y }));
@@ -324,20 +352,33 @@ const RealisticUfo = (): React.ReactElement => {
 
   return (
     <div className="ufo-viewport">
-      {trail.map((pos) => (
-        <div
-          key={pos.id}
-          className="ufo-trail-particle"
-          style={{
-            left: `${pos.x}px`,
-            top: `${pos.y}px`,
-            opacity: pos.opacity,
-            transform: `translate(-50%, -50%) scale(${pos.scale}) scaleX(${pos.scaleX || 1})`,
-            backgroundColor: pos.color, 
-          }}
-        />
-      ))}
-
+      <div className="ufo-trail">
+        {trail.map((point, index) => (
+          <div
+            key={`${point.id}-${index}`}
+            className="trail-point"
+            style={{
+              left: `${point.x}px`,
+              top: `${point.y}px`,
+              opacity: point.opacity,
+              transform: `scale(${point.scale})`,
+              backgroundColor: point.color || 'rgba(100, 200, 255, 0.6)'
+            }}
+          />
+        ))}
+        {/* Estela del láser */}
+        {laserTrail.map((point, index) => (
+          <div
+            key={`laser-trail-${index}`}
+            className="laser-trail-point"
+            style={{
+              left: `${point.x}px`,
+              top: `${point.y}px`,
+              opacity: point.opacity * 0.7,
+            }}
+          />
+        ))}
+      </div>
       <div
         className="ufo-perspective-group" 
         style={{

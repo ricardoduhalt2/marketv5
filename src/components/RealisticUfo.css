@@ -62,37 +62,170 @@
 .ufo-dome {
   position: absolute;
   width: 100%;
-  height: 70%; /* Approx 42px of 60px total height */
-  top: -2%; /* Slightly overlapping for smoother connection */
+  height: 70%;
+  top: -2%;
   left: 0;
   background: linear-gradient(to bottom, 
-    rgba(128, 148, 175, 0.22) 0%, /* Lighter top - even more transparent */
-    rgba(100, 116, 139, 0.196) 50%, /* Mid tone - even more transparent */
-    rgba(51, 65, 85, 0.172) 100%    /* Darker base - even more transparent */
+    rgba(128, 148, 175, 0.22) 0%,
+    rgba(100, 116, 139, 0.196) 50%,
+    rgba(51, 65, 85, 0.172) 100%
   );
   opacity: 0.8;
   border-top-left-radius: 50% 100%; 
   border-top-right-radius: 50% 100%;
   border-bottom-left-radius: 20% 15%; 
   border-bottom-right-radius: 20% 15%;
-  box-shadow: inset 0 3px 18px rgba(220, 230, 255, 0.25),
-              inset 0 -2px 12px rgba(80, 120, 180, 0.15);
   transform: translateZ(12px);
   overflow: hidden;
+  /* Borde con gradiente animado */
+  position: relative;
 }
 
+.ufo-dome::before {
+  content: '';
+  position: absolute;
+  inset: -1.5px;
+  background: linear-gradient(90deg, 
+    rgba(255, 107, 0, 0.6), 
+    rgba(157, 78, 221, 0.6), 
+    rgba(67, 97, 238, 0.6), 
+    rgba(76, 201, 240, 0.6), 
+    rgba(157, 78, 221, 0.6), 
+    rgba(255, 60, 95, 0.6)
+  );
+  background-size: 200% 100%;
+  border-radius: inherit;
+  z-index: -1;
+  animation: borderGradient 8s linear infinite;
+  filter: blur(0.8px);
+  mask: linear-gradient(180deg, 
+    rgba(0,0,0,0.6) 0%, 
+    rgba(0,0,0,0.7) 50%, 
+    rgba(0,0,0,0.9) 100%
+  );
+  -webkit-mask: linear-gradient(180deg, 
+    rgba(0,0,0,0.6) 0%, 
+    rgba(0,0,0,0.7) 50%, 
+    rgba(0,0,0,0.9) 100%
+  );
+  opacity: 0.8;
+}
+
+.ufo-dome::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: inherit;
+  z-index: -1;
+}
+
+/* Halo principal - Máximo brillo */
 .ufo-dome-glow-orb {
   position: absolute;
-  top: 10%; left: 30%;
-  width: 40%; height: 35%;
-  background: radial-gradient(ellipse at center, 
-    rgba(170, 200, 255, 0.15) 0%,  /* Más sutil */
-    rgba(100, 150, 210, 0.04) 60%,  /* Más sutil */
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  background: radial-gradient(
+    circle at center,
+    rgba(200, 240, 255, 1) 0%,
+    rgba(100, 200, 255, 0.9) 20%,
+    rgba(0, 150, 255, 0.7) 40%,
+    rgba(0, 80, 200, 0.3) 60%,
     transparent 80%
   );
-  border-radius: 50%;
-  animation: domeGlow 5s infinite alternate ease-in-out;
-  opacity: 0.6;  /* Más transparente */
+  filter: blur(20px) brightness(1.5);
+  opacity: 1;
+  transform: translateZ(100px);
+  box-shadow: 
+    0 0 80px 40px rgba(100, 200, 255, 0.8),
+    0 0 120px 60px rgba(100, 180, 255, 0.6),
+    0 0 200px 100px rgba(80, 160, 255, 0.3);
+  animation: pulseGlow 2s infinite alternate ease-in-out;
+}
+
+@keyframes pulseGlow {
+  0% {
+    filter: blur(15px) brightness(1.3);
+    opacity: 0.9;
+  }
+  100% {
+    filter: blur(25px) brightness(1.7);
+    opacity: 1;
+  }
+}
+
+/* Si aún no se ve, prueba descomentar esto para forzar visibilidad */
+/*
+.ufo-dome-glow-orb {
+  background: red !important;
+  opacity: 1 !important;
+}
+*/
+
+.ufo-dome-glow-orb::before,
+.ufo-dome-glow-orb::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* Capa base de brillo suave */
+.ufo-dome-glow-orb::before {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(180, 220, 255, 0.4) 0%,
+    rgba(140, 190, 250, 0.2) 40%,
+    rgba(100, 160, 240, 0.1) 70%,
+    transparent 90%
+  );
+  filter: blur(4px);
+  animation: glowPulse 6s infinite alternate ease-in-out;
+}
+
+/* Capa de resplandor intenso */
+.ufo-dome-glow-orb::after {
+  background: radial-gradient(
+    circle at 50% 30%,
+    rgba(200, 230, 255, 0.8) 0%,
+    rgba(160, 200, 255, 0.4) 30%,
+    rgba(100, 150, 220, 0.2) 60%,
+    transparent 90%
+  );
+  opacity: 0.7;
+  filter: blur(8px);
+  animation: glowMove 8s infinite alternate ease-in-out;
+}
+
+/* Efecto de partículas sutiles */
+@keyframes glowParticle {
+  0% { transform: translateY(0) scale(1); opacity: 0.3; }
+  50% { transform: translateY(-5%) scale(1.05); opacity: 0.5; }
+  100% { transform: translateY(0) scale(1); opacity: 0.3; }
+}
+
+/* Movimiento del resplandor */
+@keyframes glowMove {
+  0% { transform: translate(-5%, -5%) scale(0.95); opacity: 0.6; }
+  33% { transform: translate(5%, 0) scale(1); opacity: 0.8; }
+  66% { transform: translate(0, 5%) scale(0.98); opacity: 0.7; }
+  100% { transform: translate(-5%, -5%) scale(0.95); opacity: 0.6; }
+}
+
+/* Pulsación del brillo */
+@keyframes glowPulse {
+  0% { transform: scale(0.95); opacity: 0.7; }
+  50% { transform: scale(1.05); opacity: 0.9; }
+  100% { transform: scale(0.95); opacity: 0.7; }
 }
 
 .ufo-dome-highlight {
@@ -276,19 +409,49 @@
   left: 50%;
 }
 
-/* UFO Laser Beam */
+/* Laser Trail */
+.laser-trail-point {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  pointer-events: none;
+  background: linear-gradient(90deg, 
+    rgba(255, 107, 0, 0.8), 
+    rgba(157, 78, 221, 0.8), 
+    rgba(67, 97, 238, 0.8), 
+    rgba(76, 201, 240, 0.8)
+  );
+  background-size: 200% 100%;
+  animation: borderGradient 3s linear infinite, fadeOut 0.5s ease-out forwards;
+  filter: blur(1px);
+  z-index: 5;
+  transform: translate(-50%, -50%);
+}
+
+/* UFO Laser Beam - Mejorado */
 .ufo-laser-beam {
   position: absolute;
-  width: 8px; /* Width of the laser core */
-  background-color: rgba(0, 255, 255, 0.9); /* Bright cyan core */
-  box-shadow: 0 0 15px 5px rgba(0, 255, 255, 0.7), /* Inner glow */
-              0 0 30px 10px rgba(0, 200, 200, 0.4), /* Outer glow */
-              inset 0 0 5px rgba(255, 255, 255, 0.8); /* Core highlight */
-  border-radius: 4px 4px 0 0; /* Rounded top, sharp bottom if it hits something */
-  transform-origin: top center; /* Animation scales from the top */
-  transition: height 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Firing animation */
-  animation: laserPulse 0.5s infinite alternate;
-  z-index: -1; /* Behind the UFO body if overlapping slightly at origin */
+  width: 12px; /* Ancho aumentado */
+  background: linear-gradient(
+    to bottom,
+    rgba(200, 240, 255, 0.9) 0%,
+    rgba(100, 200, 255, 0.8) 30%,
+    rgba(0, 150, 255, 0.7) 70%,
+    rgba(0, 100, 255, 0.6) 100%
+  );
+  box-shadow: 
+    0 0 20px 8px rgba(100, 200, 255, 0.8), /* Brillo interior */
+    0 0 40px 15px rgba(0, 180, 255, 0.6), /* Brillo medio */
+    0 0 80px 30px rgba(0, 100, 255, 0.3), /* Brillo exterior */
+    inset 0 0 10px rgba(255, 255, 255, 0.9); /* Brillo del núcleo */
+  border-radius: 50%;
+  transform-origin: top center;
+  transition: height 0.2s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  animation: laserPulse 0.3s infinite alternate;
+  z-index: 5; /* Aseguramos que esté por encima del OVNI */
+  filter: blur(1px);
+  opacity: 0.95;
 }
 
 
@@ -302,14 +465,59 @@
 }
 
 @keyframes domeGlow {
-  0%, 100% { opacity: 0.4; transform: scale(1); }
-  50% { opacity: 0.8; transform: scale(1.04); }
+  0% { 
+    opacity: 0.5;
+    transform: scale(0.95) translateZ(5px);
+    filter: blur(0.6px);
+    box-shadow: 0 0 6px 1px rgba(180, 200, 255, 0.1);
+  }
+  50% { 
+    opacity: 0.7;
+    transform: scale(0.98) translateZ(5px);
+    filter: blur(0.8px);
+    box-shadow: 0 0 8px 1.5px rgba(180, 200, 255, 0.15);
+  }
+  100% { 
+    opacity: 0.6;
+    transform: scale(0.96) translateZ(5px);
+    filter: blur(0.7px);
+    box-shadow: 0 0 7px 1.2px rgba(180, 200, 255, 0.12);
+  }
 }
 
 @keyframes subtleShimmer {
   0% { opacity: 0.3; transform: translateZ(-22px) scale(0.92); } 
   50% { opacity: 0.7; transform: translateZ(-22px) scale(0.93); } 
   100% { opacity: 0.3; transform: translateZ(-22px) scale(0.92); }
+}
+
+@keyframes borderGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 0.8; transform: translate(-50%, -50%) scale(1); }
+  to { opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
+}
+
+@keyframes laserPulse {
+  0% { 
+    opacity: 0.8; 
+    transform: scaleX(0.95);
+    filter: brightness(1.2);
+  }
+  50% { 
+    opacity: 1;
+    transform: scaleX(1.05);
+    filter: brightness(1.5);
+  }
+  100% { 
+    opacity: 0.8;
+    transform: scaleX(0.95);
+    filter: brightness(1.2);
+  }
 }
 
 @keyframes enginePulse {
