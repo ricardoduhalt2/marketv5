@@ -19,7 +19,9 @@
     "isolatedModules": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@/components/*": ["./src/components/*"],
+      "@/constants": ["./src/constants.ts"]
     },
     "types": ["vite/client", "node"],
     "typeRoots": [

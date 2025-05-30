@@ -1,3 +1,6 @@
+// Re-export types from constants for backward compatibility
+export * from './constants.js';
+
 // NftData remains the primary interface for rich NFT details
 export interface NftData {
   id: string; // Unique identifier (e.g., SYMBOL or contract address)

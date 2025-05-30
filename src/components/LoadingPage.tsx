@@ -1,296 +1,541 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './LoadingPage.css';
+import { 
+  INITIAL_TERMINAL_LINES, 
+  DEPENDENCIES_TO_INSTALL, 
+  FINAL_MESSAGES, 
+  Star,
+  ShootingStar,
+  TerminalLine,
+  Spark
+} from '@/constants';
 
-interface HUDLine {
-  x1: number;
-  y1: number;
-  x2: number;
-  y2: number;
-  id?: string;
-  width?: number;
-  opacity?: number;
-  dashArray?: string;
-  dashOffset?: number;
-  color?: string;
-}
+const NUM_STARS = 250;
+const NUM_SHOOTING_STARS = 4;
+const SPARK_COUNT = 20;
+const SPARK_LIFESPAN_MIN = 0.3;
+const SPARK_LIFESPAN_MAX = 0.8;
 
 const LoadingPage: React.FC = () => {
-  const [progress, setProgress] = useState(0);
-  const [status, setStatus] = useState('INITIALIZING SYSTEM');
-  const [subStatus, setSubStatus] = useState('Establishing quantum link...');
-  const [hudLines, setHudLines] = useState<HUDLine[]>([]);
-  const containerRef = useRef<HTMLDivElement>(null);
-  // Removed unused dimensions state
+  const [stars, setStars] = useState<Star[]>([]);
+  const [shootingStars, setShootingStars] = useState<ShootingStar[]>([]);
+  const [terminalLines, setTerminalLines] = useState<TerminalLine[]>([]);
+  const [currentTypedLine, setCurrentTypedLine] = useState<string>("");
+  const [isTypingDependency, setIsTypingDependency] = useState<boolean>(false);
+  const [showCursor, setShowCursor] = useState<boolean>(true);
+  const [processingFinalMessages, setProcessingFinalMessages] = useState<boolean>(false);
+  const [currentFinalMessageIdx, setCurrentFinalMessageIdx] = useState<number>(0);
+  const [sparks, setSparks] = useState<Spark[]>([]);
+  const terminalContentRef = useRef<HTMLDivElement>(null);
 
-  // Create HUD lines based on dimensions
-  const createHudLines = (width: number, height: number): HUDLine[] => {
-    const lines: HUDLine[] = [];
-    const spacing = 50;
-    
-    // Vertical lines
-    for (let x = 0; x < width; x += spacing) {
-      lines.push({
-        x1: x,
-        y1: 0,
-        x2: x,
-        y2: height,
-        opacity: 0.1,
-        width: 1,
-        dashArray: '5,5',
-        dashOffset: 0
-      });
-    }
-    
-    // Horizontal lines
-    for (let y = 0; y < height; y += spacing) {
-      lines.push({
-        x1: 0,
-        y1: y,
-        x2: width,
-        y2: y,
-        opacity: 0.1,
-        width: 1,
-        dashArray: '5,5',
-        dashOffset: 0
-      });
-    }
-    
-    return lines;
-  };
-
-  // Initialize HUD elements
+  // Efecto para el desplazamiento automático
   useEffect(() => {
-    const updateDimensions = () => {
-      if (containerRef.current) {
-        const { width, height } = containerRef.current.getBoundingClientRect();
-        setHudLines(createHudLines(width, height));
+    if (terminalContentRef.current) {
+      terminalContentRef.current.scrollTop = terminalContentRef.current.scrollHeight;
+    }
+  }, [terminalLines]);
+
+  // Radio base para los anillos - ajustado para el tamaño del container
+  const baseRadius = 85; // Radio base para dispositivos móviles
+  const orangeRingRadius = baseRadius; // Anillo exterior naranja
+  const blueRingRadius = baseRadius * 0.75; // Anillo interior azul (75% del exterior)
+
+  const orangeRingSegments = Array.from({ length: 8 }, (_, i) => {
+    const angle = (i / 8) * 2 * Math.PI; 
+    return {
+      id: `segment-${i}`,
+      x: Math.cos(angle) * orangeRingRadius,
+      y: Math.sin(angle) * orangeRingRadius,
+      rotation: angle * (180 / Math.PI) + 90, 
+      glitchDelay: `${Math.random() * 2}s`,
+    };
+  });
+
+  const blueRingNodes = Array.from({ length: 3 }, (_, i) => {
+    const angle = (i / 3) * 2 * Math.PI;
+    return {
+      id: `node-${i}`,
+      x: Math.cos(angle) * blueRingRadius,
+      y: Math.sin(angle) * blueRingRadius,
+    };
+  });
+
+  useEffect(() => {
+    // Generate stars with more vibrant colors and realistic distribution
+    const newStars: Star[] = [];
+    const starColors = [
+      { 
+        bg: 'bg-blue-400', 
+        shadow: 'shadow-[0_0_10px_2px_rgba(96,165,250,0.8)]', 
+        hex: '#60a5fa',
+        tailFade: 'rgba(96,165,250,0)'
+      },
+      { 
+        bg: 'bg-purple-400', 
+        shadow: 'shadow-[0_0_10px_2px_rgba(192,132,252,0.8)]', 
+        hex: '#c084fc',
+        tailFade: 'rgba(192,132,252,0)'
+      },
+      { 
+        bg: 'bg-pink-400', 
+        shadow: 'shadow-[0_0_10px_2px_rgba(244,114,182,0.8)]', 
+        hex: '#f472b6',
+        tailFade: 'rgba(244,114,182,0)'
+      },
+      { 
+        bg: 'bg-cyan-300', 
+        shadow: 'shadow-[0_0_10px_2px_rgba(103,232,249,0.8)]', 
+        hex: '#67e8f9',
+        tailFade: 'rgba(103,232,249,0)'
+      },
+      { 
+        bg: 'bg-yellow-300', 
+        shadow: 'shadow-[0_0_10px_2px_rgba(253,224,71,0.8)]', 
+        hex: '#fde047',
+        tailFade: 'rgba(253,224,71,0)'
+      },
+      { 
+        bg: 'bg-white', 
+        shadow: 'shadow-[0_0_10px_2px_rgba(255,255,255,0.8)]', 
+        hex: '#ffffff',
+        tailFade: 'rgba(255,255,255,0)'
       }
-    };
-    
-    // Initial setup
-    updateDimensions();
-    window.addEventListener('resize', updateDimensions);
-    
-    // Cleanup
-    return () => {
-      window.removeEventListener('resize', updateDimensions);
-    };
+    ];
+
+    for (let i = 0; i < NUM_STARS; i++) {
+      const visual = starColors[Math.floor(Math.random() * starColors.length)];
+      const size = Math.random() > 0.9 ? 'w-1.5 h-1.5' : 
+                  Math.random() > 0.7 ? 'w-1 h-1' : 'w-0.5 h-0.5';
+      
+      // Create clusters of stars for more realistic distribution
+      let x, y;
+      if (Math.random() > 0.3) {
+        // Cluster stars in certain areas
+        const clusterX = Math.random() * 80 + 10; // 10-90% to avoid edges
+        const clusterY = Math.random() * 80 + 10;
+        x = Math.max(0, Math.min(100, clusterX + (Math.random() * 20 - 10)));
+        y = Math.max(0, Math.min(100, clusterY + (Math.random() * 20 - 10)));
+      } else {
+        // Some random stars for variety
+        x = Math.random() * 100;
+        y = Math.random() * 100;
+      }
+
+      newStars.push({
+        id: i,
+        x: x,
+        y: y,
+        sizeClass: size,
+        colorClass: visual.bg,
+        shadowClass: visual.shadow,
+        animationDelay: `${Math.random() * 15}s`,
+        animationDuration: `${3 + Math.random() * 10}s`,
+      });
+    }
+    setStars(newStars);
+
+    // Generate shooting stars with more realistic and varied trajectories
+    const newShootingStarsData: ShootingStar[] = [];
+    const shootingStarColors = [
+      { 
+        hex: '#60a5fa', 
+        tailFade: 'rgba(96,165,250,0)',
+        bg: 'bg-blue-400',
+        shadow: 'shadow-[0_0_10px_2px_rgba(96,165,250,0.8)]'
+      }, // blue
+      { 
+        hex: '#c084fc', 
+        tailFade: 'rgba(192,132,252,0)',
+        bg: 'bg-purple-400',
+        shadow: 'shadow-[0_0_10px_2px_rgba(192,132,252,0.8)]'
+      }, // purple
+      { 
+        hex: '#f472b6', 
+        tailFade: 'rgba(244,114,182,0)',
+        bg: 'bg-pink-400',
+        shadow: 'shadow-[0_0_10px_2px_rgba(244,114,182,0.8)]'
+      }, // pink
+      { 
+        hex: '#67e8f9', 
+        tailFade: 'rgba(103,232,249,0)',
+        bg: 'bg-cyan-300',
+        shadow: 'shadow-[0_0_10px_2px_rgba(103,232,249,0.8)]'
+      }, // cyan
+      { 
+        hex: '#fde047', 
+        tailFade: 'rgba(253,224,71,0)',
+        bg: 'bg-yellow-300',
+        shadow: 'shadow-[0_0_10px_2px_rgba(253,224,71,0.8)]'
+      }, // yellow
+      { 
+        hex: '#ffffff', 
+        tailFade: 'rgba(255,255,255,0)',
+        bg: 'bg-white',
+        shadow: 'shadow-[0_0_10px_2px_rgba(255,255,255,0.8)]'
+      }  // white
+    ];
+
+    for (let i = 0; i < NUM_SHOOTING_STARS; i++) {
+      const visual = shootingStarColors[Math.floor(Math.random() * shootingStarColors.length)];
+      // More natural angle range
+      const angleDeg = -20 - Math.random() * 50; 
+      const angleRad = angleDeg * (Math.PI / 180);
+      
+      // Start from edges more often for better visibility
+      let sx, sy, tx, ty;
+      const startFromTop = Math.random() > 0.7;
+      const startFromLeft = Math.random() > 0.5;
+      
+      if (startFromTop) {
+        // Start from top
+        sx = startFromLeft ? -10 : 110;
+        sy = Math.random() * 40; // Top 40%
+      } else {
+        // Start from sides
+        sx = startFromLeft ? -10 : 110;
+        sy = Math.random() * 100;
+      }
+
+      // Calculate end point based on angle and start position
+      const distance = 120 + Math.random() * 80; // Longer trails
+      tx = sx + Math.cos(angleRad) * distance * (startFromLeft ? 1 : -1);
+      ty = sy + Math.sin(angleRad) * distance;
+      
+      // Create gradient with more vibrant colors
+      const gradient = `linear-gradient(
+        to right, 
+        ${visual.hex} 0%, 
+        ${visual.hex} 30%, 
+        ${visual.hex} 50%, 
+        ${visual.tailFade} 100%
+      )`;
+
+      newShootingStarsData.push({
+        id: Date.now() + i + Math.random(),
+        startX: `${sx}vw`,
+        startY: `${sy}vh`,
+        travelX: `${tx - sx}vw`,
+        travelY: `${ty - sy}vh`,
+        angle: `${angleDeg}deg`,
+        animationDelay: `${Math.random() * 15}s`,
+        animationDuration: `${1.5 + Math.random() * 2}s`,
+        headColorHex: visual.hex,
+        tailColorHexFade: visual.tailFade,
+        gradient: gradient,
+      });
+    }
+    setShootingStars(newShootingStarsData);
   }, []);
 
-  // Simulate loading progress
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress(prev => {
-        const newProgress = prev + 1;
-        
-        // Update status messages based on progress
-        if (newProgress < 30) {
-          setStatus('INITIALIZING SYSTEM');
-          setSubStatus('Booting up quantum processors...');
-        } else if (newProgress < 70) {
-          setStatus('LOADING ASSETS');
-          setSubStatus('Decrypting data streams...');
-        } else if (newProgress < 90) {
-          setStatus('FINALIZING');
-          setSubStatus('Optimizing performance...');
-        } else {
-          setStatus('READY');
-          setSubStatus('All systems nominal');
-        }
-        
-        if (newProgress >= 100) {
-          clearInterval(timer);
-          return 100;
-        }
-        return newProgress;
-      });
-    }, 100);
+  // Función para generar chispas
+  const generateSparks = useCallback(() => {
+    const newSparks: Spark[] = [];
+    const segment = orangeRingSegments[Math.floor(Math.random() * orangeRingSegments.length)];
     
-    return () => clearInterval(timer);
+    for (let i = 0; i < SPARK_COUNT; i++) {
+      const angle = Math.atan2(segment.y, segment.x);
+      const spread = (Math.random() - 0.5) * 0.5;
+      const emissionAngle = angle + spread;
+      const speed = 34 + Math.random() * 34;
+      const duration = SPARK_LIFESPAN_MIN + Math.random() * (SPARK_LIFESPAN_MAX - SPARK_LIFESPAN_MIN);
+      
+      newSparks.push({
+        id: `spark-${Date.now()}-${i}`,
+        x: segment.x,
+        y: segment.y,
+        dx: Math.cos(emissionAngle) * speed * duration,
+        dy: Math.sin(emissionAngle) * speed * duration,
+        size: 1 + Math.random() * 2,
+        duration: duration,
+        delay: Math.random() * 0.5,
+        color: 'bg-orange-400',
+      });
+    }
+    setSparks(newSparks);
+  }, [orangeRingSegments]);
+
+  // Efecto para generar chispas periódicamente
+  useEffect(() => {
+    generateSparks();
+    const interval = setInterval(generateSparks, 2000);
+    return () => clearInterval(interval);
+  }, [generateSparks]);
+
+  // Función para el tipado de texto
+  const typeLine = useCallback((line: Omit<TerminalLine, 'id'>, onComplete: () => void) => {
+    let charIndex = 0;
+    setCurrentTypedLine("");
+    setIsTypingDependency(true);
+    
+    const typingInterval = setInterval(() => {
+      if (charIndex < line.text.length) {
+        setCurrentTypedLine(prev => prev + line.text[charIndex]);
+        charIndex++;
+      } else {
+        clearInterval(typingInterval);
+        setTerminalLines(prev => [...prev, { ...line, id: prev.length }]);
+        setCurrentTypedLine("");
+        setIsTypingDependency(false);
+        onComplete();
+      }
+    }, 20);
+    
+    return () => clearInterval(typingInterval);
+  }, [setCurrentTypedLine, setIsTypingDependency, setTerminalLines]);
+
+  useEffect(() => {
+    let currentLineIdx = 0;
+    let currentDependencyIdx = 0;
+    let timeoutId: NodeJS.Timeout;
+
+    const processNext = () => {
+      if (currentLineIdx < INITIAL_TERMINAL_LINES.length) {
+        const line = INITIAL_TERMINAL_LINES[currentLineIdx];
+        timeoutId = setTimeout(() => {
+          setTerminalLines(prev => [...prev, { ...line, id: prev.length }]);
+          currentLineIdx++;
+          processNext();
+        }, line.text === "" ? 150 : 300);
+      } else if (currentDependencyIdx < DEPENDENCIES_TO_INSTALL.length) {
+        const dep = DEPENDENCIES_TO_INSTALL[currentDependencyIdx];
+        const lineToType: Omit<TerminalLine, 'id'> = {
+          text: `Installing ${dep.name}...`,
+          colorClass: "text-yellow-400",
+          prefix: "[PKG]",
+          prefixColorClass: "text-purple-400"
+        };
+        
+        typeLine(lineToType, () => {
+          timeoutId = setTimeout(() => {
+            if (dep.detail) {
+              setTerminalLines(prev => [...prev, { 
+                id: prev.length, 
+                text: `  > ${dep.detail}`, 
+                colorClass: "text-gray-500"
+              }]);
+            }
+            
+            setTerminalLines(prev => [...prev, { 
+              id: prev.length, 
+              text: `${dep.name} installation successful.`, 
+              colorClass: "text-green-400", 
+              prefix: "[OK]", 
+              prefixColorClass: "text-green-400"
+            }]);
+            
+            currentDependencyIdx++;
+            if (currentDependencyIdx === DEPENDENCIES_TO_INSTALL.length) {
+              setProcessingFinalMessages(true);
+            }
+            processNext();
+          }, dep.time / 2.5);
+        });
+      } else if (processingFinalMessages && currentFinalMessageIdx < FINAL_MESSAGES.length) {
+        const line = FINAL_MESSAGES[currentFinalMessageIdx];
+        timeoutId = setTimeout(() => {
+          setTerminalLines(prev => [...prev, { ...line, id: prev.length }]);
+          setCurrentFinalMessageIdx(prev => prev + 1);
+          if (currentFinalMessageIdx + 1 < FINAL_MESSAGES.length) {
+            processNext();
+          }
+        }, line.text === "" ? 150 : 700);
+      }
+    };
+
+    processNext();
+    return () => clearTimeout(timeoutId);
+  }, [typeLine, processingFinalMessages, currentFinalMessageIdx]);
+
+  useEffect(() => {
+    const cursorInterval = setInterval(() => setShowCursor(prev => !prev), 500);
+    return () => clearInterval(cursorInterval);
   }, []);
 
   return (
-    <div className="loading-container" ref={containerRef}>
-      {/* Galería de NFTs con partículas */}
+    <div className="loading-page-container">
+      {/* Background Stars */}
+      {stars.map((star) => (
+        <div
+          key={star.id}
+          className={`star-element ${star.sizeClass} ${star.colorClass} ${star.shadowClass}`}
+          style={{
+            left: `${star.x}%`,
+            top: `${star.y}%`,
+            animationDuration: star.animationDuration,
+            animationDelay: star.animationDelay,
+          }}
+        />
+      ))}
+
+      {/* Realistic Shooting Stars */}
+      {shootingStars.map((star) => (
+        <div
+          key={star.id}
+          className="shooting-star-element"
+          style={{
+            width: '80px',
+            background: star.gradient,
+            filter: `drop-shadow(0 0 6px ${star.headColorHex}) drop-shadow(0 0 10px ${star.headColorHex})`,
+            animationDuration: star.animationDuration,
+            animationDelay: star.animationDelay,
+            // @ts-ignore
+            '--start-x': star.startX,
+            '--start-y': star.startY,
+            '--travel-x': star.travelX,
+            '--travel-y': star.travelY,
+            '--angle': star.angle,
+          }}
+        />
+      ))}
+
+      {/* Titles */}
+      <div className="titles-container">
+        <h1 className="main-title">
+          NFT Boutique Marketplace
+        </h1>
+        <h2 className="subtitle">
+          Arte Eterno Collection - MACQ
+        </h2>
+      </div>
       
-      {/* Imagen de carga */}
-      <div style={{
-        position: 'fixed',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        zIndex: 5,
-        textAlign: 'center'
-      }}>
-        <div style={{
-          width: 'min(80vw, 400px)',
-          height: 'min(60vh, 300px)',
-          margin: '0 auto',
-          position: 'relative'
-        }}>
-          <img 
-            src="https://a37f843ccef648163abc82ab025e7cf7.ipfscdn.io/ipfs/QmfZ3cSxD4Zri5XjCDNEjFyZpnVFa7xPkfYHesKyef3idX/0.jpg" 
-            alt="Loading Artwork"
+      {/* Spinner Container */}
+      <div className="spinner-container">
+        {/* Disco Principal con Glow */}
+        <div className="spinner-disc"></div>
+
+        {/* Anillo Interior Azul */}
+        <div className="ring-container blue-ring-container">
+          {/* Path/borde del anillo azul */}
+          <div 
+            className="base-ring-path base-blue-ring-path"
             style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'contain',
-              filter: 'drop-shadow(0 0 15px rgba(255, 107, 0, 0.7))',
-              opacity: 0.8,
-              transition: 'all 0.5s ease',
-              animation: 'pulse 3s infinite alternate'
-            }}
-            onLoad={(e) => {
-              (e.target as HTMLImageElement).style.opacity = '0.8';
+              width: `${blueRingRadius * 2}px`,
+              height: `${blueRingRadius * 2}px`,
+              left: '50%',
+              top: '50%',
+              transform: 'translate(-50%, -50%)',
             }}
           />
-          <style dangerouslySetInnerHTML={{
-            __html: `
-              @keyframes pulse {
-                0% { transform: scale(0.95); opacity: 0.7; }
-                100% { transform: scale(1.05); opacity: 0.9; }
-              }
-            `
-          }} />
-        </div>
-      </div>
-      
-      {/* Capa de superposición HUD */}
-      <div className="hud-overlay">
-        {/* Particle gallery removed */}
-      </div>
-      
-      {/* Líneas de la cuadrícula HUD */}
-      <div className="hud-lines">
-        <svg width="100%" height="100%">
-          {hudLines.map((line, index) => (
-            <line
-              key={index}
-              x1={line.x1}
-              y1={line.y1}
-              x2={line.x2}
-              y2={line.y2}
-              stroke="rgba(255, 107, 0, 0.1)"
-              strokeWidth={line.width || 1}
-              strokeDasharray={line.dashArray}
-              strokeDashoffset={line.dashOffset}
-              opacity={line.opacity}
+          {/* Nodos del anillo azul */}
+          {blueRingNodes.map(node => (
+            <div 
+              key={node.id}
+              className="blue-ring-node"
+              style={{
+                left: '50%',
+                top: '50%',
+                transform: `translate(-50%, -50%) translate(${node.x}px, ${node.y}px)`
+              }}
             />
           ))}
-        </svg>
-      </div>
-      {/* Corner Decorations */}
-      <div className="hud-corner hud-corner-tl" />
-      <div className="hud-corner hud-corner-tr" />
-      <div className="hud-corner hud-corner-bl" />
-      <div className="hud-corner hud-corner-br" />
-      
-      {/* Animated Scan Line */}
-      <div className="hud-scanline" style={{ transform: `translateY(${progress}%)` }} />
-      
-      <div className="hud-content" style={{
-        position: 'fixed',
-        bottom: '20%',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        width: '80%',
-        maxWidth: '600px',
-        zIndex: 100,
-        backgroundColor: 'rgba(5, 5, 10, 0.8)',
-        padding: '2rem',
-        borderRadius: '15px',
-        border: '1px solid rgba(255, 107, 0, 0.5)',
-        boxShadow: '0 0 30px rgba(255, 107, 0, 0.3)'
-      }}>
-        <div className="status-display" style={{
-          textAlign: 'center',
-          marginBottom: '1.5rem'
-        }}>
-          <div className="status-title" style={{
-            color: '#ff6b00',
-            fontSize: '1.2rem',
-            fontWeight: 'bold',
-            marginBottom: '0.5rem',
-            textTransform: 'uppercase',
-            letterSpacing: '2px'
-          }}>System Status</div>
-          <div className="status-value" style={{
-            color: '#fff',
-            fontSize: '1.8rem',
-            fontWeight: 'bold',
-            margin: '0.5rem 0',
-            textShadow: '0 0 10px rgba(255, 107, 0, 0.7)'
-          }}>{status}</div>
-          <div className="status-subtitle" style={{
-            color: 'rgba(255, 255, 255, 0.8)',
-            fontSize: '1rem',
-            fontStyle: 'italic'
-          }}>{subStatus}</div>
         </div>
-        
-        <div className="progress-section">
-          <div className="progress-labels" style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            marginBottom: '0.5rem',
-            color: 'rgba(255, 255, 255, 0.8)'
-          }}>
-            <span>Loading</span>
-            <span>{Math.round(progress)}%</span>
-          </div>
-          <div className="hud-progress-container" style={{
-            width: '100%',
-            height: '20px',
-            backgroundColor: 'rgba(255, 107, 0, 0.2)',
-            borderRadius: '10px',
-            overflow: 'hidden',
-            position: 'relative'
-          }}>
+
+        {/* Anillo Exterior Naranja */}
+        <div className="ring-container orange-ring-container">
+          {/* Path/borde del anillo naranja */}
+          <div 
+            className="base-ring-path base-orange-ring-path"
+            style={{
+              width: `${orangeRingRadius * 2}px`,
+              height: `${orangeRingRadius * 2}px`,
+              left: '50%',
+              top: '50%',
+              transform: 'translate(-50%, -50%)'
+            }}
+          />
+          {/* Segmentos del anillo naranja */}
+          {orangeRingSegments.map(segment => (
             <div 
-              className="hud-progress-bar" 
-              style={{ 
-                width: `${progress}%`,
-                height: '100%',
-                background: 'linear-gradient(90deg, #ff6b00, #00a8ff, #0066ff, #ff6b00)',
-                backgroundSize: '300% 300%',
-                transition: 'width 0.3s ease',
-                position: 'relative',
-                overflow: 'hidden',
-                animation: 'borderShimmer 3s ease infinite',
-                boxShadow: '0 0 10px rgba(0, 168, 255, 0.5)'
+              key={segment.id}
+              className="orange-ring-segment"
+              style={{
+                left: '50%',
+                top: '50%',
+                transform: `translate(-50%, -50%) translate(${segment.x}px, ${segment.y}px) rotate(${segment.rotation}deg)`,
               }}
             >
-              <div style={{
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent)',
-                animation: 'shimmer 2s infinite',
-                transform: 'translateX(-100%)',
-                animationTimingFunction: 'ease-in-out'
-              }} />
+              <div className="orange-segment-trail"/>
             </div>
+          ))}
+          {/* Efectos de glitch */}
+          {orangeRingSegments.map((segment, index) => (
+            <div
+              key={`glitch-${segment.id}`}
+              className="segment-glitch-overlay"
+              style={{
+                left: '50%',
+                top: '50%',
+                transform: `translate(-50%, -50%) translate(${segment.x * 0.95}px, ${segment.y * 0.95}px)`,
+                animationDelay: `${index * 0.1}s`,
+                // @ts-ignore
+                '--glitch-color-1': 'rgba(52, 211, 153, 0.6)', 
+                '--glitch-color-2': 'rgba(234, 179, 8, 0.6)', 
+              }}
+            />
+          ))}
+        </div>
+        
+        {/* Emisor de Chispas */}
+        <div className="sparks-emitter">
+            {sparks.map(spark => (
+                <div
+                    key={spark.id}
+                    className={`spark-element ${spark.color}`}
+                    style={{
+                        width: `${spark.size}px`,
+                        height: `${spark.size}px`,
+                        left: '50%',
+                        top: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        animation: `sparkAnimation ${spark.duration}s linear ${spark.delay}s forwards`,
+                        // @ts-ignore
+                        '--spark-dx': `${spark.dx}px`,
+                        '--spark-dy': `${spark.dy}px`,
+                    }}
+                />
+            ))}
+        </div>
+      </div>
+
+      {/* Terminal Output */}
+      <div className="terminal-output-container">
+        <div className="terminal-window">
+          <div className="terminal-header">
+            <div className="terminal-buttons">
+              <span className="terminal-button close"></span>
+              <span className="terminal-button minimize"></span>
+              <span className="terminal-button maximize"></span>
+            </div>
+            <div className="terminal-title">terminal</div>
+          </div>
+          <div className="terminal-content" ref={terminalContentRef}>
+            <div className="text-purple-300/80 text-sm mb-2">// Iniciando sistema de carga...</div>
+            <div className="text-slate-400/60 text-xs mb-3">// Versión 1.0.0 - {new Date().toLocaleDateString()}</div>
+            {terminalLines.map((line, index) => (
+              <div key={index} className="terminal-line">
+                {line.prefix && (
+                  <span className={`terminal-line-prefix ${line.prefixColorClass || 'text-purple-400'}`}>
+                    {line.prefix}
+                  </span>
+                )}
+                <span className={line.colorClass || 'text-gray-300'}>{line.text}</span>
+              </div>
+            ))}
+            {isTypingDependency && (
+              <div className="terminal-line">
+                <span className="text-purple-400">[PKG]</span>
+                <span className="text-yellow-400 ml-2">{currentTypedLine}</span>
+                {showCursor && <span className="terminal-cursor"></span>}
+              </div>
+            )}
+            {!isTypingDependency && processingFinalMessages && currentFinalMessageIdx >= FINAL_MESSAGES.length && showCursor && (
+              <div className="terminal-line">
+                <span className="terminal-cursor"></span>
+              </div>
+            )}
           </div>
         </div>
       </div>
-      
-      {/* Estilos para la animación de brillo */}
-      <style dangerouslySetInnerHTML={{
-        __html: `
-          @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-          }
-          @keyframes borderShimmer {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-          }
-        `
-      }} />
     </div>
   );
 };
