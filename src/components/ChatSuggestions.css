@@ -1,0 +1,141 @@
+.chat-suggestions {
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+  margin: 0.5rem 0;
+  backdrop-filter: blur(10px);
+}
+
+.suggestions-header {
+  margin-bottom: 0.75rem;
+}
+
+.suggestions-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.suggestions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.5rem;
+}
+
+.suggestion-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid;
+  border-radius: 8px;
+  background: transparent;
+  color: #374151;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  min-height: 44px;
+}
+
+.suggestion-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.suggestion-button:active {
+  transform: translateY(0);
+}
+
+.suggestion-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.suggestion-text {
+  flex: 1;
+  line-height: 1.4;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .suggestions-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .suggestion-button {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.8rem;
+  }
+  
+  .chat-suggestions {
+    padding: 0.75rem;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .chat-suggestions {
+    background: rgba(255, 255, 255, 0.05);
+  }
+  
+  .suggestions-title {
+    color: #9ca3af;
+  }
+  
+  .suggestion-button {
+    color: #e5e7eb;
+  }
+}
+
+/* Animation for new suggestions */
+.suggestion-button {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Focus styles for accessibility */
+.suggestion-button:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Hover effects for different categories */
+.suggestion-button.bg-green-500\/20:hover {
+  background: rgba(34, 197, 94, 0.3) !important;
+  border-color: rgba(34, 197, 94, 0.5);
+}
+
+.suggestion-button.bg-blue-500\/20:hover {
+  background: rgba(59, 130, 246, 0.3) !important;
+  border-color: rgba(59, 130, 246, 0.5);
+}
+
+.suggestion-button.bg-purple-500\/20:hover {
+  background: rgba(168, 85, 247, 0.3) !important;
+  border-color: rgba(168, 85, 247, 0.5);
+}
+
+.suggestion-button.bg-orange-500\/20:hover {
+  background: rgba(249, 115, 22, 0.3) !important;
+  border-color: rgba(249, 115, 22, 0.5);
+}
+
+.suggestion-button.bg-yellow-500\/20:hover {
+  background: rgba(234, 179, 8, 0.3) !important;
+  border-color: rgba(234, 179, 8, 0.5);
+}

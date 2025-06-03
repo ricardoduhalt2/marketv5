@@ -389,6 +389,20 @@ body::before { /* Pseudo-element for background shifting light effect */
   animation: animatedGradient 4s linear infinite;
 }
 
+/* Gradient text effect - same as BOT button */
+.gradient-text-effect {
+  background: linear-gradient(90deg, #ff6b00, #9d4edd, #4361ee, #4cc9f0, #9d4edd, #ff3c5f);
+  background-size: 300% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: textGradient 8s linear infinite;
+  text-shadow: none;
+  display: inline-block;
+  line-height: 1;
+}
+
 @keyframes textGradient {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
@@ -752,6 +766,93 @@ body::before { /* Pseudo-element for background shifting light effect */
   font-size: 0.8rem; /* Smaller font size */
   cursor: pointer;
   transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* NFT Boutique Logo Animations - Blacklight Effect */
+@keyframes blacklightPulse {
+  0%, 100% {
+    box-shadow: 
+      0 0 8px rgba(106, 17, 203, 0.4),
+      0 0 16px rgba(0, 168, 255, 0.3),
+      0 0 24px rgba(0, 102, 255, 0.2),
+      inset 0 0 8px rgba(255, 255, 255, 0.1);
+  }
+  50% {
+    box-shadow: 
+      0 0 12px rgba(106, 17, 203, 0.6),
+      0 0 24px rgba(0, 168, 255, 0.5),
+      0 0 36px rgba(0, 102, 255, 0.3),
+      inset 0 0 12px rgba(255, 255, 255, 0.15);
+  }
+}
+
+@keyframes blacklightBorder {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes blacklightGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 4px rgba(0, 168, 255, 0.4)) 
+            drop-shadow(0 0 8px rgba(106, 17, 203, 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 6px rgba(0, 168, 255, 0.6)) 
+            drop-shadow(0 0 12px rgba(106, 17, 203, 0.5));
+  }
+}
+
+/* Enhanced logo container with blacklight effects */
+.nft-boutique-logo-container {
+  position: relative;
+  display: inline-block;
+  border-radius: 12px;
+  padding: 2px;
+  background: linear-gradient(
+    90deg,
+    #ff6b00,
+    #00a8ff,
+    #0066ff,
+    #6a11cb,
+    #ff6b00
+  );
+  background-size: 300% 300%;
+  animation: blacklightBorder 4s ease infinite;
+}
+
+.nft-boutique-logo-container::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  background: linear-gradient(
+    45deg,
+    rgba(106, 17, 203, 0.3),
+    rgba(0, 168, 255, 0.2),
+    rgba(0, 102, 255, 0.3),
+    rgba(106, 17, 203, 0.3)
+  );
+  background-size: 400% 400%;
+  border-radius: 15px;
+  animation: blacklightBorder 6s linear infinite;
+  z-index: -1;
+  filter: blur(4px);
+}
+
+.nft-boutique-logo-inner {
+  position: relative;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.8);
+  animation: blacklightPulse 3s ease-in-out infinite;
 }
 
 .crystal-button:hover {

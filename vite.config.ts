@@ -15,17 +15,6 @@ export default defineConfig({
     port: 3000,
     open: true,
     host: true,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:3002',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '')
-      },
-      '/ai-assistant': {
-        target: 'http://localhost:3002',
-        changeOrigin: true
-      }
-    }
   },
   css: {
     devSourcemap: true,

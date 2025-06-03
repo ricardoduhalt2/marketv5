@@ -1,0 +1,887 @@
+import { useCallback, useState, useRef, useEffect, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+
+// Constants
+const DEFAULT_CURRENCY_RATES = {
+  usd: 0.7,
+  mxn: 17.5
+} as const;
+
+// Types
+export interface Message {
+  id: string;
+  text: string;
+  isUser: boolean;
+  timestamp: Date;
+  sender: 'user' | 'bot';
+}
+
+export interface NftAttribute {
+  trait_type: string;
+  value: string | number;
+}
+
+export interface NftContext {
+  collectionInfo: string;
+  marketData: {
+    floorPrice: string;
+    totalVolume: string;
+    owners: number;
+  };
+  floorPrice: string;
+  totalVolume: string;
+  owners: number;
+  currencyRates: {
+    maticToUSD: number;
+    usdToMXN: number;
+  };
+  maticToUSD: number;
+  usdToMXN: number;
+}
+
+export interface ChatNftData {
+  id: string;
+  token_id: string;
+  name: string;
+  price: number;
+  currencySymbol: string;
+  description: string;
+  traits: NftAttribute[];
+  collection?: {
+    name: string;
+    description?: string;
+  };
+  metadata?: {
+    name?: string;
+    description?: string;
+    image?: string;
+  };
+  image_url?: string;
+  external_url?: string;
+  animation_url?: string;
+}
+
+interface CurrencyRates {
+  usd: number;
+  mxn: number;
+}
+
+interface UseChatbotReturn {
+  messages: Message[];
+  input: string;
+  isExpanded: boolean;
+  isTyping: boolean;
+  isInputDisabled: boolean;
+  messagesEndRef: React.RefObject<HTMLDivElement | null>;
+  inputRef: React.RefObject<HTMLInputElement | null>;
+  messagesContainerRef: React.RefObject<HTMLDivElement | null>;
+  setInput: (value: string) => void;
+  setIsExpanded: (value: boolean) => void;
+  handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleInputKeyPress: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  handleSendMessage: () => Promise<void>;
+  toggleExpand: () => void;
+  processUserMessage: (userInput: string) => Promise<string>;
+}
+
+// Sample NFT data from the Arte Eterno Collection
+const nftCollection: ChatNftData[] = [
+  {
+    id: 'tem',
+    token_id: '1',
+    name: 'Tides of the Eternal Mind',
+    price: 8903,
+    currencySymbol: 'POL',
+    description: 'A beautiful digital artwork from the Arte Eterno Collection',
+    traits: [
+      { trait_type: 'Artist', value: 'Unknown' },
+      { trait_type: 'Collection', value: 'Arte Eterno' },
+      { trait_type: 'Symbol', value: 'TEM' }
+    ],
+    collection: {
+      name: 'Arte Eterno Collection',
+      description: 'A curated collection of digital art NFTs on Polygon'
+    }
+  },
+  {
+    id: 'chido',
+    token_id: '15',
+    name: 'C.H.I.D.O.',
+    price: 0.5,
+    currencySymbol: 'POL',
+    description: 'Historical Collection of Original Digital Identity',
+    traits: [
+      { trait_type: 'Artist', value: 'Emerging artist' },
+      { trait_type: 'Type', value: 'Digital Art' },
+      { trait_type: 'Collection', value: 'Arte Eterno' },
+      { trait_type: 'Symbol', value: 'CHIDO' }
+    ],
+    collection: {
+      name: 'Arte Eterno Collection',
+      description: 'A curated collection of digital art NFTs on Polygon'
+    }
+  },
+  {
+    id: 'gcc',
+    token_id: '2',
+    name: 'Galactic Clean-Up Crew',
+    price: 1001,
+    currencySymbol: 'POL',
+    description: 'A unique piece from the Arte Eterno Collection',
+    traits: [
+      { trait_type: 'Artist', value: 'Unknown' },
+      { trait_type: 'Collection', value: 'Arte Eterno' },
+      { trait_type: 'Symbol', value: 'GCC' }
+    ]
+  },
+  // Add more NFTs as needed
+];
+
+// Fetch currency rates with retry logic
+const fetchCurrencyRates = async (): Promise<CurrencyRates> => {
+  try {
+    // In a real app, you would fetch this from an API
+    // const response = await fetch('https://api.exchangerate-api.com/v4/latest/MATIC');
+    // const data = await response.json();
+    // return {
+    //   usd: data.rates.USD,
+    //   mxn: data.rates.MXN
+    // };
+    return DEFAULT_CURRENCY_RATES;
+  } catch (error) {
+    console.error('Error fetching currency rates:', error);
+    return DEFAULT_CURRENCY_RATES;
+  }
+};
+
+const useChatbot = (): UseChatbotReturn => {
+  // State
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState('');
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+  const [isInputDisabled, setIsInputDisabled] = useState(false);
+  const [aiModel, setAiModel] = useState<any>(null);
+  const [currencyRates] = useState<CurrencyRates>({ usd: 0.5, mxn: 10.0 });
+
+  // Refs
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+
+  // Initialize AI model
+  useEffect(() => {
+    const initializeAi = async () => {
+      try {
+        const { GoogleGenerativeAI } = await import('@google/generative-ai');
+        const apiKey = import.meta.env.VITE_GOOGLE_AI_API_KEY;
+        if (!apiKey) {
+          console.error('Google AI API key not found in environment variables');
+          return;
+        }
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+        setAiModel(model);
+      } catch (error) {
+        console.error('Error initializing AI model:', error);
+      }
+    };
+
+    initializeAi();
+  }, []);
+
+  // Check for greeting
+  const checkGreeting = useCallback((input: string, isSpanish: boolean): string | null => {
+    if (/(hola|buenos|buenas|hi|hello|hey)/i.test(input)) {
+      return isSpanish 
+        ? '¡Hola! Soy el asistente de la colección Arte Eterno. ¿En qué puedo ayudarte hoy?'
+        : 'Hello! I\'m the assistant for the Arte Eterno collection. How can I help you today?';
+    }
+    return null;
+  }, []);
+
+  // Check for thanks
+  const checkThanks = useCallback((input: string, isSpanish: boolean): string | null => {
+    if (/(gracias|thank|thanks)/i.test(input)) {
+      return isSpanish
+        ? '¡De nada! Estoy aquí para ayudarte con cualquier consulta sobre la colección Arte Eterno.'
+        : 'You\'re welcome! I\'m here to help you with any questions about the Arte Eterno collection.';
+    }
+    return null;
+  }, []);
+
+  // Format NFT price with currency conversion
+  const formatNftPrice = useCallback((nft: ChatNftData | null, showUSD: boolean = true, rates: CurrencyRates): string => {
+    if (!nft) return 'Price not available';
+    
+    const price = typeof nft.price === 'string' ? parseFloat(nft.price) : nft.price || 0;
+    let formattedPrice = `${price.toFixed(4)} ${nft.currencySymbol || 'POL'}`;
+    
+    if (showUSD && rates) {
+      const priceInUSD = price * rates.usd;
+      const priceInMXN = price * rates.mxn;
+      formattedPrice += ` ($${priceInUSD.toFixed(2)} USD / $${priceInMXN.toFixed(2)} MXN)`;
+    }
+    
+    return formattedPrice;
+  }, []);
+
+  // Find NFT in text
+  const findNftInText = useCallback((text: string): ChatNftData | null => {
+    if (!text) return null;
+    
+    const searchText = text.toLowerCase().trim();
+    
+    // First, try to find by symbol (exact match)
+    const bySymbol = nftCollection.find(nft => {
+      const symbolTrait = nft.traits?.find(t => t.trait_type === 'Symbol')?.value?.toString().toLowerCase();
+      return symbolTrait && new RegExp(`\\b${symbolTrait}\\b`, 'i').test(searchText);
+    });
+    
+    if (bySymbol) return bySymbol;
+    
+    // Then try to find by ID (exact match)
+    const byId = nftCollection.find(nft => 
+      nft.id && new RegExp(`\\b${nft.id}\\b`, 'i').test(searchText)
+    );
+    
+    if (byId) return byId;
+    
+    // Then try to find by name (partial match)
+    const byName = nftCollection.find(nft => 
+      nft.name && searchText.includes(nft.name.toLowerCase())
+    );
+    
+    if (byName) return byName;
+    
+    // If no match found, try to find by partial symbol match
+    const byPartialSymbol = nftCollection.find(nft => {
+      const symbolTrait = nft.traits?.find(t => t.trait_type === 'Symbol')?.value?.toString().toLowerCase();
+      return symbolTrait && searchText.includes(symbolTrait);
+    });
+    
+    return byPartialSymbol || null;
+  }, []);
+
+  // Process user message with AI
+  const processUserMessage = useCallback(async (userInput: string, rates: CurrencyRates): Promise<string> => {
+    const lowerInput = userInput.toLowerCase().trim();
+    const isSpanish = /[áéíóúüñ¿¡]/.test(userInput);
+
+    // Check for greeting
+    const greetingResponse = checkGreeting(lowerInput, isSpanish);
+    if (greetingResponse) return greetingResponse;
+    
+    // Check for thanks
+    const thanksResponse = checkThanks(lowerInput, isSpanish);
+    if (thanksResponse) return thanksResponse;
+
+    // Handle price queries
+    const priceQuery = /\b(precio|price|cu[aá]nto cuesta|how much does it cost|valor|value|precio de|price of|cuanto vale|how much is)\b/i.test(lowerInput);
+    if (priceQuery) {
+      const nft = findNftInText(userInput);
+      if (nft) {
+        return formatNftPrice(nft, true, rates);
+      }
+      return isSpanish
+        ? 'No encontré un NFT con ese nombre. ¿Podrías ser más específico? Por ejemplo: "Precio de CHIDO" o "¿Cuánto cuesta TEM?"'
+        : 'I couldn\'t find an NFT with that name. Could you be more specific? For example: "Price of CHIDO" or "How much does TEM cost?"';
+    }
+
+    // List available NFTs
+    if (/(lista|listado|muestra|show|list|available|disponibles|nfts?|artworks?|obras?|piezas?)/i.test(lowerInput)) {
+      const nftList = nftCollection.map(nft => {
+        const symbol = nft.traits?.find(t => t.trait_type === 'Symbol')?.value || nft.id;
+        return `- ${symbol} (${nft.name}) - ${nft.price} ${nft.currencySymbol || 'POL'}`;
+      }).join('\n');
+      
+      return isSpanish
+        ? 'Aquí tienes algunos NFTs de la colección Arte Eterno sobre los que puedo darte información:\n' +
+          nftList + '\n\nPregunta por cualquiera de ellos para obtener más detalles.'
+        : 'Here are some NFTs from the Arte Eterno collection that I can provide information about:\n' +
+          nftList + '\n\nAsk me about any of them for more details.';
+    }
+
+    // Default response for AI processing
+    if (aiModel) {
+      try {
+        const prompt = `You are an expert NFT assistant with knowledge in digital art, cryptocurrencies, and blockchain markets.
+        
+        Context:
+        - Collection: Arte Eterno Collection
+        - Floor Price: 0.5 POL
+        - Total Volume: 1000 POL
+        - Current MATIC to USD rate: ${rates.usd}
+        - Current USD to MXN rate: ${rates.mxn / (rates.usd || 1)}
+        
+        User question: ${userInput}
+        
+        Please provide a helpful and informative response in the same language as the user's question.`;
+
+        const result = await aiModel.generateContent(prompt);
+        const response = await result.response;
+        return response.text();
+      } catch (error) {
+        console.error('Error generating AI response:', error);
+        return isSpanish
+          ? 'Lo siento, hubo un error al procesar tu mensaje. Por favor, inténtalo de nuevo más tarde.'
+          : 'I\'m sorry, there was an error processing your message. Please try again later.';
+      }
+    }
+
+    // Fallback response if AI is not available
+    return isSpanish
+      ? 'Lo siento, no entendí tu pregunta. ¿Podrías reformularla? Por ejemplo, puedes preguntar por el precio de un NFT o pedir una lista de NFTs disponibles.'
+      : 'I\'m sorry, I didn\'t understand your question. Could you rephrase it? For example, you can ask about the price of an NFT or request a list of available NFTs.';
+  }, [aiModel, checkGreeting, checkThanks, findNftInText, formatNftPrice]);
+
+  // Handle send message
+  const handleSendMessage = useCallback(async () => {
+    if (!input.trim()) return;
+
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      text: input,
+      isUser: true,
+      timestamp: new Date(),
+      sender: 'user'
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setInput('');
+    setIsTyping(true);
+    setIsInputDisabled(true);
+
+    try {
+      const response = await processUserMessage(input, currencyRates);
+      
+      const botMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: response,
+        isUser: false,
+        timestamp: new Date(),
+        sender: 'bot'
+      };
+
+      setMessages(prev => [...prev, botMessage]);
+    } catch (error) {
+      console.error('Error processing message:', error);
+      
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: 'Lo siento, hubo un error al procesar tu mensaje. Por favor, inténtalo de nuevo más tarde.',
+        isUser: false,
+        timestamp: new Date(),
+        sender: 'bot'
+      };
+      
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsTyping(false);
+      setIsInputDisabled(false);
+      
+      // Scroll to bottom of messages
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+  }, [input, processUserMessage, currencyRates]);
+
+  // Handle input key press
+  const handleInputKeyPress = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  }, [handleSendMessage]);
+
+  // Toggle chat expansion
+  const toggleExpand = useCallback(() => {
+    setIsExpanded(prev => !prev);
+  }, []);
+
+  // Handle input change
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value);
+  }, []);
+
+  // Initialize component
+  useEffect(() => {
+    // Focus input when expanded
+    if (isExpanded && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isExpanded]);
+
+  // Return the hook's API
+  return {
+    messages,
+    input,
+    isExpanded,
+    isTyping,
+    isInputDisabled,
+    messagesEndRef,
+    inputRef,
+    messagesContainerRef,
+    setInput,
+    setIsExpanded,
+    handleInputChange,
+    handleInputKeyPress,
+    handleSendMessage,
+    toggleExpand,
+    processUserMessage: (userInput: string) => processUserMessage(userInput, currencyRates)
+  };
+  setMessages([welcomeMessage]);
+}, []);
+
+  // Initialize welcome message
+  useEffect(() => {
+    const welcomeMessage: Message = {
+      id: '1',
+      text: '¡Hola! Soy el asistente de la colección Arte Eterno. ¿En qué puedo ayudarte hoy?',
+      isUser: false,
+      timestamp: new Date(),
+      sender: 'bot',
+    };
+    setMessages([welcomeMessage]);
+  }, []);
+
+  // Initialize AI model
+  useEffect(() => {
+    const initializeAi = async () => {
+      try {
+        const { GoogleGenerativeAI } = await import('@google/generative-ai');
+        const apiKey = import.meta.env.VITE_GOOGLE_AI_API_KEY;
+        if (!apiKey) {
+          console.error('Google AI API key not found in environment variables');
+          return;
+        }
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+        setAiModel(model);
+      } catch (error) {
+        console.error('Error initializing AI model:', error);
+      }
+    };
+
+    initializeAi();
+  }, []);
+    try {
+      const apiKey = import.meta.env.VITE_GOOGLE_AI_API_KEY;
+      if (!apiKey) {
+        console.warn('Google AI API key is not set. Please set VITE_GOOGLE_AI_API_KEY in your .env file.');
+        return null;
+      }
+      return new GoogleGenerativeAI(apiKey).getGenerativeModel({
+        model: 'gemini-pro',
+      });
+    } catch (error) {
+      console.error('Error initializing AI model:', error);
+      return null;
+    }
+  }, []);
+
+  // Refs
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+
+  // Toggle chat expansion
+  const toggleExpand = useCallback(() => {
+    setIsExpanded(prev => !prev);
+  }, []);
+
+  // Handle input change
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value);
+  }, []);
+
+  // Format NFT price with currency conversion
+  const formatNftPrice = useCallback((nft: ChatNftData | null, showUSD: boolean = true): string => {
+    if (!nft) return 'Price not available';
+    
+    const price = typeof nft.price === 'string' ? parseFloat(nft.price) : nft.price || 0;
+    let formattedPrice = `${price.toFixed(4)} ${nft.currencySymbol || 'POL'}`;
+    
+    if (showUSD && currencyRates) {
+      const priceInUSD = price * currencyRates.usd;
+      const priceInMXN = price * currencyRates.mxn;
+      formattedPrice += ` ($${priceInUSD.toFixed(2)} USD / $${priceInMXN.toFixed(2)} MXN)`;
+    }
+    
+    return formattedPrice;
+  }, [currencyRates]);
+
+  // Use the global nftCollection constant
+
+  // Find NFT in text
+  const findNftInText = useCallback((text: string): ChatNftData | null => {
+    if (!text) return null;
+    
+    const searchText = text.toLowerCase().trim();
+    
+    // First, try to find by symbol (exact match)
+    const bySymbol = nftCollection.find(nft => {
+      const symbolTrait = nft.traits?.find(t => t.trait_type === 'Symbol')?.value?.toString().toLowerCase();
+      return symbolTrait && new RegExp(`\\b${symbolTrait}\\b`, 'i').test(searchText);
+    });
+    
+    if (bySymbol) return bySymbol;
+    
+    // Then try to find by ID (exact match)
+    const byId = nftCollection.find(nft => 
+      nft.id && new RegExp(`\\b${nft.id}\\b`, 'i').test(searchText)
+    );
+    
+    if (byId) return byId;
+    
+    // Then try to find by name (partial match)
+    const byName = nftCollection.find(nft => 
+      nft.name && searchText.includes(nft.name.toLowerCase())
+    );
+    
+    if (byName) return byName;
+    
+    // If no match found, try to find by partial symbol match
+    const byPartialSymbol = nftCollection.find(nft => {
+      const symbolTrait = nft.traits?.find(t => t.trait_type === 'Symbol')?.value?.toString().toLowerCase();
+      return symbolTrait && searchText.includes(symbolTrait);
+    });
+    
+    return byPartialSymbol || null;
+  }, [nftCollection]);
+
+  // Process user message with AI
+  const processUserMessage = useCallback(async (userInput: string): Promise<string> => {
+    const lowerInput = userInput.toLowerCase().trim();
+    const isSpanish = /[áéíóúüñ¿¡]/.test(userInput);
+
+    try {
+      // Check for greeting
+      if (/(hola|buenos|buenas|hi|hello|hey)/i.test(lowerInput)) {
+        return isSpanish 
+          ? '¡Hola! Soy el asistente de la colección Arte Eterno. ¿En qué puedo ayudarte hoy?'
+          : 'Hello! I\'m the assistant for the Arte Eterno collection. How can I help you today?';
+      }
+      
+      // Check for thanks
+      if (/(gracias|thank|thanks)/i.test(lowerInput)) {
+        return isSpanish
+          ? '¡De nada! Estoy aquí para ayudarte con cualquier consulta sobre la colección Arte Eterno.'
+          : 'You\'re welcome! I\'m here to help you with any questions about the Arte Eterno collection.';
+      }
+      
+      // Handle NFT price queries
+      const priceQuery = /\b(precio|price|cu[aá]nto cuesta|how much does it cost|valor|value|precio de|price of|cuanto vale|how much is)\b/i.test(lowerInput);
+      if (priceQuery) {
+        const nft = findNftInText(userInput);
+        if (nft) {
+          const priceInfo = formatNftPrice(nft, true);
+          return isSpanish
+            ? `*${nft.name}*\n\nPrecio: ${priceInfo}\n\n¿Te gustaría más información sobre esta obra?`
+            : `*${nft.name}*\n\nPrice: ${priceInfo}\n\nWould you like more information about this piece?`;
+        }
+        
+        // If no specific NFT found but user asked about prices in general
+        if (/\b(todos|todos los nft|todos los precios|all nfts|all prices|list all|listar todo)\b/i.test(lowerInput)) {
+          return isSpanish
+            ? 'Puedo proporcionarte el precio de cualquier NFT de la colección. Por favor, indícame el nombre o símbolo del NFT que te interesa. Por ejemplo: "Precio de CHIDO" o "¿Cuánto cuesta TEM?"'
+            : 'I can provide the price of any NFT in the collection. Please tell me the name or symbol of the NFT you\'re interested in. For example: "Price of CHIDO" or "How much does TEM cost?"';
+        }
+        
+        return isSpanish
+          ? 'No encontré un NFT con ese nombre. ¿Podrías ser más específico? Por ejemplo: "Precio de CHIDO" o "¿Cuánto cuesta TEM?"'
+          : 'I couldn\'t find an NFT with that name. Could you be more specific? For example: "Price of CHIDO" or "How much does TEM cost?"';
+      }
+      
+      // Handle NFT information queries
+      const infoQuery = /\b(qué es|quien es|qué sabes|what is|who is|tell me about|información|information|dime sobre|tell me more about)\b/i.test(lowerInput);
+      if (infoQuery) {
+        const nft = findNftInText(userInput);
+        if (nft) {
+          const priceInfo = formatNftPrice(nft, true);
+          return isSpanish
+            ? `*${nft.name}*\n\n${nft.description || 'No hay descripción disponible.'}\n\n*Precio:* ${priceInfo}\n` +
+              (nft.traits?.length ? `*Atributos:*\n${nft.traits.map(t => `- ${t.trait_type}: ${t.value}`).join('\n')}` : '') +
+              '\n\n¿Te gustaría saber más sobre esta pieza?'
+            : `*${nft.name}*\n\n${nft.description || 'No description available.'}\n\n*Price:* ${priceInfo}\n` +
+              (nft.traits?.length ? `*Attributes:*\n${nft.traits.map(t => `- ${t.trait_type}: ${t.value}`).join('\n')}` : '') +
+              '\n\nWould you like to know more about this piece?';
+        }
+        
+        return isSpanish
+          ? 'No encontré un NFT con ese nombre. ¿Podrías ser más específico? Por ejemplo: "¿Qué es TEM?" o "Dime sobre CHIDO"'
+          : 'I couldn\'t find an NFT with that name. Could you be more specific? For example: "What is TEM?" or "Tell me about CHIDO"';
+      }
+      
+      // List available NFTs if user asks
+      if (/(lista|listado|muestra|show|list|available|disponibles|nfts?|artworks?|obras?|piezas?)/i.test(lowerInput)) {
+        const nftList = 'Here are some NFTs from the Arte Eterno collection:\n' +
+               '- YSL (Yo Soy Libertad) - 35,259 POL\n' +
+               '- PSA (Pirolisaurio) - 12,020 POL\n' +
+               '- RAI (regenAIssance) - 13,353 POL\n' +
+               '- CHIDO (C.H.I.D.O.) - 0.5 POL\n' +
+               '- FLC (Floral Coral by IGLI) - 320 POL';
+        
+        return isSpanish
+          ? 'Aquí tienes algunos NFTs de la colección Arte Eterno sobre los que puedo darte información:\n' +
+            '- YSL (Yo Soy Libertad) - 35,259 POL\n' +
+            '- PSA (Pirolisaurio) - 12,020 POL\n' +
+            '- RAI (regenAIssance) - 13,353 POL\n' +
+            '- CHIDO (C.H.I.D.O.) - 0.5 POL\n' +
+            '- FLC (Floral Coral by IGLI) - 320 POL\n\n' +
+            'Pregunta por cualquiera de ellos para obtener más detalles.'
+          : nftList + '\n\nAsk me about any of them for more details.';
+      }
+      
+      // If we get here, use AI for the response if available
+      if (!model) {
+        return isSpanish
+          ? 'Lo siento, el servicio de IA no está disponible en este momento. ' +
+             'Puedo ayudarte con información sobre precios y detalles de los NFTs de la colección Arte Eterno. ' +
+             '¿Sobre qué NFT te gustaría saber más?'
+          : 'I\'m sorry, the AI service is not available at the moment. ' +
+             'I can help you with information about prices and details of the Arte Eterno collection NFTs. ' +
+             'Which NFT would you like to know more about?';
+      }
+      
+      // Prepare context for the AI
+      const context: NftContext = {
+        collectionInfo: 'A curated collection of digital art from emerging and established artists on the Polygon blockchain.',
+        marketData: {
+          floorPrice: '0.5 POL',
+          totalVolume: '1000 POL',
+          owners: 150
+        },
+        floorPrice: '0.5 POL',
+        totalVolume: '1000 POL',
+        owners: 150,
+        currencyRates: {
+          maticToUSD: currencyRates.usd,
+          usdToMXN: currencyRates.mxn / (currencyRates.usd || 1)
+        },
+        maticToUSD: currencyRates.usd,
+        usdToMXN: currencyRates.mxn / (currencyRates.usd || 1)
+      };
+      
+      const response = await model.generateContent({
+        contents: [
+          {
+            role: 'user',
+            parts: [
+              { text: `User question: ${userInput}` },
+              { text: `Context: ${JSON.stringify(context, null, 2)}` },
+              { text: 'Please respond in the same language as the question. ' +
+                     'If the question is about prices, include values in POL, USD, and MXN.' }
+            ]
+          }
+        ],
+        generationConfig: {
+          temperature: 0.7,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 1024,
+        },
+      });
+      
+      const result = await response.response;
+      const text = await result.text();
+      
+      if (!text) {
+        throw new Error('Failed to generate response');
+      }
+      
+      return text;
+    } catch (aiError) {
+      console.error('Error generating AI response:', aiError);
+      return isSpanish
+        ? 'Lo siento, hubo un error al procesar tu solicitud. ' +
+           '¿Podrías reformular tu pregunta o preguntar por algo más específico de la colección Arte Eterno?'
+        : 'I\'m sorry, there was an error processing your request. ' +
+           'Could you rephrase your question or ask about something more specific from the Arte Eterno collection?';
+    }
+  }, [model, findNftInText, formatNftPrice, currencyRates]);
+
+  // Handle input key press (Enter to send)
+  const handleInputKeyPress = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  }, [handleSendMessage]);
+
+  // Handle sending a message
+  const handleSendMessage = useCallback(async () => {
+    if (!input.trim() || isInputDisabled) return;
+    
+    const userMessage = input.trim();
+    setInput('');
+    setIsInputDisabled(true);
+    
+    // Add user message to chat
+    const newUserMessage: Message = {
+      id: Date.now().toString(),
+      text: userMessage,
+      isUser: true,
+      timestamp: new Date(),
+      sender: 'user' as const
+    };
+    
+    setMessages(prev => [...prev, newUserMessage]);
+    setIsTyping(true);
+    
+    try {
+      // Process the message and get bot response
+      const botResponse = await processUserMessage(userMessage);
+      
+      // Add bot response to chat
+      const newBotMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: botResponse,
+        isUser: false,
+        timestamp: new Date(),
+        sender: 'bot' as const
+      };
+      
+      setMessages(prev => [...prev, newBotMessage]);
+    } catch (error) {
+      console.error('Error handling message:', error);
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: 'Lo siento, hubo un error al procesar tu mensaje. Por favor, inténtalo de nuevo más tarde.',
+        isUser: false,
+        timestamp: new Date(),
+        sender: 'bot' as const
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsTyping(false);
+      setIsInputDisabled(false);
+    }
+  }, [input, isInputDisabled, processUserMessage]);
+
+  // Auto-scroll to bottom when messages change
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
+  
+  // Focus input when chat is expanded
+  useEffect(() => {
+    if (isExpanded && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isExpanded]);
+
+  // Fetch currency rates
+  const { data: currencyRates = { usd: 0.7, mxn: 17.5 } } = useQuery<CurrencyRates>({
+    queryKey: ['currencyRates'],
+    queryFn: fetchCurrencyRates,
+    refetchInterval: 5 * 60 * 1000, // Refresh every 5 minutes
+    initialData: { usd: 0.7, mxn: 17.5 }
+  });
+
+  // Initialize AI client and model
+  const genAI = useMemo(() => {
+    try {
+      const apiKey = import.meta.env.VITE_GOOGLE_AI_API_KEY;
+      if (!apiKey) {
+        console.warn('Google AI API key is not set. Please set VITE_GOOGLE_AI_API_KEY in your .env file.');
+        return null;
+    
+    return isSpanish
+      ? 'Aquí tienes algunos NFTs de la colección Arte Eterno sobre los que puedo darte información:\n' +
+        '- YSL (Yo Soy Libertad) - 35,259 POL\n' +
+        '- PSA (Pirolisaurio) - 12,020 POL\n' +
+        '- RAI (regenAIssance) - 13,353 POL\n' +
+        '- CHIDO (C.H.I.D.O.) - 0.5 POL\n' +
+        '- FLC (Floral Coral by IGLI) - 320 POL\n\n' +
+        'Pregunta por cualquiera de ellos para obtener más detalles.'
+      : nftList + '\n\nAsk me about any of them for more details.';
+  };
+
+  // Process user message with AI
+  const processUserMessage = useCallback(async (userInput: string): Promise<string> => {
+    const lowerInput = userInput.toLowerCase().trim();
+    const isSpanish = /[áéíóúüñ¿¡]/.test(userInput);
+
+    try {
+      // Check for greeting
+      const greetingResponse = checkGreeting(lowerInput, isSpanish);
+      if (greetingResponse) return greetingResponse;
+      
+      // Check for thanks
+      const thanksResponse = checkThanks(lowerInput, isSpanish);
+      if (thanksResponse) return thanksResponse;
+      if (/(gracias|thank|thanks)/i.test(lowerInput)) {
+        return isSpanish
+          ? '¡De nada! Estoy aquí para ayudarte con cualquier consulta sobre la colección Arte Eterno.'
+          : 'You\'re welcome! I\'m here to help you with any questions about the Arte Eterno collection.';
+      }
+      
+      // Handle NFT price queries
+      const priceQuery = /\b(precio|price|cu[aá]nto cuesta|how much does it cost|valor|value|precio de|price of|cuanto vale|how much is)\b/i.test(lowerInput);
+      if (priceQuery) {
+        const nft = findNftInText(userInput);
+        if (nft) {
+          const priceInfo = formatNftPrice(nft, true);
+          return isSpanish
+            ? `*${nft.name}*\n\n` +
+              `Precio: ${priceInfo}\n\n` +
+              '¿Te gustaría más información sobre esta obra?'
+            : `*${nft.name}*\n\n` +
+              `Price: ${priceInfo}\n\n` +
+              'Would you like more information about this piece?';
+        }
+        
+        // If no specific NFT found but user asked about prices in general
+        if (/\b(todos|todos los nft|todos los precios|all nfts|all prices|list all|listar todo)\b/i.test(lowerInput)) {
+          return isSpanish
+            ? 'Puedo proporcionarte el precio de cualquier NFT de la colección. Por favor, indícame el nombre o símbolo del NFT que te interesa. Por ejemplo: "Precio de CHIDO" o "¿Cuánto cuesta TEM?"'
+            : 'I can provide the price of any NFT in the collection. Please tell me the name or symbol of the NFT you\'re interested in. For example: "Price of CHIDO" or "How much does TEM cost?"';
+        }
+        
+        return isSpanish
+          ? 'No encontré un NFT con ese nombre. ¿Podrías ser más específico? Por ejemplo: "Precio de CHIDO" o "¿Cuánto cuesta TEM?"'
+          : 'I couldn\'t find an NFT with that name. Could you be more specific? For example: "Price of CHIDO" or "How much does TEM cost?"';
+      }
+      
+      // Handle NFT information queries
+      const infoQuery = /\b(qué es|quien es|qué sabes|what is|who is|tell me about|información|information|dime sobre|tell me more about)\b/i.test(lowerInput);
+      if (infoQuery) {
+        const nft = findNftInText(userInput);
+        if (nft) {
+          const priceInfo = formatNftPrice(nft, true);
+          return isSpanish
+            ? `*${nft.name}*\n\n` +
+              `${nft.description || 'No hay descripción disponible.'}\n\n` +
+              `*Precio:* ${priceInfo}\n` +
+              (nft.traits?.length ? `*Atributos:*\n${nft.traits.map(t => `- ${t.trait_type}: ${t.value}`).join('\n')}` : '') +
+              '\n\n¿Te gustaría saber más sobre esta pieza?'
+            : `*${nft.name}*\n\n` +
+              `${nft.description || 'No description available.'}\n\n` +
+              `*Price:* ${priceInfo}\n` +
+              (nft.traits?.length ? `*Attributes:*\n${nft.traits.map(t => `- ${t.trait_type}: ${t.value}`).join('\n')}` : '') +
+  // Return all necessary values and functions
+  return {
+    messages,
+    input,
+    isExpanded,
+    isTyping,
+    isInputDisabled,
+    messagesEndRef,
+    inputRef,
+    messagesContainerRef,
+    setInput,
+    setIsExpanded,
+    handleInputChange,
+    handleInputKeyPress,
+    handleSendMessage,
+    toggleExpand,
+    processUserMessage
+  } as const;
+};
+
+export default useChatbot;

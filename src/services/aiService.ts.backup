@@ -1,0 +1,207 @@
+import { GoogleGenerativeAI, type GenerativeModel } from '@google/generative-ai';
+
+// Cache for storing API responses
+const responseCache = new Map<string, { response: string; timestamp: number }>();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes cache
+
+// Rate limiting state
+let lastRequestTime = 0;
+const MIN_REQUEST_INTERVAL = 1000; // 1 second between requests
+
+/**
+ * Get a cached response if available and not expired
+ */
+const getCachedResponse = (key: string): string | null => {
+  const cached = responseCache.get(key);
+  if (!cached) return null;
+  
+  const now = Date.now();
+  if (now - cached.timestamp > CACHE_TTL) {
+    responseCache.delete(key);
+    return null;
+  }
+  
+  return cached.response;
+};
+
+/**
+ * Store a response in cache
+ */
+const cacheResponse = (key: string, response: string): void => {
+  responseCache.set(key, {
+    response,
+    timestamp: Date.now()
+  });
+};
+
+/**
+ * Rate limiting function
+ */
+const waitForRateLimit = async (): Promise<void> => {
+  const now = Date.now();
+  const timeSinceLastRequest = now - lastRequestTime;
+  
+  if (timeSinceLastRequest < MIN_REQUEST_INTERVAL) {
+    const waitTime = MIN_REQUEST_INTERVAL - timeSinceLastRequest;
+    await new Promise(resolve => setTimeout(resolve, waitTime));
+  }
+  
+  lastRequestTime = Date.now();
+};
+
+// Initialize Google AI client
+export const initAIClient = (apiKey: string) => {
+  if (!apiKey) {
+    console.warn('Google AI API key not provided');
+    return null;
+  }
+  try {
+    return new GoogleGenerativeAI(apiKey);
+  } catch (error) {
+    console.error('Error initializing Google AI client:', error);
+    return null;
+  }
+};
+
+// Interface for NFT context
+export interface NftContext {
+  nftInfo?: string;
+  collectionInfo?: string;
+  marketData?: {
+    floorPrice?: string;
+    totalVolume?: string;
+    owners?: number;
+  };
+  similarNfts?: Array<{
+    id: string;
+    name: string;
+    price: string;
+  }>;
+  currencyRates?: {
+    maticToUSD: number;
+    usdToMXN: number;
+  };
+}
+
+/**
+ * Process user question about NFTs using AI with caching and rate limiting
+ */
+export const processWithAI = async (
+  model: GenerativeModel | null,
+  userInput: string,
+  context: NftContext
+): Promise<string> => {
+  if (!model) {
+    return "I'm sorry, I can't process your request right now. Please try again later.";
+  }
+
+  // Create a cache key based on the user input and context
+  const cacheKey = `${userInput.toLowerCase().trim()}:${JSON.stringify(context).length}`;
+  
+  // Check cache first
+  const cachedResponse = getCachedResponse(cacheKey);
+  if (cachedResponse) {
+    console.log('Serving from cache');
+    return cachedResponse;
+  }
+
+  try {
+    // Apply rate limiting
+    await waitForRateLimit();
+
+    const prompt = `You are an assistant specialized in NFTs from the Museo de Arte Contemporáneo de Quintana Roo.
+
+Context:
+${JSON.stringify(context, null, 2)}
+
+User question: ${userInput}
+
+Please provide a helpful and concise response based on the context above.`;
+
+    console.log('Sending request to AI model...');
+9. For price-related questions, provide values in both MATIC, USD, and MXN when possible
+10. If the user asks to convert between currencies, use the provided rates
+
+RESPONSE:`;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    
+    // Format the response based on the detected language
+    const defaultResponse = language === 'es' 
+      ? "🤔 No pude generar una respuesta específica. ¿Podrías reformular tu pregunta?"
+      : "🤔 I couldn't generate a specific response. Could you rephrase your question?";
+      
+    return response.text() || defaultResponse;
+  } catch (error) {
+    console.error('Error processing with AI:', error);
+    return language === 'es'
+      ? "⚠️ Lo siento, hubo un error al procesar tu solicitud. Por favor, inténtalo de nuevo más tarde."
+      : "⚠️ Sorry, there was an error processing your request. Please try again later.";
+  }
+};
+
+/**
+ * Gets a summary of the collection for context
+ * @param language Language code ('es' for Spanish, 'en' for English)
+ * @returns Collection summary in the specified language
+ */
+export const getCollectionSummary = (language: 'es' | 'en' = 'es'): string => {
+  if (language === 'es') {
+    return `# Colección Arte Eterno
+
+## Resumen de la Colección
+La Colección Arte Eterno es una selección de 16 NFTs únicos que representan obras de arte digital de artistas emergentes y establecidos. La colección abarca diversos estilos y técnicas, desde arte generativo hasta ilustración digital.
+
+## Características Destacadas
+- 16 NFTs únicos con precios que van desde 0.5 hasta 35,259 POL
+- Obras de artistas emergentes del programa de talentos del MACQ
+- Incluye piezas animadas y estáticas
+- Precios accesibles para diferentes presupuestos
+- Algunas piezas tienen ediciones limitadas
+
+## Obras Destacadas
+- **YSL - Yo Soy Libertad** (35,259 POL)
+- **PSA - Pirolisaurio: Born from the Fossil Age** (12,020 POL)
+- **RAI - regenAIssance** (13,353 POL)
+- **CHIDO - C.H.I.D.O.** (0.5 POL)
+- **FLC - Floral Coral by IGLI** (320 POL)
+
+## Beneficios
+- Oportunidad de poseer obras de arte digital únicas
+- Soporte a artistas emergentes
+- Piezas coleccionables con valor potencial de apreciación
+- Accesibles a través de la blockchain de Polygon
+
+## Cómo Adquirir
+Puedes adquirir estas obras directamente a través de nuestro marketplace usando MATIC, la criptomoneda nativa de la red Polygon.`;
+  } else {
+    return `# Arte Eterno Collection
+
+## Collection Summary
+The Arte Eterno Collection features 16 unique NFTs representing digital artworks from emerging and established artists. The collection spans various styles and techniques, from generative art to digital illustration.
+
+## Key Features
+- 16 unique NFTs with prices ranging from 0.5 to 35,259 POL
+- Works by emerging artists from MACQ's talent program
+- Includes both animated and static pieces
+- Accessible price points for different budgets
+- Some pieces have limited editions
+
+## Featured Works
+- **YSL - Yo Soy Libertad** (35,259 POL)
+- **PSA - Pirolisaurio: Born from the Fossil Age** (12,020 POL)
+- **RAI - regenAIssance** (13,353 POL)
+- **CHIDO - C.H.I.D.O.** (0.5 POL)
+- **FLC - Floral Coral by IGLI** (320 POL)
+
+## Benefits
+- Opportunity to own unique digital artworks
+- Support for emerging artists
+- Collectible pieces with potential appreciation value
+- Accessible through the Polygon blockchain
+
+## How to Purchase
+You can acquire these works directly through our marketplace using MATIC, the native cryptocurrency of the Polygon network.`;
+  }
+};
