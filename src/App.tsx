@@ -1,19 +1,19 @@
-import './App.css';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { createThirdwebClient } from 'thirdweb';
 import Navbar from './components/Navbar';
-
-createThirdwebClient({
-  clientId: import.meta.env.VITE_THIRDWEB_CLIENT_ID || 'YOUR_CLIENT_ID',
-});
 import NFTList from './components/NFTList';
 import NFTDetail from './components/NFTDetail';
 import AiAssistant from './pages/AiAssistant';
 import ParticlesBackground from './components/ParticlesBackground';
 import LoadingPage from './components/LoadingPage';
-import { useState, useEffect } from 'react';
 import RealisticUfo from './components/RealisticUfo';
 import MarqueeTicker from './components/MarqueeTicker';
+import NFTBoutiqueLogo from './components/NFTBoutiqueLogo';
+
+createThirdwebClient({
+  clientId: import.meta.env.VITE_THIRDWEB_CLIENT_ID || 'YOUR_CLIENT_ID',
+});
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -68,38 +68,40 @@ function App() {
       <header className="header relative z-10 w-full max-w-7xl flex flex-col items-center pt-16 pb-2 mb-2 px-3 mx-auto">
         <div className="flex flex-col items-center text-center w-full">
           <div className="relative flex items-center justify-center mb-6 group">
-            <div className="relative">
-              <div className="relative w-16 h-16">
-                {/* Animated gradient glow effect */}
-                <div 
-                  className="absolute inset-0"
-                  style={{
-                    background: 'linear-gradient(90deg, #ff6b00, #9d4edd, #4361ee, #4cc9f0, #9d4edd, #ff3c5f)',
-                    backgroundSize: '300% 100%',
-                    WebkitMask: 'url(https://petgascoin.com/wp-content/uploads/2025/05/UCA-logo-fondo-blanco-horizontal-1-scaled-e1748567694616.png) center/contain no-repeat',
-                    mask: 'url(https://petgascoin.com/wp-content/uploads/2025/05/UCA-logo-fondo-blanco-horizontal-1-scaled-e1748567694616.png) center/contain no-repeat',
-                    filter: 'blur(3px)',
-                    opacity: '0.9',
-                    zIndex: 1,
-                    animation: 'gradient 8s linear infinite',
-                  }}
-                ></div>
-                {/* Original logo */}
-                <img
-                  src="https://petgascoin.com/wp-content/uploads/2025/05/UCA-logo-fondo-blanco-horizontal-1-scaled-e1748567694616.png"
-                  alt="UCA Logo"
-                  className="relative z-10 w-full h-full object-contain"
-                  style={{
-                    filter: 'drop-shadow(0 0 1px white)'
-                  }}
-                />
-              </div>
-            </div>
+            <NFTBoutiqueLogo />
           </div>
-          <h1 className="text-2xl font-semibold mb-2 text-white">
+          <h1 
+            className="text-2xl font-semibold mb-2"
+            style={{
+              background: 'linear-gradient(90deg, #ff6b00, #9d4edd, #4361ee, #4cc9f0, #9d4edd, #ff3c5f)',
+              backgroundSize: '300% 100%',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              color: 'transparent',
+              WebkitTextFillColor: 'transparent',
+              animation: 'textGradient 8s linear infinite',
+              textShadow: 'none',
+              display: 'inline-block',
+              lineHeight: '1'
+            }}
+          >
             NFT Boutique Marketplace
           </h1>
-          <h2 className="text-lg text-gray-300 mb-2">
+          <h2 
+            className="text-lg mb-2"
+            style={{
+              background: 'linear-gradient(90deg, #ff6b00, #9d4edd, #4361ee, #4cc9f0, #9d4edd, #ff3c5f)',
+              backgroundSize: '300% 100%',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              color: 'transparent',
+              WebkitTextFillColor: 'transparent',
+              animation: 'textGradient 8s linear infinite',
+              textShadow: 'none',
+              display: 'inline-block',
+              lineHeight: '1'
+            }}
+          >
             Arte Eterno Collection - MACQ
           </h2>
           <div className="w-screen overflow-hidden px-0 -mx-4">
