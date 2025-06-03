@@ -9,8 +9,8 @@ export interface NftData {
   image: string; // HTTP URL for the NFT's primary image/media
   animation_url?: string; // Optional HTTP URL for animation/video
   editionContractAddress: string; // Smart contract address of the ERC1155 Edition Drop
-  price?: string; // Formatted price string, e.g., "10 MATIC"
-  currencySymbol?: string; // e.g., "MATIC" / "POL"
+  price: string; // Price as a string, e.g., "0.5"
+  currencySymbol: string; // e.g., "MATIC" or "POL"
   splitContractAddress: string; // Smart contract address of the associated Split contract
   tokenUri: string; // IPFS or HTTP URI for metadata (required)
   // sellerAddress (Split) is the splitContractAddress for now, recipient can be fetched

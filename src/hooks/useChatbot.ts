@@ -1,334 +1,323 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { findNftInText, getNftInfo, getCollectionContext } from '../services/nftService';
-import { processWithAI, initAIClient } from '../services/aiService';
+import React, { 
+  useCallback, 
+  useState, 
+  useRef, 
+  useEffect 
+} from 'react';
+import { 
+  processWithAI, 
+  initAIClient, 
+  NftContext,
+  getCollectionSummary 
+} from '../services/aiService';
+import { analyticsService } from '../services/analyticsService';
 
+// Types
 export interface Message {
+  id: string;
   text: string;
+  isUser: boolean;
+  timestamp: Date;
   sender: 'user' | 'bot';
 }
 
-// Función para obtener el precio de MATIC en USD desde CoinGecko
-const fetchMaticPrice = async (): Promise<number> => {
-  try {
-    const response = await fetch(
-      'https://api.coingecko.com/api/v3/simple/price?ids=matic-network&vs_currencies=usd&precision=4'
-    );
-    const data = await response.json();
-    return data['matic-network']?.usd || 0.7;
-  } catch (error) {
-    console.error('Error fetching MATIC price:', error);
-    return 0.7;
-  }
-};
+interface UseChatbotReturn {
+  messages: Message[];
+  input: string;
+  isExpanded: boolean;
+  isTyping: boolean;
+  isInputDisabled: boolean;
+  error: string | null;
+  handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  handleSendMessage: () => Promise<void>;
+  handleKeyPress: (e: React.KeyboardEvent) => void;
+  toggleExpand: () => void;
+  inputRef: React.RefObject<HTMLInputElement | HTMLTextAreaElement | null>;
+  messagesEndRef: React.RefObject<HTMLDivElement | null>;
+  handleSuggestionClick: (suggestion: string) => void;
+}
 
-export const useChatbot = (fullPage: boolean = false) => {
-  // Estados
+const useChatbot = (): UseChatbotReturn => {
+  // State
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
-  const [isExpanded, setIsExpanded] = useState(fullPage);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [isInputDisabled, setIsInputDisabled] = useState(false);
-  const messagesEndRef = useRef<null | HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const messagesContainerRef = useRef<null | HTMLDivElement>(null);
-
-  // Configuración de Google AI
-  const API_KEY = import.meta.env.VITE_GOOGLE_AI_API_KEY;
-  const [genAI] = useState(() => initAIClient(API_KEY));
-  const model = genAI?.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
-
-  // Obtener el precio de MATIC en USD
-  const { data: maticPrice } = useQuery({
-    queryKey: ['maticPrice'],
-    queryFn: fetchMaticPrice,
-    staleTime: 5 * 60 * 1000, // 5 minutos hasta que se considere obsoleto
-    refetchInterval: 5 * 60 * 1000, // Actualizar cada 5 minutos
-  });
-
-  // Formatear precio (función interna)
-  const formatPrice = useCallback((price: string, symbol: string): string => {
-    if (!price || !symbol) return 'Precio no disponible';
-    
-    const numericPrice = Number(price);
-    const usdValue = numericPrice * (maticPrice || 0.7);
-    
-    const formattedPrice = numericPrice.toLocaleString('en-US', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 4
-    });
-    
-    const formattedUsd = usdValue.toLocaleString('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    });
-    
-    return `${formattedPrice} ${symbol} (~${formattedUsd})`;
-  }, [maticPrice]);
+  const [aiModel, setAiModel] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
   
-  // Función segura para formatear precios
-  const safeFormatPrice = useCallback((price: string | undefined, symbol: string | undefined): string => {
-    if (!price || !symbol) return 'Precio no disponible';
-    return formatPrice(price, symbol);
-  }, [formatPrice]);
+  // Refs with proper null handling
+  const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  // Procesar el mensaje del usuario
-  const processUserMessage = useCallback(async (userInput: string): Promise<string> => {
-    const lowerInput = userInput.toLowerCase().trim();
-    
-    // Manejar saludos
-    if (lowerInput.includes('hola') || 
-        lowerInput.includes('buenos') || 
-        lowerInput.includes('buenas') ||
-        lowerInput.includes('hi') || 
-        lowerInput.includes('hello') ||
-        lowerInput.includes('hey') ||
-        lowerInput.includes('what\'s your name') || 
-        lowerInput.includes('who are you')) {
-      return "Soy el asistente de MACQ. Estoy aquí para ayudarte con información sobre nuestra colección de NFTs.";
-    }
-    
-    // Manejar preguntas sobre la ubicación del museo
-    if (lowerInput.includes('dónde está') || 
-        lowerInput.includes('donde esta') || 
-        lowerInput.includes('ubicación') ||
-        lowerInput.includes('ubicacion') ||
-        lowerInput.includes('dirección') ||
-        lowerInput.includes('direccion') ||
-        lowerInput.includes('dirección del museo') ||
-        lowerInput.includes('direccion del museo') ||
-        lowerInput.includes('location') ||
-        lowerInput.includes('mapa') ||
-        lowerInput.includes('cómo llegar') ||
-        lowerInput.includes('como llegar') ||
-        lowerInput.includes('playa del carmen') ||
-        lowerInput.includes('cancun') ||
-        lowerInput.includes('la isla')) {
-      
-      // Si la consulta menciona específicamente Cancún o La Isla
-      if (lowerInput.includes('cancun') || lowerInput.includes('la isla')) {
-        return "📍 Sucursal en Cancún - La Isla Shopping Village\n" +
-               "Blvd. Kukulcan Km 12.5, La Isla, Zona Hotelera\n" +
-               "77500 Cancún, Quintana Roo, México\n\n" +
-               "🔗 Ver en Google Maps: https://goo.gl/maps/LaIslaShoppingVillage\n\n" +
-               "📅 Horario:\n" +
-               "- Lunes a domingo: 10:00 AM - 10:00 PM\n\n" +
-               "📞 Contacto: +52 998 123 4567\n" +
-               "📧 Correo: cancun@macq.mx\n\n" +
-               "¡Ven a visitarnos en el corazón de la Zona Hotelera de Cancún!";
+  // Initialize AI client when component mounts
+  useEffect(() => {
+    const initializeAI = async () => {
+      const apiKey = import.meta.env.VITE_GOOGLE_AI_API_KEY;
+      if (!apiKey) {
+        const errorMsg = 'Google AI API key not found';
+        console.error(errorMsg);
+        setError(errorMsg);
+        return;
       }
       
-      // Ubicación principal en Playa del Carmen
-      return "📍 Sede Principal - Playa del Carmen\n" +
-             "Avenida Héroes s/n, Esquina con Calle 8 Norte\n" +
-             "Centro, 77710 Playa del Carmen, Quintana Roo, México\n\n" +
-             "🔗 Ver en Google Maps: https://www.google.com/maps/place/MUSEO+DE+ARTE+CONTEMPORANEO+DE+QUINTANA+ROO/@21.1127019,-86.7621038,16z\n\n" +
-             "📅 Horario:\n" +
-             "- Martes a domingo: 10:00 AM - 7:00 PM\n" +
-             "- Lunes: Cerrado\n\n" +
-             "📞 Contacto: +52 984 147 4848\n" +
-             "📧 Correo: info@macq.mx\n\n" +
-             "También puedes visitarnos en nuestra sucursal de Cancún. Pregunta por 'MACQ Cancún' para más información.\n\n" +
-             "¡Te esperamos en el corazón de la Riviera Maya!";
-    }
-    
-    // Manejar preguntas sobre horarios
-    if (lowerInput.includes('horario') || 
-        lowerInput.includes('hora') || 
-        lowerInput.includes('abierto') ||
-        lowerInput.includes('abren') ||
-        lowerInput.includes('cierra') ||
-        lowerInput.includes('horas')) {
-      return "El horario del MACQ es el siguiente:\n\n" +
-             "- Martes a domingo: 10:00 AM a 7:00 PM\n" +
-             "- Lunes: Cerrado\n\n" +
-             "Los días festivos puede haber cambios en el horario.";
-    }
-    
-    // Manejar preguntas sobre precios de entrada
-    if ((lowerInput.includes('cuánto cuesta') || 
-         lowerInput.includes('cuanto cuesta') ||
-         lowerInput.includes('precio de entrada') ||
-         lowerInput.includes('cuesta entrar')) && 
-        (lowerInput.includes('museo') || lowerInput.includes('entrada'))) {
-      return "Los precios de entrada al MACQ son los siguientes:\n\n" +
-             "- Entrada general: $100 MXN\n" +
-             "- Estudiantes y maestros con credencial vigente: $50 MXN\n" +
-             "- Adultos mayores y niños menores de 12 años: Entrada libre\n" +
-             "- Domingos: Entrada libre para público nacional\n\n" +
-             "*Precios sujetos a cambio sin previo aviso.";
-    }
+      try {
+        const client = initAIClient(apiKey);
+        if (client) {
+          const model = client.getGenerativeModel({ model: 'gemini-1.5-flash' });
+          setAiModel(model);
+          setError(null);
+          
+          // Add enhanced welcome message
+          setMessages([{
+            id: '1',
+            text: `¡Hola! 👋 Soy tu asistente especializado en la colección **Arte Eterno** del Museo de Arte Contemporáneo de Quintana Roo.
 
-    // Si pregunta por la colección completa
-    if (lowerInput.includes('colección') || 
-        lowerInput.includes('nfts') || 
-        lowerInput === 'si' || 
-        lowerInput === 'sí') {
-      return `Aquí está la información completa de nuestra colección:\n\n${getCollectionContext()}`;
-    }
+🎨 **¿Qué puedo hacer por ti?**
+• Información detallada sobre nuestras 16 piezas únicas
+• Precios y rareza de los NFTs (desde 0.5 POL hasta 35,259 POL)
+• Ubicaciones del museo en Playa del Carmen y Cancún
+• Guía para comprar y entender la tecnología blockchain
+• Recomendaciones personalizadas según tus intereses
 
-    // Manejar consultas de información general sobre NFTs
-    const infoKeywords = [
-      'información', 'info', 'saber', 'conoce', 'dime', 'cuéntame', 'hablame', 
-      'qué es', 'que es', 'dame', 'muestrame', 'muéstrame', 'hablame',
-      'information', 'info', 'tell me', 'show me', 'what is', 'what are', 'give me', 'show', 'tell'
-    ];
+**Destacados de la colección:**
+🌟 YSL - "Yo Soy Libertad" (Legendario - 35,259 POL)
+⚡ TEM - "Tides of the Eternal Mind" (Ultra Raro - 8,903 POL)  
+🎯 CHIDO - Perfecto para comenzar (0.5 POL)
+
+¿Qué te gustaría explorar primero? 🚀`,
+            isUser: false,
+            timestamp: new Date(),
+            sender: 'bot'
+          }]);
+        }
+      } catch (error) {
+        const errorMsg = 'Failed to initialize AI service. Please refresh the page to try again.';
+        console.error(errorMsg, error);
+        setError(errorMsg);
+      }
+    };
     
-    const isInfoQuery = infoKeywords.some(keyword => lowerInput.includes(keyword));
+    initializeAI();
+  }, []);
+
+  // Process user message with AI
+  const processUserMessage = useCallback(async (message: string) => {
+    const startTime = Date.now();
+    let errorOccurred = false;
+    let intent = 'general_inquiry';
     
-    // Buscar si el usuario está preguntando por un NFT específico
-    let mentionedNft = findNftInText(userInput);
+    if (!aiModel) {
+      errorOccurred = true;
+      analyticsService.trackInteraction({
+        userInput: message,
+        botResponse: 'AI model not available',
+        responseTime: Date.now() - startTime,
+        intent,
+        wasHelpful: false,
+        errorOccurred
+      });
+      return 'I am not able to process your request right now. Please try again later.';
+    }
     
-    // Si no se mencionó un NFT en este mensaje, revisar el contexto de la conversación
-    if (!mentionedNft && messages.length > 0) {
-      const recentMessages = [...messages].reverse().slice(0, 4);
-      for (const msg of recentMessages) {
-        if (msg.sender === 'bot') {
-          const nftInMessage = findNftInText(msg.text);
-          if (nftInMessage) {
-            mentionedNft = nftInMessage;
-            break;
-          }
+    // Detect intent for analytics
+    const input = message.toLowerCase();
+    if (input.includes('precio') || input.includes('price')) intent = 'price_inquiry';
+    else if (input.includes('museo') || input.includes('museum')) intent = 'museum_info';
+    else if (input.includes('comprar') || input.includes('buy')) intent = 'purchase_info';
+    else if (input.includes('colección') || input.includes('collection')) intent = 'collection_overview';
+    
+    // Create context for the AI with detailed collection info
+    const context: NftContext = {
+      collectionInfo: getCollectionSummary(),
+      marketData: {
+        floorPrice: '0.5',
+        totalVolume: '1000',
+        owners: 100
+      },
+      currencyRates: {
+        maticToUSD: 0.5,
+        usdToMXN: 20
+      }
+    };
+    
+    try {
+      // Show typing indicator
+      setIsTyping(true);
+      
+      // Process with AI (with timeout to prevent hanging)
+      const response = await Promise.race([
+        processWithAI(aiModel, message, context),
+        new Promise<string>((_, reject) => 
+          setTimeout(() => reject(new Error('Request timeout')), 10000)
+        )
+      ]);
+      
+      // Track successful interaction
+      analyticsService.trackInteraction({
+        userInput: message,
+        botResponse: response as string,
+        responseTime: Date.now() - startTime,
+        intent,
+        wasHelpful: true,
+        errorOccurred: false
+      });
+      
+      return response as string;
+      
+    } catch (error) {
+      console.error('Error processing message with AI:', error);
+      errorOccurred = true;
+      
+      // Provide more specific error messages with helpful suggestions
+      let errorResponse = '';
+      if (error instanceof Error) {
+        if (error.message.includes('quota') || error.message.includes('rate limit')) {
+          errorResponse = 'Estoy recibiendo muchas consultas en este momento. Mientras tanto, puedo ayudarte con:\n\n• C.H.I.D.O. cuesta solo 0.5 POL (~$0.25)\n• El museo está en Playa del Carmen y Cancún\n• Tenemos 16 piezas únicas en la colección\n\n¿Te interesa alguna de estas opciones?';
+        } else if (error.message.includes('timeout')) {
+          errorResponse = 'La consulta está tardando más de lo normal. Aquí tienes información rápida:\n\n🎨 **Destacados:**\n• YSL - Yo Soy Libertad (35,259 POL) - La más valiosa\n• TEM - Tides of the Eternal Mind (8,903 POL) - Ultra rara\n• CHIDO - C.H.I.D.O. (0.5 POL) - Perfecta para empezar\n\n¿Quieres saber más sobre alguna?';
+        } else if (error.message.includes('network')) {
+          errorResponse = 'Problemas de conexión detectados. Te puedo ayudar con información básica:\n\n📍 **Museo ubicado en:**\n• Playa del Carmen: 5ta Avenida entre Calle 14 y 16\n• Cancún: La Isla Shopping Village\n\n💡 **Tip:** Todas nuestras piezas están en blockchain Polygon para transacciones rápidas y económicas.';
         }
       }
-    }
-    
-    // Si encontramos un NFT mencionado, mostrar su información
-    if (mentionedNft) {
-      const priceKeywords = ['precio', 'price', 'cuesta', 'costo', 'cost', 'value', 'cuanto', 'cuánto'];
-      const isPriceQuery = priceKeywords.some(keyword => lowerInput.includes(keyword));
       
-      if (isPriceQuery) {
-        const priceDisplay = safeFormatPrice(mentionedNft.price, mentionedNft.currencySymbol);
-        return `El precio de ${mentionedNft.name} (${mentionedNft.id}) es: ${priceDisplay}`;
+      if (!errorResponse) {
+        errorResponse = 'Tengo dificultades técnicas temporales. Mientras se resuelve, aquí tienes lo esencial:\n\n🌟 **Arte Eterno Collection:**\n• 16 piezas únicas de arte digital\n• Precios desde 0.5 POL hasta 35,259 POL\n• Tecnología blockchain Polygon\n• Museo en Quintana Roo\n\n¿Te gustaría que profundice en algún tema específico?';
       }
       
-      // Si es una pregunta general, mostrar toda la información
-      return getNftInfo(mentionedNft, formatPrice);
-    }
-    
-    // Si es una consulta de información pero no se encontró un NFT específico
-    if (isInfoQuery) {
-      return `No encontré un NFT que coincida con tu búsqueda.\n\n` +
-             `Puedes preguntar por más información usando el nombre o el ID del NFT.`;
-    }
-
-    // Procesar con AI para otras preguntas, incluyendo el contexto de la conversación
-    const conversationContext = messages
-      .slice(-4) // Tomar los últimos 4 mensajes (2 intercambios)
-      .map(msg => `${msg.sender === 'user' ? 'Usuario' : 'Asistente'}: ${msg.text}`)
-      .join('\n');
+      // Track error interaction
+      analyticsService.trackInteraction({
+        userInput: message,
+        botResponse: errorResponse,
+        responseTime: Date.now() - startTime,
+        intent,
+        wasHelpful: false,
+        errorOccurred
+      });
       
-    const additionalContext = `Información sobre el MACQ:
-- Nombre: Museo de Arte Contemporáneo de Quintana Roo
-- Ubicación: Avenida Héroes s/n, Esquina con Calle 8 Norte, Centro, 77710 Playa del Carmen, Q.R., México
-- Horario: Martes a domingo de 10:00 AM a 7:00 PM
-- Contacto: info@macq.mx | +52 984 147 4848
+      return errorResponse;
+    } finally {
+      setIsTyping(false);
+    }
+  }, [aiModel]);
 
-${getCollectionContext()}`;
-      
-    return processWithAI(
-      model,
-      userInput, 
-      `${additionalContext}\n\nContexto de la conversación:\n${conversationContext}`
-    ) || "Lo siento, no pude procesar tu pregunta en este momento. ¿Te gustaría información sobre nuestra colección de NFTs o la ubicación del museo?";
-  }, [messages, formatPrice, model]);
-
-  // Manejador de envío de mensajes
+  // Handle sending a message
   const handleSendMessage = useCallback(async () => {
-    if (!input.trim() || isInputDisabled) return;
-
-    setIsInputDisabled(true);
-    if (!fullPage) setIsExpanded(true);
+    if (!input.trim() || isTyping) return;
     
     const userMessage = input.trim();
-    setInput('');
-    setMessages(prev => [...prev, { text: userMessage, sender: 'user' }]);
+    const messageId = Date.now().toString();
     
+    // Add user message to chat
+    setMessages(prev => [
+      ...prev, 
+      {
+        id: messageId,
+        text: userMessage,
+        isUser: true,
+        timestamp: new Date(),
+        sender: 'user'
+      }
+    ]);
+    
+    // Clear input and disable while processing
+    setInput('');
     setIsTyping(true);
+    setIsInputDisabled(true);
+    
     try {
-      const response = await processUserMessage(userMessage);
-      setMessages(prev => [...prev, { text: response, sender: 'bot' }]);
+      // Process message with AI
+      const aiResponse = await processUserMessage(userMessage);
+      
+      // Add AI response to chat
+      setMessages(prev => [
+        ...prev,
+        {
+          id: `ai-${Date.now()}`,
+          text: aiResponse,
+          isUser: false,
+          timestamp: new Date(),
+          sender: 'bot'
+        }
+      ]);
     } catch (error) {
-      console.error('Error processing message:', error);
-      setMessages(prev => [...prev, { 
-        text: "Lo siento, hubo un error al procesar tu mensaje. Por favor, inténtalo de nuevo.", 
-        sender: 'bot' 
-      }]);
+      console.error('Error in handleSendMessage:', error);
+      setError('Failed to get a response. Please try again.');
     } finally {
       setIsTyping(false);
       setIsInputDisabled(false);
+      
+      // Focus input after processing
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
     }
-  }, [input, isInputDisabled, fullPage, processUserMessage]);
+  }, [input, isTyping, processUserMessage]);
 
-  // Manejador de cambio en el input
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  // Handle suggestion click
+  const handleSuggestionClick = useCallback((suggestion: string) => {
+    setInput(suggestion);
+    // Auto-send the suggestion
+    setTimeout(() => {
+      handleSendMessage();
+    }, 100);
+  }, [handleSendMessage]);
+  
+  // Handle input change
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setInput(e.target.value);
   }, []);
-
-  // Manejador de la tecla Enter
-  const handleInputKeyPress = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && input.trim() && !isInputDisabled) {
+  
+  // Handle key press (Enter to send)
+  const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
       handleSendMessage();
     }
-  }, [input, isInputDisabled, handleSendMessage]);
-
-  // Focus input cuando el componente se monta
-  useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.focus();
+  }, [handleSendMessage]);
+  
+  // Toggle chat expansion
+  const toggleExpand = useCallback(() => {
+    setIsExpanded(prev => !prev);
+    
+    // Focus input when expanding
+    if (!isExpanded && inputRef.current) {
+      setTimeout(() => inputRef.current?.focus(), 100);
     }
-  }, []);
-
-  // Scroll al final cuando llegan nuevos mensajes
+  }, [isExpanded]);
+  
+  // Auto-scroll to bottom when messages change
   useEffect(() => {
-    const container = messagesContainerRef.current;
-    if (container && isExpanded) {
-      container.scrollTop = container.scrollHeight;
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages, isExpanded]);
-
-  // Manejar clics fuera del chat (solo si no está en modo pantalla completa)
+  }, [messages]);
+  
+  // Focus input when expanded changes
   useEffect(() => {
-    if (!fullPage) {
-      const handleClickOutside = (event: MouseEvent) => {
-        const container = document.querySelector('.chatbot-container');
-        if (container && !container.contains(event.target as Node)) {
-          setIsExpanded(false);
-        }
-      };
-
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
+    if (isExpanded && inputRef.current) {
+      // Use type assertion to tell TypeScript we know what we're doing
+      const input = inputRef.current as HTMLInputElement;
+      setTimeout(() => input.focus(), 100);
     }
-  }, [fullPage]);
-
-  // Focus input cuando se monta en modo pantalla completa
-  useEffect(() => {
-    if (fullPage && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [fullPage]);
+  }, [isExpanded]);
 
   return {
-    // Estados
     messages,
     input,
     isExpanded,
     isTyping,
     isInputDisabled,
-    
-    // Refs
-    messagesEndRef,
-    inputRef,
-    messagesContainerRef,
-    
-    // Handlers
+    error,
     handleInputChange,
-    handleInputKeyPress,
     handleSendMessage,
-    setIsExpanded,
+    handleKeyPress,
+    toggleExpand,
+    inputRef,
+    messagesEndRef,
+    handleSuggestionClick
   };
 };
+
+export default useChatbot;

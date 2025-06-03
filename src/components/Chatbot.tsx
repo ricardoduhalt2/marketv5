@@ -1,6 +1,7 @@
 import React from 'react';
 import './Chatbot.css';
-import { useChatbot, type Message } from '../hooks/useChatbot';
+import useChatbot from '../hooks/useChatbot';
+import ChatSuggestions from './ChatSuggestions';
 
 export interface ChatbotProps {
   fullPage?: boolean;
@@ -8,38 +9,50 @@ export interface ChatbotProps {
 
 const Chatbot: React.FC<ChatbotProps> = ({ fullPage = false }) => {
   const {
-    // Estados
     messages,
     input,
     isExpanded,
     isTyping,
     isInputDisabled,
-    
-    // Refs
-    messagesEndRef,
-    inputRef,
-    messagesContainerRef,
-    
-    // Handlers
+    error,
     handleInputChange,
-    handleInputKeyPress,
     handleSendMessage,
-    setIsExpanded: _setIsExpanded, // Prefijo con _ para indicar que no se usa directamente
-  } = useChatbot(fullPage);
+    handleKeyPress,
+    toggleExpand,
+    inputRef,
+    messagesEndRef,
+    handleSuggestionClick
+  } = useChatbot();
 
-  // La lógica del chatbot ahora está en el hook useChatbot
-
-  // La lógica de procesamiento de mensajes ahora está en el hook useChatbot
+  // Render error message if there's an error
+  if (error) {
+    return (
+      <div className="p-4 text-red-500 bg-red-50 rounded-lg">
+        Error: {error}
+      </div>
+    );
+  }
 
   return (
     <div className={fullPage ? 'h-full w-full flex flex-col' : `chatbot-container ${isExpanded ? 'expanded' : ''}`}>
+      {!fullPage && (
+        <div 
+          className="chatbot-header"
+          onClick={toggleExpand}
+        >
+          <h3>Arte Eterno Assistant</h3>
+          <button className="toggle-button">
+            {isExpanded ? '−' : '+'}
+          </button>
+        </div>
+      )}
+      
       <div 
-        ref={messagesContainerRef} 
         className={`messages-container ${fullPage ? 'flex-1 overflow-y-auto' : ''} ${!fullPage && !isExpanded ? 'hidden' : ''}`}
       >
-        {messages.map((message: Message, index: number) => (
+        {messages.map((message) => (
           <div 
-            key={index} 
+            key={message.id} 
             className={`message ${message.sender} ${fullPage ? 'max-w-4xl mx-auto w-full' : ''}`}
           >
             <div className="message-content">
@@ -62,24 +75,34 @@ const Chatbot: React.FC<ChatbotProps> = ({ fullPage = false }) => {
         <div ref={messagesEndRef} />
       </div>
 
+      {/* Add suggestions when chat is expanded or in full page mode */}
+      {(isExpanded || fullPage) && messages.length > 0 && (
+        <ChatSuggestions
+          onSuggestionClick={handleSuggestionClick}
+          messageHistory={messages.map(m => m.text)}
+          currentInput={input}
+          showQuickActions={messages.length <= 1}
+        />
+      )}
+
       <div className="chatbot-main">
         <div className="chatbot-input-wrapper">
           <input
-            ref={inputRef}
+            ref={inputRef as React.RefObject<HTMLInputElement>}
             type="text"
             className="chatbot-input"
-            placeholder={fullPage ? "Escribe tu pregunta aquí..." : "Pregunta sobre nuestra colección..."}
+            placeholder="Type your message..."
             value={input}
             onChange={handleInputChange}
-            onKeyPress={handleInputKeyPress}
+            onKeyPress={handleKeyPress}
             disabled={isInputDisabled}
-            aria-label="Escribe tu mensaje"
+            aria-label="Type your message"
           />
           <button
             className="chatbot-send-button"
             onClick={handleSendMessage}
             disabled={!input.trim() || isInputDisabled}
-            aria-label="Enviar mensaje"
+            aria-label="Send message"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="22" y1="2" x2="11" y2="13"></line>
