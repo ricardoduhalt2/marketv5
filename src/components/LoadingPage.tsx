@@ -8,6 +8,7 @@ import {
   Spark
 } from '@/constants';
 import StarsBackground from './StarsBackground';
+import LoadingUfo from './LoadingUfo';
 
 const SPARK_COUNT = 20;
 const SPARK_LIFESPAN_MIN = 0.3;
@@ -395,6 +396,11 @@ const LoadingPage: React.FC = () => {
     <div className="loading-page-container">
       {/* Stars Background */}
       <StarsBackground />
+
+      {/* UFO flotante en la esquina superior derecha */}
+      <div className="loading-ufo-wrapper">
+        <LoadingUfo />
+      </div>
 
       {/* Titles */}
       <div className="titles-container">

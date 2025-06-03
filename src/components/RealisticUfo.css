@@ -347,25 +347,67 @@
   transform-origin: top center;
 }
 
-/* Halo de energía verde */
+/* Halo de energía verde - VERSIÓN ETÉREA */
 .ufo-green-halo {
   position: absolute;
-  top: -21%;
-  left: -21%;
-  width: 128%;
-  height: 128%;
+  top: -35%;
+  left: -35%;
+  width: 170%;
+  height: 170%;
   border-radius: 50%;
   pointer-events: none;
   z-index: 0;
   background: radial-gradient(
     circle at center,
-    rgba(0, 255, 100, 0.4) 0%,
-    rgba(50, 255, 150, 0.3) 30%,
-    rgba(100, 255, 200, 0.15) 60%,
+    rgba(0, 255, 100, 0.15) 0%,
+    rgba(50, 255, 150, 0.12) 20%,
+    rgba(100, 255, 200, 0.08) 40%,
+    rgba(150, 255, 220, 0.05) 60%,
+    rgba(200, 255, 240, 0.03) 80%,
     transparent 100%
   );
-  filter: blur(3px);
-  animation: greenHaloPulse 3s ease-in-out infinite;
+  filter: blur(8px);
+  animation: etherealHaloPulse 4s ease-in-out infinite;
+}
+
+/* Segundo halo etéreo para crear capas */
+.ufo-green-halo::before {
+  content: '';
+  position: absolute;
+  top: 15%;
+  left: 15%;
+  width: 70%;
+  height: 70%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at center,
+    rgba(0, 255, 100, 0.25) 0%,
+    rgba(50, 255, 150, 0.18) 30%,
+    rgba(100, 255, 200, 0.12) 60%,
+    transparent 100%
+  );
+  filter: blur(12px);
+  animation: etherealHaloPulse 4s ease-in-out infinite 1s;
+}
+
+/* Tercer halo etéreo más interno */
+.ufo-green-halo::after {
+  content: '';
+  position: absolute;
+  top: 25%;
+  left: 25%;
+  width: 50%;
+  height: 50%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at center,
+    rgba(0, 255, 100, 0.35) 0%,
+    rgba(50, 255, 150, 0.25) 40%,
+    rgba(100, 255, 200, 0.15) 70%,
+    transparent 100%
+  );
+  filter: blur(6px);
+  animation: etherealHaloPulse 4s ease-in-out infinite 2s;
 }
 
 /* Tira de luces que corren alrededor del UFO - AJUSTADA AL TAMAÑO CLÁSICO */
@@ -463,70 +505,115 @@
   filter: brightness(1.4) saturate(1.3);
 }
 
-/* PARTÍCULAS DE ENERGÍA VERDE QUE SE MUEVEN CON EL UFO - MEJORADAS */
+/* PARTÍCULAS DE ENERGÍA VERDE ETÉREAS */
 .green-energy-particle {
-  position: absolute;
-  width: 2px;
-  height: 2px;
-  background: radial-gradient(
-    circle at center,
-    rgba(0, 255, 100, 1) 0%,
-    rgba(50, 255, 150, 0.8) 40%,
-    rgba(100, 255, 200, 0.4) 80%,
-    transparent 100%
-  );
-  border-radius: 50%;
-  box-shadow: 
-    0 0 4px 1px rgba(0, 255, 100, 0.8),
-    0 0 8px 2px rgba(50, 255, 150, 0.6),
-    0 0 12px 3px rgba(100, 255, 200, 0.4);
-  animation: greenParticleFloat 3s ease-in-out infinite;
-  z-index: 5;
-}
-/* PARTÍCULAS ESPECIALES CUANDO SE DETIENE - NUEVAS */
-.stopping-energy-particle {
   position: absolute;
   width: 3px;
   height: 3px;
   background: radial-gradient(
     circle at center,
-    rgba(0, 255, 100, 1) 0%,
-    rgba(50, 255, 150, 0.9) 30%,
-    rgba(100, 255, 200, 0.6) 70%,
+    rgba(0, 255, 100, 0.8) 0%,
+    rgba(50, 255, 150, 0.5) 40%,
+    rgba(100, 255, 200, 0.2) 80%,
     transparent 100%
   );
   border-radius: 50%;
   box-shadow: 
-    0 0 6px 2px rgba(0, 255, 100, 0.9),
-    0 0 12px 3px rgba(50, 255, 150, 0.7),
-    0 0 18px 4px rgba(100, 255, 200, 0.5);
-  animation: stoppingParticleFloat 2s ease-in-out infinite;
+    0 0 8px 2px rgba(0, 255, 100, 0.4),
+    0 0 16px 4px rgba(50, 255, 150, 0.3),
+    0 0 24px 6px rgba(100, 255, 200, 0.2);
+  animation: etherealParticleFloat 5s ease-in-out infinite;
+  filter: blur(1px);
+  z-index: 5;
+}
+/* PARTÍCULAS ESPECIALES ETÉREAS CUANDO SE DETIENE */
+.stopping-energy-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: radial-gradient(
+    circle at center,
+    rgba(0, 255, 100, 0.9) 0%,
+    rgba(50, 255, 150, 0.6) 30%,
+    rgba(100, 255, 200, 0.3) 70%,
+    transparent 100%
+  );
+  border-radius: 50%;
+  box-shadow: 
+    0 0 12px 3px rgba(0, 255, 100, 0.5),
+    0 0 24px 6px rgba(50, 255, 150, 0.4),
+    0 0 36px 8px rgba(100, 255, 200, 0.3);
+  animation: etherealStoppingParticleFloat 3s ease-in-out infinite;
+  filter: blur(1.5px);
   z-index: 6;
 }
 
-/* HALO DE ENERGÍA CONCENTRADA CUANDO SE DETIENE */
+/* HALO DE ENERGÍA ETÉREA CONCENTRADA CUANDO SE DETIENE */
 .stopping-energy-halo {
   position: absolute;
-  top: -30%;
-  left: -30%;
-  width: 160%;
-  height: 160%;
+  top: -40%;
+  left: -40%;
+  width: 180%;
+  height: 180%;
   border-radius: 50%;
   pointer-events: none;
   z-index: 1;
   background: radial-gradient(
     circle at center,
-    rgba(0, 255, 100, 0.6) 0%,
-    rgba(50, 255, 150, 0.4) 20%,
-    rgba(100, 255, 200, 0.3) 40%,
-    rgba(150, 255, 220, 0.2) 60%,
-    rgba(200, 255, 240, 0.1) 80%,
+    rgba(0, 255, 100, 0.3) 0%,
+    rgba(50, 255, 150, 0.2) 20%,
+    rgba(100, 255, 200, 0.15) 40%,
+    rgba(150, 255, 220, 0.1) 60%,
+    rgba(200, 255, 240, 0.05) 80%,
     transparent 100%
   );
-  filter: blur(4px);
-  animation: stoppingHaloPulse 1.5s ease-in-out infinite;
+  filter: blur(8px);
+  animation: etherealStoppingHaloPulse 2s ease-in-out infinite;
 }
-/* ANIMACIONES */
+
+/* Segundo halo etéreo para el estado de detención */
+.stopping-energy-halo::before {
+  content: '';
+  position: absolute;
+  top: 20%;
+  left: 20%;
+  width: 60%;
+  height: 60%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at center,
+    rgba(0, 255, 100, 0.4) 0%,
+    rgba(50, 255, 150, 0.25) 40%,
+    rgba(100, 255, 200, 0.15) 70%,
+    transparent 100%
+  );
+  filter: blur(6px);
+  animation: etherealStoppingHaloPulse 2s ease-in-out infinite 0.5s;
+}
+/* ANIMACIONES ETÉREAS */
+@keyframes etherealHaloPulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(0.8) rotate(0deg);
+    filter: blur(8px) hue-rotate(0deg);
+  }
+  25% {
+    opacity: 0.6;
+    transform: scale(1.1) rotate(90deg);
+    filter: blur(10px) hue-rotate(15deg);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.3) rotate(180deg);
+    filter: blur(12px) hue-rotate(30deg);
+  }
+  75% {
+    opacity: 0.6;
+    transform: scale(1.1) rotate(270deg);
+    filter: blur(10px) hue-rotate(15deg);
+  }
+}
+
 @keyframes greenHaloPulse {
   0%, 100% {
     opacity: 0.6;
@@ -605,6 +692,67 @@
   }
 }
 
+@keyframes etherealParticleFloat {
+  0%, 100% {
+    opacity: 0.3;
+    transform: translateY(0px) translateX(0px) scale(0.6) rotate(0deg);
+    filter: blur(1px) hue-rotate(0deg);
+  }
+  25% {
+    opacity: 0.7;
+    transform: translateY(-15px) translateX(-10px) scale(1.0) rotate(90deg);
+    filter: blur(1.5px) hue-rotate(10deg);
+  }
+  50% {
+    opacity: 0.9;
+    transform: translateY(-25px) translateX(0px) scale(1.3) rotate(180deg);
+    filter: blur(2px) hue-rotate(20deg);
+  }
+  75% {
+    opacity: 0.7;
+    transform: translateY(-15px) translateX(10px) scale(1.0) rotate(270deg);
+    filter: blur(1.5px) hue-rotate(10deg);
+  }
+}
+
+/* ANIMACIÓN ETÉREA PARA PARTÍCULAS CUANDO SE DETIENE */
+@keyframes etherealStoppingParticleFloat {
+  0%, 100% {
+    opacity: 0.5;
+    transform: translateY(0px) translateX(0px) scale(0.7) rotate(0deg);
+    filter: blur(1.5px) hue-rotate(0deg);
+  }
+  25% {
+    opacity: 0.8;
+    transform: translateY(-20px) translateX(-15px) scale(1.1) rotate(120deg);
+    filter: blur(2px) hue-rotate(15deg);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-35px) translateX(0px) scale(1.4) rotate(240deg);
+    filter: blur(2.5px) hue-rotate(30deg);
+  }
+  75% {
+    opacity: 0.8;
+    transform: translateY(-20px) translateX(15px) scale(1.1) rotate(360deg);
+    filter: blur(2px) hue-rotate(15deg);
+  }
+}
+
+/* ANIMACIÓN ETÉREA PARA EL HALO CUANDO SE DETIENE */
+@keyframes etherealStoppingHaloPulse {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(0.8) rotate(0deg);
+    filter: blur(8px) hue-rotate(0deg);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.3) rotate(180deg);
+    filter: blur(12px) hue-rotate(20deg);
+  }
+}
+
 @keyframes greenParticleFloat {
   0%, 100% {
     opacity: 0.6;
@@ -624,37 +772,7 @@
   }
 }
 
-/* ANIMACIÓN PARA PARTÍCULAS CUANDO SE DETIENE */
-@keyframes stoppingParticleFloat {
-  0%, 100% {
-    opacity: 0.8;
-    transform: translateY(0px) translateX(0px) scale(0.9);
-  }
-  25% {
-    opacity: 1;
-    transform: translateY(-12px) translateX(-8px) scale(1.2);
-  }
-  50% {
-    opacity: 1;
-    transform: translateY(-20px) translateX(0px) scale(1.4);
-  }
-  75% {
-    opacity: 1;
-    transform: translateY(-12px) translateX(8px) scale(1.2);
-  }
-}
 
-/* ANIMACIÓN PARA EL HALO CUANDO SE DETIENE */
-@keyframes stoppingHaloPulse {
-  0%, 100% {
-    opacity: 0.4;
-    transform: scale(0.9);
-  }
-  50% {
-    opacity: 0.8;
-    transform: scale(1.2);
-  }
-}
 
 @keyframes laserPulseRealistic {
   0% {

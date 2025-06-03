@@ -1,0 +1,659 @@
+/* CONTENEDOR PRINCIPAL DEL UFO DE LOADING */
+.loading-ufo-container {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+/* UFO PRINCIPAL - MUCHO MÁS COMPACTO */
+.loading-ufo-main {
+  position: relative;
+  width: 60px;
+  height: 22px; /* Reducido drásticamente de 28px a 22px */
+  transform-style: preserve-3d;
+  animation: loadingUfoFloat 4s ease-in-out infinite;
+}
+
+/* HALO DE ENERGÍA VERDE ETÉREA - MISMO EFECTO QUE EL MAIN UFO */
+.loading-ufo-green-halo {
+  position: absolute;
+  top: -35%;
+  left: -35%;
+  width: 170%;
+  height: 170%;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(
+    circle at center,
+    rgba(0, 255, 100, 0.15) 0%,
+    rgba(50, 255, 150, 0.12) 20%,
+    rgba(100, 255, 200, 0.08) 40%,
+    rgba(150, 255, 220, 0.05) 60%,
+    rgba(200, 255, 240, 0.03) 80%,
+    transparent 100%
+  );
+  filter: blur(8px);
+  animation: etherealHaloPulse 4s ease-in-out infinite;
+}
+
+/* Segundo halo etéreo para crear capas - IGUAL QUE EL MAIN UFO */
+.loading-ufo-green-halo::before {
+  content: '';
+  position: absolute;
+  top: 15%;
+  left: 15%;
+  width: 70%;
+  height: 70%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at center,
+    rgba(0, 255, 100, 0.25) 0%,
+    rgba(50, 255, 150, 0.18) 30%,
+    rgba(100, 255, 200, 0.12) 60%,
+    transparent 100%
+  );
+  filter: blur(12px);
+  animation: etherealHaloPulse 4s ease-in-out infinite 1s;
+}
+
+/* Tercer halo etéreo más interno - IGUAL QUE EL MAIN UFO */
+.loading-ufo-green-halo::after {
+  content: '';
+  position: absolute;
+  top: 25%;
+  left: 25%;
+  width: 50%;
+  height: 50%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at center,
+    rgba(0, 255, 100, 0.35) 0%,
+    rgba(50, 255, 150, 0.25) 40%,
+    rgba(100, 255, 200, 0.15) 70%,
+    transparent 100%
+  );
+  filter: blur(6px);
+  animation: etherealHaloPulse 4s ease-in-out infinite 2s;
+}
+
+/* CÚPULA DEL UFO - MUCHO MÁS UNIDA */
+.loading-ufo-dome {
+  position: absolute;
+  top: -2px; /* Cambiado de -6px a -2px para unión extrema */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 14px; /* Reducido de 16px a 14px */
+  background: linear-gradient(
+    135deg,
+    rgba(180, 190, 200, 0.95) 0%,
+    rgba(220, 230, 240, 0.9) 30%,
+    rgba(160, 170, 180, 0.85) 70%,
+    rgba(140, 150, 160, 0.9) 100%
+  );
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  border: 1px solid rgba(200, 210, 220, 0.6);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 3px rgba(255, 255, 255, 0.4);
+  z-index: 3;
+}
+
+/* SUPERFICIE DE LA CÚPULA */
+.loading-ufo-dome-surface {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  overflow: hidden;
+}
+
+.loading-ufo-dome-highlight {
+  position: absolute;
+  top: 15%;
+  left: 20%;
+  width: 40%;
+  height: 30%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 255, 255, 0.6) 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 100%
+  );
+  border-radius: 50%;
+  filter: blur(1px);
+}
+
+.loading-ufo-dome-reflection {
+  position: absolute;
+  top: 10%;
+  right: 25%;
+  width: 20%;
+  height: 40%;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.4) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 100%
+  );
+  border-radius: 50%;
+  filter: blur(0.5px);
+}
+
+/* VENTANAS DE LA CÚPULA - AJUSTADAS PARA CÚPULA MÁS PEQUEÑA */
+.loading-ufo-dome-window {
+  position: absolute;
+  width: 3px; /* Reducido de 4px a 3px */
+  height: 2px; /* Reducido de 3px a 2px */
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 200, 50, 0.9) 0%,
+    rgba(255, 150, 0, 0.7) 50%,
+    rgba(200, 100, 0, 0.5) 100%
+  );
+  border-radius: 50%;
+  border: 0.5px solid rgba(255, 220, 100, 0.6);
+  box-shadow: 
+    0 0 3px 1px rgba(255, 200, 50, 0.4),
+    inset 0 0 2px rgba(255, 255, 255, 0.6);
+  animation: loadingWindowGlow 2s ease-in-out infinite;
+}
+
+.loading-ufo-dome-window:nth-child(4) {
+  top: 45%; /* Ajustado para la cúpula más pequeña */
+  left: 25%;
+  animation-delay: 0s;
+}
+
+.loading-ufo-dome-window:nth-child(5) {
+  top: 40%; /* Ajustado para la cúpula más pequeña */
+  left: 50%;
+  transform: translateX(-50%);
+  animation-delay: 0.7s;
+}
+
+.loading-ufo-dome-window:nth-child(6) {
+  top: 45%; /* Ajustado para la cúpula más pequeña */
+  right: 25%;
+  animation-delay: 1.4s;
+}
+
+.loading-ufo-dome-surface {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  overflow: hidden;
+}
+
+.loading-ufo-dome-highlight {
+  position: absolute;
+  top: 15%;
+  left: 20%;
+  width: 40%;
+  height: 30%;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.6) 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 100%
+  );
+  border-radius: 50%;
+  filter: blur(1px);
+}
+
+.loading-ufo-dome-reflection {
+  position: absolute;
+  top: 25%;
+  right: 15%;
+  width: 25%;
+  height: 20%;
+  background: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.4) 0%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  border-radius: 50%;
+  filter: blur(0.5px);
+}
+
+/* VENTANAS DE LA CÚPULA */
+.loading-ufo-dome-window {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 255, 100, 0.9) 0%,
+    rgba(255, 200, 50, 0.7) 50%,
+    rgba(255, 150, 0, 0.5) 100%
+  );
+  border-radius: 50%;
+  box-shadow: 
+    0 0 3px 1px rgba(255, 200, 50, 0.6),
+    inset 0 0 2px rgba(255, 255, 255, 0.8);
+  animation: loadingWindowGlow 2s ease-in-out infinite;
+}
+
+.loading-ufo-dome-window:nth-child(4) {
+  top: 45%; /* Ajustado para la cúpula más pequeña */
+  left: 25%;
+  animation-delay: 0s;
+}
+
+.loading-ufo-dome-window:nth-child(5) {
+  top: 40%; /* Ajustado para la cúpula más pequeña */
+  left: 50%;
+  transform: translateX(-50%);
+  animation-delay: 0.7s;
+}
+
+.loading-ufo-dome-window:nth-child(6) {
+  top: 45%; /* Ajustado para la cúpula más pequeña */
+  right: 25%;
+  animation-delay: 1.4s;
+}
+
+/* CONECTOR DEL CUERPO - ELIMINADO PARA UNIÓN TOTAL */
+.loading-ufo-body-connector {
+  position: absolute;
+  top: 10px; /* Cambiado de 8px a 10px para solapar */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 35px; /* Aumentado de 30px a 35px para mejor conexión */
+  height: 2px; /* Reducido de 3px a 2px para ser más sutil */
+  background: linear-gradient(
+    90deg,
+    rgba(120, 130, 140, 0.6) 0%,
+    rgba(160, 170, 180, 0.8) 50%,
+    rgba(120, 130, 140, 0.6) 100%
+  );
+  border-radius: 1px;
+  z-index: 2;
+}
+
+/* SOMBRA DE LA CÚPULA - ELIMINADA PARA UNIÓN TOTAL */
+.loading-ufo-dome-shadow {
+  display: none; /* Eliminamos la sombra para unir más */
+}
+
+/* SECCIÓN MEDIA - MUCHO MÁS UNIDA */
+.loading-ufo-mid-section {
+  position: absolute;
+  top: 8px; /* Cambiado de 9px a 8px para solapar con la cúpula */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 10px; /* Reducido de 11px a 10px */
+  background: linear-gradient(
+    180deg,
+    rgba(140, 150, 160, 0.95) 0%,
+    rgba(160, 170, 180, 0.9) 30%,
+    rgba(120, 130, 140, 0.85) 70%,
+    rgba(100, 110, 120, 0.9) 100%
+  );
+  border-radius: 25px;
+  border: 1px solid rgba(180, 190, 200, 0.6);
+  box-shadow: 
+    0 2px 6px rgba(0, 0, 0, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.3);
+  z-index: 2;
+}
+
+.loading-ufo-metallic-band {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    rgba(200, 210, 220, 0.8) 0%,
+    rgba(255, 255, 255, 0.9) 50%,
+    rgba(200, 210, 220, 0.8) 100%
+  );
+  border-radius: 1px;
+}
+
+/* LUCES CORRIENTES */
+.loading-ufo-running-light-strip {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 4px;
+}
+
+.loading-ufo-running-light {
+  width: 2px;
+  height: 2px;
+  background: radial-gradient(
+    circle at center,
+    rgba(0, 150, 255, 1) 0%,
+    rgba(0, 100, 200, 0.8) 50%,
+    rgba(0, 50, 150, 0.6) 100%
+  );
+  border-radius: 50%;
+  box-shadow: 
+    0 0 3px 1px rgba(0, 150, 255, 0.6),
+    0 0 6px 2px rgba(0, 100, 200, 0.4);
+  animation: loadingRunningLights 1.5s ease-in-out infinite;
+}
+
+/* PARTE INFERIOR - TOTALMENTE UNIDA */
+.loading-ufo-underside {
+  position: absolute;
+  bottom: 2px; /* Cambiado de 0px a 2px para solapar con la sección media */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px; /* Reducido de 42px a 40px */
+  height: 6px; /* Reducido de 7px a 6px */
+  background: linear-gradient(
+    180deg,
+    rgba(100, 110, 120, 0.9) 0%,
+    rgba(80, 90, 100, 0.85) 50%,
+    rgba(60, 70, 80, 0.8) 100%
+  );
+  border-radius: 0 0 20px 20px; /* Reducido de 21px a 20px */
+  border: 1px solid rgba(120, 130, 140, 0.6);
+  border-top: none;
+  z-index: 2;
+}
+
+.loading-ufo-engine-glow-cone {
+  position: absolute;
+  bottom: -6px; /* Cambiado de -8px a -6px para estar más cerca */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 18px; /* Reducido de 20px a 18px */
+  height: 10px; /* Reducido de 12px a 10px */
+  background: radial-gradient(
+    ellipse at top,
+    rgba(0, 220, 255, 0.8) 0%,
+    rgba(0, 180, 255, 0.6) 30%,
+    rgba(0, 140, 255, 0.4) 60%,
+    rgba(0, 100, 255, 0.2) 80%,
+    transparent 100%
+  );
+  border-radius: 0 0 50% 50%;
+  filter: blur(1px);
+  animation: loadingEngineGlow 2s ease-in-out infinite;
+}
+
+.loading-ufo-thruster-ports {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  padding: 0 6px;
+}
+
+.loading-ufo-thruster-port {
+  width: 2px;
+  height: 2px;
+  background: radial-gradient(
+    circle at center,
+    rgba(0, 220, 255, 1) 0%,
+    rgba(0, 180, 255, 0.8) 50%,
+    rgba(0, 140, 255, 0.6) 100%
+  );
+  border-radius: 50%;
+  animation: loadingThrusterPulse 1.8s ease-in-out infinite;
+}
+
+/* PARTÍCULAS DE ENERGÍA VERDE ETÉREAS PARA LOADING */
+.loading-green-energy-particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: radial-gradient(
+    circle at center,
+    rgba(0, 255, 100, 0.7) 0%,
+    rgba(50, 255, 150, 0.4) 40%,
+    rgba(100, 255, 200, 0.2) 80%,
+    transparent 100%
+  );
+  border-radius: 50%;
+  box-shadow: 
+    0 0 6px 1px rgba(0, 255, 100, 0.3),
+    0 0 12px 2px rgba(50, 255, 150, 0.2),
+    0 0 18px 3px rgba(100, 255, 200, 0.1);
+  animation: loadingEtherealParticleFloat 4s ease-in-out infinite;
+  filter: blur(0.5px);
+  z-index: 5;
+}
+
+/* ANIMACIONES PARA EL UFO DE LOADING */
+@keyframes loadingUfoFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-4px) rotate(1deg);
+  }
+  50% {
+    transform: translateY(-6px) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-4px) rotate(-1deg);
+  }
+}
+
+@keyframes loadingEtherealHaloPulse {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(0.9) rotate(0deg);
+    filter: blur(6px) hue-rotate(0deg);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.2) rotate(180deg);
+    filter: blur(8px) hue-rotate(15deg);
+  }
+}
+
+/* ANIMACIONES ETÉREAS - IGUALES AL MAIN UFO */
+@keyframes etherealHaloPulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(0.8) rotate(0deg);
+    filter: blur(8px) hue-rotate(0deg);
+  }
+  25% {
+    opacity: 0.6;
+    transform: scale(1.1) rotate(90deg);
+    filter: blur(10px) hue-rotate(15deg);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.3) rotate(180deg);
+    filter: blur(12px) hue-rotate(30deg);
+  }
+  75% {
+    opacity: 0.6;
+    transform: scale(1.1) rotate(270deg);
+    filter: blur(10px) hue-rotate(15deg);
+  }
+}
+
+@keyframes loadingEtherealParticleFloat {
+  0%, 100% {
+    opacity: 0.2;
+    transform: translateY(0px) translateX(0px) scale(0.7) rotate(0deg);
+    filter: blur(0.5px) hue-rotate(0deg);
+  }
+  25% {
+    opacity: 0.5;
+    transform: translateY(-8px) translateX(-5px) scale(1.0) rotate(90deg);
+    filter: blur(1px) hue-rotate(10deg);
+  }
+  50% {
+    opacity: 0.7;
+    transform: translateY(-12px) translateX(0px) scale(1.2) rotate(180deg);
+    filter: blur(1.5px) hue-rotate(20deg);
+  }
+  75% {
+    opacity: 0.5;
+    transform: translateY(-8px) translateX(5px) scale(1.0) rotate(270deg);
+    filter: blur(1px) hue-rotate(10deg);
+  }
+}
+
+@keyframes loadingWindowGlow {
+  0%, 100% {
+    opacity: 0.6;
+    box-shadow: 
+      0 0 3px 1px rgba(255, 200, 50, 0.4),
+      inset 0 0 2px rgba(255, 255, 255, 0.6);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 
+      0 0 6px 2px rgba(255, 200, 50, 0.8),
+      inset 0 0 3px rgba(255, 255, 255, 0.9);
+  }
+}
+
+@keyframes loadingRunningLights {
+  0%, 100% {
+    opacity: 0.4;
+    box-shadow: 
+      0 0 3px 1px rgba(0, 150, 255, 0.4),
+      0 0 6px 2px rgba(0, 100, 200, 0.2);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 
+      0 0 6px 2px rgba(0, 150, 255, 0.8),
+      0 0 12px 3px rgba(0, 100, 200, 0.6);
+  }
+}
+
+@keyframes loadingEngineGlow {
+  0%, 100% {
+    opacity: 0.3;
+    transform: translateX(-50%) scale(0.8);
+  }
+  50% {
+    opacity: 0.8;
+    transform: translateX(-50%) scale(1.1);
+  }
+}
+
+@keyframes loadingThrusterPulse {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(0.8);
+    box-shadow: 0 0 4px 1px rgba(0, 220, 255, 0.4);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+    box-shadow: 0 0 8px 2px rgba(0, 220, 255, 0.8);
+  }
+}
+
+/* RAYO LÁSER DEL UFO DE LOADING */
+.loading-ufo-laser-beam {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 3px;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 255, 100, 1) 0%,
+    rgba(50, 255, 150, 0.9) 20%,
+    rgba(100, 255, 200, 0.8) 40%,
+    rgba(150, 255, 220, 0.6) 60%,
+    rgba(200, 255, 240, 0.4) 80%,
+    rgba(255, 255, 255, 0.2) 100%
+  );
+  box-shadow: 
+    0 0 6px 2px rgba(0, 255, 100, 0.8),
+    0 0 12px 4px rgba(50, 255, 150, 0.6),
+    0 0 18px 6px rgba(100, 255, 200, 0.4);
+  border-radius: 2px;
+  z-index: 15;
+  animation: laserPulse 0.1s ease-in-out infinite alternate;
+}
+
+/* Efecto de pulso del láser */
+@keyframes laserPulse {
+  0% {
+    opacity: 0.8;
+    width: 3px;
+    box-shadow: 
+      0 0 6px 2px rgba(0, 255, 100, 0.8),
+      0 0 12px 4px rgba(50, 255, 150, 0.6),
+      0 0 18px 6px rgba(100, 255, 200, 0.4);
+  }
+  100% {
+    opacity: 1;
+    width: 4px;
+    box-shadow: 
+      0 0 8px 3px rgba(0, 255, 100, 1),
+      0 0 16px 6px rgba(50, 255, 150, 0.8),
+      0 0 24px 8px rgba(100, 255, 200, 0.6);
+  }
+}
+
+/* ESTADOS DEL UFO */
+.loading-ufo-main[data-state="moving"] {
+  animation: loadingUfoMoving 2s ease-in-out;
+}
+
+.loading-ufo-main[data-state="firingLaser"] {
+  animation: loadingUfoLaserCharge 0.5s ease-in-out;
+}
+
+@keyframes loadingUfoMoving {
+  0% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-6px) rotate(3deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-6px) rotate(-3deg);
+  }
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+}
+
+@keyframes loadingUfoLaserCharge {
+  0% {
+    transform: scale(1) translateY(0px);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.08) translateY(-4px);
+    filter: brightness(1.5);
+  }
+  100% {
+    transform: scale(1.05) translateY(-2px);
+    filter: brightness(1.8);
+  }
+}
