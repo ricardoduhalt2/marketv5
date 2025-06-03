@@ -1,42 +1,32 @@
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import './RealisticUfo.css';
 
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import './RealisticUfo.css'; // Import the new CSS file
+type UfoFSMState = 'normal' | 'stopping' | 'firingLaser' | 'postLaserMove' | 'hyperjumping' | 'returning' | 'randomMoving' | 'specialMovement';
+type LaserShotStep = 'idle' | 'prepareShot' | 'firing' | 'cooldown';
 
 interface TrailPoint {
   x: number;
   y: number;
   opacity: number;
   scale: number;
-  scaleX?: number; // For hyperjump stretching
-  color?: string; // For hyperjump color change
+  scaleX?: number;
+  color?: string;
   id: string;
-  type?: 'normal' | 'laser';
 }
 
-const UFO_BASE_WIDTH = 200; // Original width before scaling
-const UFO_BASE_HEIGHT = 60; // Original height before scaling
-const UFO_SCALE = 0.3; // Reducido aproximadamente un 50% desde el tamaño original
+const UFO_BASE_WIDTH = 126; // Aumentado 5%: 120 * 1.05 = 126
+const UFO_BASE_HEIGHT = 63; // Aumentado 5%: 60 * 1.05 = 63
+const UFO_SCALE = 1.26; // Aumentado 5%: 1.2 * 1.05 = 1.26
+const NORMAL_SPEED = 1.2;
+const HYPERJUMP_SPEED = 8;
+const HYPERJUMP_RETURN_DELAY_MS = 2000;
 
-const NORMAL_SPEED = 1.8;
-const HYPERJUMP_SPEED = 60;
-const SHORTER_LASER_DURATION_MS = 700; 
-const MAX_LASER_SHOTS = 2; 
-const LASER_REFIRE_DELAY_MS = 300; 
-const POST_LASER_MOVE_DURATION_MS = 1500; // Increased for longer advance
-const POST_LASER_MOVE_SPEED = NORMAL_SPEED * 0.7; 
-const HYPERJUMP_RETURN_DELAY_MS = 2500;
-const RANDOM_MOVE_DURATION_MS = 15000;
-const EVENT_SEQUENCE_TRIGGER_MS = 12000;
-
-type UfoFSMState = 'normal' | 'stopping' | 'firingLaser' | 'postLaserMove' | 'hyperjumping' | 'returning' | 'randomMoving';
-type LaserShotStep = 'idle' | 'prepareShot' | 'firingActive' | 'shotCooldown';
-
-const RealisticUfo = (): React.ReactElement => {
-  const [ufoPosition, setUfoPosition] = useState({ x: -UFO_BASE_WIDTH * 1.5 * UFO_SCALE, y: 150 });
+const RealisticUfo: React.FC = () => {
+  const [ufoPosition, setUfoPosition] = useState({ x: 100, y: 100 });
   const [trail, setTrail] = useState<TrailPoint[]>([]);
-  const [laserTrail, setLaserTrail] = useState<{x: number, y: number, opacity: number, id: string}[]>([]);
   const [tilt, setTilt] = useState({ x: 0, z: 0 });
-  const [engineGlowOpacity, setEngineGlowOpacity] = useState(0.7);
+  const [greenHaloIntensity, setGreenHaloIntensity] = useState(1);
+  const [engineGlowOpacity, setEngineGlowOpacity] = useState(0.5);
 
   const [ufoFSMState, setUfoFSMState] = useState<UfoFSMState>('normal');
   const [currentSpeed, setCurrentSpeed] = useState(NORMAL_SPEED);
@@ -44,6 +34,7 @@ const RealisticUfo = (): React.ReactElement => {
   const [laserHeight, setLaserHeight] = useState(0);
   const [randomMoveTarget, setRandomMoveTarget] = useState<{ x: number, y: number } | null>(null);
   const [isStretched, setIsStretched] = useState(false);
+  const [shockwaves, setShockwaves] = useState<{x: number, y: number, opacity: number, scale: number, id: string}[]>([]);
   
   const [laserShotStep, setLaserShotStep] = useState<LaserShotStep>('idle');
   const laserFireCountRef = useRef(0);
@@ -51,111 +42,92 @@ const RealisticUfo = (): React.ReactElement => {
   const actionTimeoutRef = useRef<number | null>(null);
   const animationFrameRef = useRef<number | null>(null);
 
+  const [laserTrail, setLaserTrail] = useState<{x: number, y: number, opacity: number, id: string}[]>([]);
+  const [greenEnergyParticles, setGreenEnergyParticles] = useState<{x: number, y: number, opacity: number, id: string}[]>([]);
+  const [stoppingParticles, setStoppingParticles] = useState<{x: number, y: number, opacity: number, id: string}[]>([]);
+
   const clearActionTimeout = useCallback(() => {
     if (actionTimeoutRef.current) {
       clearTimeout(actionTimeoutRef.current);
       actionTimeoutRef.current = null;
     }
   }, []);
-  
-  const scheduleAction = useCallback((callback: () => void, delay: number) => {
-    clearActionTimeout(); // Clear any existing pending action before scheduling a new one
-    actionTimeoutRef.current = window.setTimeout(callback, delay);
+
+  const scheduleAction = useCallback((action: () => void, delay: number) => {
+    clearActionTimeout();
+    actionTimeoutRef.current = window.setTimeout(action, delay);
   }, [clearActionTimeout]);
-
-  // Effect to manage the laser firing sub-sequence
-  useEffect(() => {
-    if (ufoFSMState !== 'firingLaser') {
-      if (laserActive) setLaserActive(false);
-      if (laserHeight > 0) setLaserHeight(0);
-      if (laserShotStep !== 'idle') setLaserShotStep('idle');
-      return;
-    }
-
-    switch (laserShotStep) {
-      case 'prepareShot':
-        if (laserFireCountRef.current < MAX_LASER_SHOTS) {
-          setLaserActive(true);
-          scheduleAction(() => setLaserShotStep('firingActive'), 50); 
-        } else {
-          // All shots fired, transition out of laser sequence
-          setLaserShotStep('idle'); 
-          setUfoFSMState('postLaserMove');
-          setCurrentSpeed(POST_LASER_MOVE_SPEED);
-          scheduleAction(() => {
-            setUfoFSMState('hyperjumping');
-            setCurrentSpeed(HYPERJUMP_SPEED);
-            setIsStretched(true);
-          }, POST_LASER_MOVE_DURATION_MS);
-        }
-        break;
-
-      case 'firingActive':
-        scheduleAction(() => setLaserShotStep('shotCooldown'), SHORTER_LASER_DURATION_MS);
-        break;
-
-      case 'shotCooldown':
-        setLaserActive(false);
-        setLaserHeight(0);
-        laserFireCountRef.current += 1; 
-        scheduleAction(() => setLaserShotStep('prepareShot'), LASER_REFIRE_DELAY_MS); 
-        break;
-    }
-  }, [ufoFSMState, laserShotStep, scheduleAction, laserActive, laserHeight]);
-
 
   const handleNormalFlight = useCallback(() => {
     setUfoPosition(prev => {
-      let newX = prev.x + NORMAL_SPEED; 
-      if (newX > window.innerWidth + UFO_BASE_WIDTH / 2) newX = -UFO_BASE_WIDTH / 2 * 1.5; 
-      const waveAmplitude = 35;
-      const waveFrequency = 0.008;
-      const newY = 150 + Math.sin(newX * waveFrequency) * waveAmplitude;
-      const verticalVelocity = Math.cos(newX * waveFrequency) * waveAmplitude * waveFrequency * NORMAL_SPEED;
-      setTilt({ x: -verticalVelocity * 3.5, z: Math.sin(newX * 0.015) * 12 });
+      const newX = prev.x + currentSpeed;
+      
+      if (newX > window.innerWidth + UFO_BASE_WIDTH) {
+        const scaledUfoWidth = UFO_BASE_WIDTH * UFO_SCALE;
+        const scaledUfoHeight = UFO_BASE_HEIGHT * UFO_SCALE;
+        const marginX = scaledUfoWidth / 2;
+        const marginY = scaledUfoHeight / 2;
+        const spawnableHeight = Math.max(0, window.innerHeight - scaledUfoHeight);
+        
+        return { 
+          x: -marginX, 
+          y: marginY + Math.random() * spawnableHeight 
+        };
+      }
+      
+      // Probabilidades de cambio de estado
+      const rand = Math.random();
+      if (rand < 0.25) { // 25% probabilidad de movimiento especial
+        setUfoFSMState('specialMovement');
+      } else if (rand < 0.65) { // 40% probabilidad de detenerse y disparar
+        setUfoFSMState('stopping');
+      } else if (rand < 0.85) { // 20% probabilidad de movimiento aleatorio
+        setUfoFSMState('randomMoving');
+      } else if (rand < 1.0) { // 15% probabilidad de hyperjump
+        setCurrentSpeed(HYPERJUMP_SPEED);
+        setIsStretched(true);
+        setUfoFSMState('hyperjumping');
+      }
+      
+      return { x: newX, y: prev.y };
+    });
+  }, [currentSpeed]);
+
+  const handleSpecialMovement = useCallback(() => {
+    setUfoPosition(prev => {
+      const time = Date.now() * 0.003;
+      const amplitude = 30;
+      const frequency = 0.8;
+      
+      const newX = prev.x + currentSpeed;
+      const newY = prev.y + Math.sin(time * frequency) * amplitude * 0.1;
+      
+      setTilt({
+        x: Math.sin(time * frequency) * 15,
+        z: Math.cos(time * frequency * 0.7) * 8
+      });
+      
+      if (newX > window.innerWidth + UFO_BASE_WIDTH) {
+        setTilt({ x: 0, z: 0 });
+        setUfoFSMState('normal');
+        return { x: -UFO_BASE_WIDTH, y: 100 + Math.random() * (window.innerHeight - 200) };
+      }
+      
       return { x: newX, y: newY };
     });
-  }, []);
-
-
-  const handleFiringLaser = useCallback(() => {
-    if (laserActive) {
-      const visualUfoBottomY = ufoPosition.y + (UFO_BASE_HEIGHT * UFO_SCALE);
-      setLaserHeight(window.innerHeight - visualUfoBottomY);
-      
-      // Agregar punto a la estela del láser
-      setLaserTrail(prev => [
-        ...prev.slice(-5), // Mantener solo los últimos 5 puntos para la estela
-        { 
-          x: ufoPosition.x + (UFO_BASE_WIDTH * UFO_SCALE / 2) - 4, // Centrado
-          y: visualUfoBottomY,
-          opacity: 1,
-          id: `laser-trail-${Date.now()}`
-        }
-      ]);
-    } else {
-      setLaserHeight(0);
-      // Desvanecer gradualmente la estela
-      const fadeInterval = setInterval(() => {
-        setLaserTrail(prev => {
-          const updated = prev.map(point => ({
-            ...point,
-            opacity: point.opacity - 0.02
-          }));
-          return updated.filter(p => p.opacity > 0);
-        });
-      }, 30);
-      
-      setTimeout(() => {
-        clearInterval(fadeInterval);
-        setLaserTrail([]);
-      }, 1000);
-    }
-  }, [laserActive, ufoPosition.x, ufoPosition.y]);
+  }, [currentSpeed]);
 
   const handlePostLaserMove = useCallback(() => {
-    setUfoPosition(prev => ({ x: prev.x + currentSpeed, y: prev.y }));
-    setTilt({ x: -2, z: 0 }); 
+    setUfoPosition(prev => {
+      const newX = prev.x + currentSpeed;
+      
+      if (newX > window.innerWidth + UFO_BASE_WIDTH) {
+        setUfoFSMState('normal');
+        return { x: -UFO_BASE_WIDTH, y: 100 + Math.random() * (window.innerHeight - 200) };
+      }
+      
+      return { x: newX, y: prev.y };
+    });
   }, [currentSpeed]);
 
   const handleHyperjumping = useCallback(() => {
@@ -165,7 +137,7 @@ const RealisticUfo = (): React.ReactElement => {
       if (newX > window.innerWidth + UFO_BASE_WIDTH || newX < -UFO_BASE_WIDTH * 1.5) { 
         setIsStretched(false);
         setUfoFSMState('returning');
-        setUfoPosition({ x: -UFO_BASE_WIDTH * 10, y: -UFO_BASE_HEIGHT * 10 }); 
+        setUfoPosition({ x: -UFO_BASE_WIDTH * 15, y: -UFO_BASE_HEIGHT * 15 }); // Más lejos para efecto dramático
         
         scheduleAction(() => {
           const scaledUfoWidth = UFO_BASE_WIDTH * UFO_SCALE;
@@ -177,12 +149,28 @@ const RealisticUfo = (): React.ReactElement => {
           const spawnableWidth = Math.max(0, window.innerWidth - scaledUfoWidth);
           const spawnableHeight = Math.max(0, window.innerHeight - scaledUfoHeight);
 
-          const enterX = marginX + Math.random() * spawnableWidth;
-          const enterY = marginY + Math.random() * spawnableHeight;
+          // Entrada más espectacular desde diferentes direcciones
+          const entryDirection = Math.random();
+          let enterX, enterY;
+          
+          if (entryDirection < 0.25) { // Desde arriba
+            enterX = marginX + Math.random() * spawnableWidth;
+            enterY = -scaledUfoHeight;
+          } else if (entryDirection < 0.5) { // Desde abajo
+            enterX = marginX + Math.random() * spawnableWidth;
+            enterY = window.innerHeight + scaledUfoHeight;
+          } else if (entryDirection < 0.75) { // Desde la izquierda
+            enterX = -scaledUfoWidth;
+            enterY = marginY + Math.random() * spawnableHeight;
+          } else { // Desde la derecha
+            enterX = window.innerWidth + scaledUfoWidth;
+            enterY = marginY + Math.random() * spawnableHeight;
+          }
           
           setUfoPosition({ x: enterX, y: enterY });
           setCurrentSpeed(NORMAL_SPEED); 
           setUfoFSMState('normal'); 
+          setGreenHaloIntensity(1);
         }, HYPERJUMP_RETURN_DELAY_MS);
       }
       setTilt({ x: 0, z: 0 });
@@ -213,28 +201,126 @@ const RealisticUfo = (): React.ReactElement => {
       const distance = Math.sqrt(dx * dx + dy * dy);
 
       if (distance < speedForRandomMove * 1.5) { 
-        setRandomMoveTarget(null); 
+        setRandomMoveTarget(null);
         return prev;
       }
 
       const moveX = (dx / distance) * speedForRandomMove;
       const moveY = (dy / distance) * speedForRandomMove;
-      
-      const newX = prev.x + moveX;
-      const newY = prev.y + moveY;
 
-      const angleToTarget = Math.atan2(dy, dx);
-      const desiredTiltZ = -Math.cos(angleToTarget) * 25; 
-      const desiredTiltX = -Math.sin(angleToTarget) * 20; 
-      setTilt(prevTilt => ({
-        x: prevTilt.x * 0.85 + desiredTiltX * 0.15, 
-        z: prevTilt.z * 0.85 + desiredTiltZ * 0.15,
-      }));
+      setTilt({
+        x: moveY * 2,
+        z: moveX * 1.5
+      });
 
-      return { x: newX, y: newY };
+      return { x: prev.x + moveX, y: prev.y + moveY };
     });
-  }, [randomMoveTarget]); 
+  }, [randomMoveTarget]);
 
+  const handleFiringLaser = useCallback(() => {
+    if (laserActive) {
+      const visualUfoBottomY = ufoPosition.y + (UFO_BASE_HEIGHT * UFO_SCALE);
+      setLaserHeight(window.innerHeight - visualUfoBottomY);
+      
+      // Agregar punto a la estela del láser - CORREGIDO PARA ALINEACIÓN PERFECTA
+      setLaserTrail(prev => [
+        ...prev.slice(-5), // Mantener solo los últimos 5 puntos para la estela
+        { 
+          x: ufoPosition.x, // Centrado con la nave
+          y: visualUfoBottomY,
+          opacity: 1,
+          id: `laser-trail-${Date.now()}`
+        }
+      ]);
+
+      // 🌟 CREAR ONDAS DE CHOQUE AL DISPARAR
+      if (Math.random() < 0.3) { // 30% probabilidad por frame
+        setShockwaves(prev => [
+          ...prev.slice(-3), // Mantener solo las últimas 3 ondas
+          {
+            x: ufoPosition.x, // Centrado con la nave
+            y: visualUfoBottomY,
+            opacity: 1,
+            scale: 0.1,
+            id: `shockwave-${Date.now()}`
+          }
+        ]);
+      }
+    } else {
+      setLaserHeight(0);
+      // Desvanecer gradualmente la estela
+      const fadeInterval = setInterval(() => {
+        setLaserTrail(prev => {
+          const updated = prev.map(point => ({
+            ...point,
+            opacity: point.opacity - 0.02
+          }));
+          return updated.filter(p => p.opacity > 0);
+        });
+      }, 30);
+      
+      setTimeout(() => {
+        clearInterval(fadeInterval);
+        setLaserTrail([]);
+      }, 1000);
+    }
+  }, [laserActive, ufoPosition.x, ufoPosition.y]);
+
+  // Laser firing effect
+  useEffect(() => {
+    if (laserShotStep === 'prepareShot') {
+      scheduleAction(() => {
+        setLaserShotStep('firing');
+        setLaserActive(true);
+        setGreenHaloIntensity(3.5); // Intensidad muy alta durante el disparo
+      }, 800); // Tiempo de preparación más largo
+    } else if (laserShotStep === 'firing') {
+      scheduleAction(() => {
+        setLaserActive(false);
+        setLaserShotStep('cooldown');
+        setGreenHaloIntensity(2); // Intensidad media después del disparo
+      }, 1200); // Duración del disparo más larga
+    } else if (laserShotStep === 'cooldown') {
+      laserFireCountRef.current += 1;
+      
+      if (laserFireCountRef.current < 4) { // Disparar 4 veces en lugar de 3
+        scheduleAction(() => {
+          setLaserShotStep('prepareShot');
+        }, 600); // Tiempo entre disparos más corto
+      } else {
+        scheduleAction(() => {
+          setLaserShotStep('idle');
+          setCurrentSpeed(NORMAL_SPEED);
+          setUfoFSMState('postLaserMove');
+          setGreenHaloIntensity(1); // Volver a intensidad normal
+        }, 500);
+      }
+    }
+  }, [laserShotStep, scheduleAction]);
+
+  // Green halo intensity effect based on state
+  useEffect(() => {
+    switch (ufoFSMState) {
+      case 'normal':
+        setGreenHaloIntensity(1); // Intensidad normal
+        break;
+      case 'stopping':
+        setGreenHaloIntensity(1.3); // Ligeramente más intenso al detenerse
+        break;
+      case 'firingLaser':
+        // La intensidad se controla en el efecto del láser
+        break;
+      case 'hyperjumping':
+        setGreenHaloIntensity(2.5); // Intensidad muy alta durante hyperjump
+        break;
+      case 'randomMoving':
+        setGreenHaloIntensity(1.8); // Intensidad alta durante movimiento aleatorio
+        break;
+      case 'specialMovement':
+        setGreenHaloIntensity(1.5); // Intensidad moderada durante movimiento especial
+        break;
+    }
+  }, [ufoFSMState]);
 
   const updateUfoAndWorld = useCallback(() => {
     switch (ufoFSMState) {
@@ -267,6 +353,9 @@ const RealisticUfo = (): React.ReactElement => {
       case 'randomMoving':
         handleRandomMoving();
         break;
+      case 'specialMovement':
+        handleSpecialMovement();
+        break;
     }
 
     setEngineGlowOpacity(0.5 + Math.random() * 0.5);
@@ -295,11 +384,95 @@ const RealisticUfo = (): React.ReactElement => {
         }));
         });
     }
+
+    // 🌟 GENERAR Y ANIMAR PARTÍCULAS DE ENERGÍA VERDE
+    if (ufoFSMState !== 'returning' && greenHaloIntensity > 1.2) {
+      setGreenEnergyParticles(prevParticles => {
+        // Generar nuevas partículas alrededor del UFO
+        const newParticles = [];
+        const particleCount = Math.floor(greenHaloIntensity * 2); // Más partículas con mayor intensidad
+        
+        for (let i = 0; i < particleCount; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const distance = 30 + Math.random() * 50; // Distancia del UFO
+          const offsetX = Math.cos(angle) * distance;
+          const offsetY = Math.sin(angle) * distance;
+          
+          newParticles.push({
+            x: ufoPosition.x + offsetX,
+            y: ufoPosition.y + offsetY,
+            opacity: 1,
+            id: `green-particle-${Date.now()}-${i}`
+          });
+        }
+        
+        // Combinar con partículas existentes y limitar cantidad
+        const allParticles = [...newParticles, ...prevParticles];
+        return allParticles.slice(0, 20); // Máximo 20 partículas
+      });
+    }
+
+    // 🌟 GENERAR PARTÍCULAS ESPECIALES CUANDO SE DETIENE
+    if (ufoFSMState === 'stopping' || ufoFSMState === 'firingLaser') {
+      setStoppingParticles(prevParticles => {
+        // Generar nuevas partículas concentradas alrededor del UFO
+        const newParticles = [];
+        const particleCount = ufoFSMState === 'firingLaser' ? 8 : 5; // Más partículas al disparar
+        
+        for (let i = 0; i < particleCount; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const distance = 20 + Math.random() * 40; // Más cerca del UFO
+          const offsetX = Math.cos(angle) * distance;
+          const offsetY = Math.sin(angle) * distance;
+          
+          newParticles.push({
+            x: ufoPosition.x + offsetX,
+            y: ufoPosition.y + offsetY,
+            opacity: 1,
+            id: `stopping-particle-${Date.now()}-${i}`
+          });
+        }
+        
+        // Combinar con partículas existentes y limitar cantidad
+        const allParticles = [...newParticles, ...prevParticles];
+        return allParticles.slice(0, 15); // Máximo 15 partículas especiales
+      });
+    } else {
+      // Limpiar partículas de detención cuando no está en esos estados
+      setStoppingParticles([]);
+    }
+
+    // Desvanecer partículas de energía verde
+    setGreenEnergyParticles(prevParticles => 
+      prevParticles.map(particle => ({
+        ...particle,
+        opacity: particle.opacity - 0.02
+      })).filter(particle => particle.opacity > 0)
+    );
+
+    // Desvanecer partículas de detención
+    setStoppingParticles(prevParticles => 
+      prevParticles.map(particle => ({
+        ...particle,
+        opacity: particle.opacity - 0.03
+      })).filter(particle => particle.opacity > 0)
+    );
+
+    // 🌟 ANIMAR ONDAS DE CHOQUE
+    setShockwaves(prevShockwaves => 
+      prevShockwaves.map(wave => ({
+        ...wave,
+        opacity: wave.opacity - 0.03,
+        scale: wave.scale + 0.15
+      })).filter(wave => wave.opacity > 0 && wave.scale < 5)
+    );
+
     animationFrameRef.current = requestAnimationFrame(updateUfoAndWorld);
   }, [
     ufoFSMState, currentSpeed, ufoPosition, 
     handleNormalFlight, handleFiringLaser, handlePostLaserMove, 
-    handleHyperjumping, handleRandomMoving, 
+    handleHyperjumping, handleRandomMoving, handleSpecialMovement,
+    greenHaloIntensity
   ]);
   
   // Main animation loop effect
@@ -308,45 +481,14 @@ const RealisticUfo = (): React.ReactElement => {
     return () => { // This cleanup runs when component unmounts OR when dependencies change
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
-        animationFrameRef.current = null;
       }
-      // DO NOT call clearActionTimeout() here, as it prematurely clears scheduled actions like hyperjump transition
-    };
-  }, [updateUfoAndWorld]); 
-
-  // Effect for unmount cleanup of actionTimeoutRef
-  useEffect(() => {
-    return () => {
       clearActionTimeout();
     };
-  }, [clearActionTimeout]);
+  }, [updateUfoAndWorld, clearActionTimeout]);
 
-
-  useEffect(() => {
-    if (ufoFSMState === 'normal') {
-      const eventTimer = setTimeout(() => {
-        if (ufoFSMState === 'normal') { 
-           setUfoFSMState('stopping');
-        }
-      }, EVENT_SEQUENCE_TRIGGER_MS + Math.random() * 5000);
-      return () => clearTimeout(eventTimer);
-    } 
-    else if (ufoFSMState === 'randomMoving') { 
-        const normalTimer = setTimeout(() => {
-            if (ufoFSMState === 'randomMoving') { 
-                setUfoFSMState('normal');
-                setCurrentSpeed(NORMAL_SPEED); 
-                setRandomMoveTarget(null); 
-            }
-        }, RANDOM_MOVE_DURATION_MS + Math.random() * 3000);
-        return () => clearTimeout(normalTimer);
-    }
-  }, [ufoFSMState]);
-
-
-  const engineLights = useMemo(() => Array(5).fill(null).map((_, i) => ({
+  const engineLights = useMemo(() => [...Array(6)].map((_, i) => ({
     id: i,
-    intensity: Math.random() * 0.4 + 0.6,
+    intensity: 0.3 + Math.random() * 0.7,
     delay: i * 0.11
   })), []);
 
@@ -378,6 +520,43 @@ const RealisticUfo = (): React.ReactElement => {
             }}
           />
         ))}
+        {/* 🌟 PARTÍCULAS DE ENERGÍA VERDE */}
+        {greenEnergyParticles.map((particle, index) => (
+          <div
+            key={`green-energy-${index}`}
+            className="green-energy-particle"
+            style={{
+              left: `${particle.x}px`,
+              top: `${particle.y}px`,
+              opacity: particle.opacity,
+            }}
+          />
+        ))}
+        {/* 🌟 PARTÍCULAS ESPECIALES CUANDO SE DETIENE */}
+        {stoppingParticles.map((particle, index) => (
+          <div
+            key={`stopping-energy-${index}`}
+            className="stopping-energy-particle"
+            style={{
+              left: `${particle.x}px`,
+              top: `${particle.y}px`,
+              opacity: particle.opacity,
+            }}
+          />
+        ))}
+        {/* 🌟 ONDAS DE CHOQUE DEL LÁSER */}
+        {shockwaves.map((wave, index) => (
+          <div
+            key={`shockwave-${index}`}
+            className="laser-shockwave"
+            style={{
+              left: `${wave.x}px`,
+              top: `${wave.y}px`,
+              opacity: wave.opacity,
+              transform: `translate(-50%, -50%) scale(${wave.scale})`,
+            }}
+          />
+        ))}
       </div>
       <div
         className="ufo-perspective-group" 
@@ -386,37 +565,44 @@ const RealisticUfo = (): React.ReactElement => {
         }}
       >
         <div 
-          className="ufo-scaler-wrapper" 
-          style={{ 
-            transform: `scale(${UFO_SCALE})`,
-            width: '100%', 
-            height: '100%',
-            transformOrigin: 'center center', 
+          className="ufo-scaler-wrapper"
+          style={{
+            transform: `scale(${UFO_SCALE}) ${isStretched ? 'scaleX(2.5)' : ''}`,
           }}
         >
-          <div
-            className="ufo-body" 
+          <div 
+            className="ufo-tilt-wrapper"
             style={{
-              transform: `rotateX(${tilt.x}deg) rotateZ(${tilt.z}deg) ${isStretched ? 'scaleX(2.5) scaleY(0.7)' : ''}`,
-              transition: isStretched ? 'transform 0.15s ease-in' : 'transform 0.1s ease-out',
+              transform: `rotateX(${tilt.x}deg) rotateZ(${tilt.z}deg)`,
             }}
           >
-            <div className="ufo-spinner">
-              <div className="ufo-shimmer-hull" />
-              <div className="ufo-dome">
-                <div className="ufo-dome-glow-orb" />
-                <div className="ufo-dome-highlight" />
-                <div className="ufo-dome-static-pattern">
-                  {[...Array(3)].map((_, i) => (
-                    <div 
-                      key={`static-${i}`} 
-                      className="ufo-dome-static-line" 
-                      style={{ top: `${25 + i * 18}%`, animationDelay: `${i * 0.7}s` }}
-                    />
-                  ))}
+            <div className="ufo-main-body">
+              <div className="ufo-top-dome">
+                <div 
+                  className="ufo-green-halo" 
+                  style={{ 
+                    opacity: greenHaloIntensity * 0.4,
+                    transform: `scale(${0.8 + greenHaloIntensity * 0.3})`,
+                    filter: `blur(${2 + greenHaloIntensity * 2}px)`
+                  }} 
+                />
+                {/* HALO ESPECIAL CUANDO SE DETIENE */}
+                {(ufoFSMState === 'stopping' || ufoFSMState === 'firingLaser') && (
+                  <div className="stopping-energy-halo" />
+                )}
+                <div className="ufo-dome-surface">
+                  <div className="ufo-dome-highlight" />
+                  <div className="ufo-dome-reflection" />
                 </div>
+                {/* VENTANAS DE LA CÚPULA */}
+                <div className="ufo-dome-window"></div>
+                <div className="ufo-dome-window"></div>
+                <div className="ufo-dome-window"></div>
               </div>
+              <div className="ufo-body-connector" />
+              <div className="ufo-dome-shadow" />
               <div className="ufo-mid-section">
+                <div className="ufo-metallic-band" />
                 <div className="ufo-running-light-strip">
                   {[...Array(8)].map((_, i) => (
                     <div
@@ -443,6 +629,8 @@ const RealisticUfo = (): React.ReactElement => {
                     ))}
                   </div>
               </div>
+              {/* PUERTO DEL LÁSER */}
+              <div className="ufo-laser-port" />
             </div>
           </div>
         </div> 
@@ -451,21 +639,12 @@ const RealisticUfo = (): React.ReactElement => {
           <div
             className="ufo-laser-beam"
             style={{
-              top: `${UFO_BASE_HEIGHT * 0.85}px`, 
-              left: `${UFO_BASE_WIDTH / 2}px`, 
-              transform: 'translateX(-50%)', 
               height: `${laserHeight}px`,
+              opacity: laserActive ? 1 : 0,
             }}
           />
         )}
       </div>
-      <div
-        className="ufo-ambient-aura" 
-        style={{
-          left: `${ufoPosition.x}px`, 
-          top: `${ufoPosition.y}px`,
-        }}
-      />
     </div>
   );
 };
