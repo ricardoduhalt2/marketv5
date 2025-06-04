@@ -219,15 +219,17 @@ const RealisticUfo: React.FC = () => {
 
   const handleFiringLaser = useCallback(() => {
     if (laserActive) {
-      const visualUfoBottomY = ufoPosition.y + (UFO_BASE_HEIGHT * UFO_SCALE);
-      setLaserHeight(window.innerHeight - visualUfoBottomY);
+      // Posición del puerto del láser en la parte inferior del OVNI
+      const laserPortY = ufoPosition.y + (UFO_BASE_HEIGHT * UFO_SCALE);
+      // Altura del láser desde el puerto hasta el borde inferior de la pantalla
+      setLaserHeight(window.innerHeight - laserPortY);
       
-      // Agregar punto a la estela del láser - CORREGIDO PARA ALINEACIÓN PERFECTA
+      // Agregar punto a la estela del láser en la parte inferior del OVNI
       setLaserTrail(prev => [
         ...prev.slice(-5), // Mantener solo los últimos 5 puntos para la estela
         { 
-          x: ufoPosition.x, // Centrado con la nave
-          y: visualUfoBottomY,
+          x: ufoPosition.x + (UFO_BASE_WIDTH * UFO_SCALE) / 2, // Centrado con la nave
+          y: laserPortY,
           opacity: 1,
           id: `laser-trail-${Date.now()}`
         }
@@ -238,8 +240,8 @@ const RealisticUfo: React.FC = () => {
         setShockwaves(prev => [
           ...prev.slice(-3), // Mantener solo las últimas 3 ondas
           {
-            x: ufoPosition.x, // Centrado con la nave
-            y: visualUfoBottomY,
+            x: ufoPosition.x + (UFO_BASE_WIDTH * UFO_SCALE) / 2, // Centrado con la nave
+            y: window.innerHeight, // Impacto en la parte inferior de la pantalla
             opacity: 1,
             scale: 0.1,
             id: `shockwave-${Date.now()}`
@@ -597,6 +599,17 @@ const RealisticUfo: React.FC = () => {
                 {/* VENTANAS DE LA CÚPULA */}
                 <div className="ufo-dome-window"></div>
                 <div className="ufo-dome-window"></div>
+                
+                {/* Cúpula inferior */}
+                <div className="ufo-bottom-dome">
+                  <div className="ufo-dome-surface">
+                    <div className="ufo-dome-highlight" />
+                    <div className="ufo-dome-reflection" />
+                  </div>
+                  {/* Ventanas de la cúpula inferior */}
+                  <div className="ufo-dome-window"></div>
+                  <div className="ufo-dome-window"></div>
+                </div>
                 <div className="ufo-dome-window"></div>
               </div>
               <div className="ufo-body-connector" />
