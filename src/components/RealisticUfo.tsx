@@ -219,17 +219,15 @@ const RealisticUfo: React.FC = () => {
 
   const handleFiringLaser = useCallback(() => {
     if (laserActive) {
-      // Posición del puerto del láser en la parte inferior del OVNI
-      const laserPortY = ufoPosition.y + (UFO_BASE_HEIGHT * UFO_SCALE);
-      // Altura del láser desde el puerto hasta el borde inferior de la pantalla
-      setLaserHeight(window.innerHeight - laserPortY);
+      const visualUfoBottomY = ufoPosition.y + (UFO_BASE_HEIGHT * UFO_SCALE);
+      setLaserHeight(window.innerHeight - visualUfoBottomY);
       
-      // Agregar punto a la estela del láser en la parte inferior del OVNI
+      // Agregar punto a la estela del láser - CORREGIDO PARA ALINEACIÓN PERFECTA
       setLaserTrail(prev => [
         ...prev.slice(-5), // Mantener solo los últimos 5 puntos para la estela
         { 
-          x: ufoPosition.x + (UFO_BASE_WIDTH * UFO_SCALE) / 2, // Centrado con la nave
-          y: laserPortY,
+          x: ufoPosition.x, // Centrado con la nave
+          y: visualUfoBottomY,
           opacity: 1,
           id: `laser-trail-${Date.now()}`
         }
@@ -240,8 +238,8 @@ const RealisticUfo: React.FC = () => {
         setShockwaves(prev => [
           ...prev.slice(-3), // Mantener solo las últimas 3 ondas
           {
-            x: ufoPosition.x + (UFO_BASE_WIDTH * UFO_SCALE) / 2, // Centrado con la nave
-            y: window.innerHeight, // Impacto en la parte inferior de la pantalla
+            x: ufoPosition.x, // Centrado con la nave
+            y: visualUfoBottomY,
             opacity: 1,
             scale: 0.1,
             id: `shockwave-${Date.now()}`
@@ -599,29 +597,45 @@ const RealisticUfo: React.FC = () => {
                 {/* VENTANAS DE LA CÚPULA */}
                 <div className="ufo-dome-window"></div>
                 <div className="ufo-dome-window"></div>
-                
-                {/* Cúpula inferior */}
-                <div className="ufo-bottom-dome">
-                  <div className="ufo-dome-surface">
-                    <div className="ufo-dome-highlight" />
-                    <div className="ufo-dome-reflection" />
-                  </div>
-                  {/* Ventanas de la cúpula inferior */}
-                  <div className="ufo-dome-window"></div>
-                  <div className="ufo-dome-window"></div>
-                </div>
                 <div className="ufo-dome-window"></div>
               </div>
               <div className="ufo-body-connector" />
               <div className="ufo-dome-shadow" />
+              {/* Back Dome - Flipped 180 degrees */}
+              <div className="ufo-dome-back" style={{ transform: 'rotateY(180deg) translateZ(-10px)' }}>
+                <div className="ufo-dome-surface">
+                  <div className="ufo-dome-highlight" />
+                  <div className="ufo-dome-reflection" />
+                </div>
+                <div className="ufo-dome-window"></div>
+                <div className="ufo-dome-window"></div>
+                <div className="ufo-dome-window"></div>
+              </div>
               <div className="ufo-mid-section">
                 <div className="ufo-metallic-band" />
                 <div className="ufo-running-light-strip">
-                  {[...Array(8)].map((_, i) => (
+                  {[
+                    { color1: '255, 100, 100', color2: '255, 50, 50' },   // Rojo
+                    { color1: '100, 255, 100', color2: '50, 200, 50' },   // Verde
+                    { color1: '100, 100, 255', color2: '50, 50, 255' },   // Azul
+                    { color1: '255, 255, 100', color2: '255, 200, 50' },  // Amarillo
+                    { color1: '255, 100, 255', color2: '200, 50, 200' },  // Magenta
+                    { color1: '100, 255, 255', color2: '50, 200, 200' },  // Cian
+                    { color1: '255, 150, 50', color2: '255, 100, 0' },    // Naranja
+                    { color1: '150, 50, 255', color2: '100, 0, 200' }     // Púrpura
+                  ].map((colors, i) => ({
+                    ...colors,
+                    id: `runlight-${i}`,
+                    delay: i * 0.22
+                  })).map(light => (
                     <div
-                      key={`runlight-${i}`}
+                      key={light.id}
                       className="ufo-running-light"
-                      style={{ animationDelay: `${i * 0.22}s` }}
+                      style={{
+                        '--color1': light.color1,
+                        '--color2': light.color2,
+                        animationDelay: `${light.delay}s`
+                      } as React.CSSProperties}
                     />
                   ))}
                 </div>

@@ -70,8 +70,34 @@
   overflow: hidden;
 }
 
+/* Back Dome - Cúpula trasera */
+.ufo-dome-back {
+  position: absolute;
+  width: 42px; /* Un poco menos ancha */
+  height: 18px; /* 20% más pequeña (22 * 0.8 ≈ 18) */
+  background: radial-gradient(ellipse at 50% 40%, 
+    rgba(230, 240, 255, 0.15) 0%, 
+    rgba(200, 220, 240, 0.1) 50%,
+    rgba(170, 200, 230, 0.08) 80%,
+    transparent 100%);
+  border-radius: 48%; /* Un poco más redonda */
+  top: -3px; /* Un poco más abajo que -5px */
+  left: 45.5%; /* Ligeramente a la izquierda */
+  transform: translateX(-50%) rotateY(180deg);
+  box-shadow: 
+    0 0 8px rgba(200, 220, 255, 0.4),
+    0 0 4px rgba(150, 200, 255, 0.3) inset,
+    0 0 10px rgba(255, 255, 255, 0.2) inset;
+  backdrop-filter: blur(3px);
+  border: 1px solid rgba(220, 230, 255, 0.4);
+  z-index: 5;
+  overflow: hidden;
+  opacity: 0.9; /* Más translúcido */
+  filter: brightness(1.1) contrast(1.1);
+}
+
 /* Efecto de vidrio en la cúpula */
-.ufo-dome::before {
+.ufo-dome::before, .ufo-dome-back::before {
   content: '';
   position: absolute;
   bottom: 30%;
@@ -87,7 +113,7 @@
 }
 
 /* Reflejo de la cúpula */
-.ufo-dome::after {
+.ufo-dome::after, .ufo-dome-back::after {
   content: '';
   position: absolute;
   bottom: 10%;
@@ -653,33 +679,31 @@
   left: 50%;
   transform: translate(-50%, -50%);
   width: 92%;
-  height: 2.2px;
+  height: 2.5px;
   display: flex;
   justify-content: space-around;
   align-items: center;
-  z-index: 4;
+  z-index: 5;
 }
 
 /* Luces individuales que corren - MÁS REALISTAS */
 .ufo-running-light {
-  width: 2px;
-  height: 2px;
+  width: 3px;
+  height: 3px;
   border-radius: 50%;
   background: radial-gradient(
     circle at center,
     rgba(255, 255, 255, 1) 0%,
-    rgba(120, 220, 255, 0.95) 25%,
-    rgba(80, 180, 255, 0.85) 50%,
-    rgba(40, 140, 220, 0.70) 75%,
-    rgba(20, 100, 180, 0.50) 100%
+    rgba(var(--color1), 0.9) 50%,
+    rgba(var(--color2), 0.8) 100%
   );
   box-shadow: 
-    0 0 5px 1.5px rgba(255, 255, 255, 0.9),
-    0 0 10px 2.5px rgba(120, 220, 255, 0.7),
-    0 0 15px 3.5px rgba(80, 180, 255, 0.5),
-    0 0 20px 5px rgba(40, 140, 220, 0.3);
+    0 0 2px 0.8px rgba(255, 255, 255, 0.8),
+    0 0 4px 1px rgba(var(--color1), 0.6);
   animation: runningLightsRealistic 2s linear infinite;
   filter: brightness(1.3) saturate(1.4);
+  opacity: 0.9;
+  transition: all 0.3s ease-in-out;
 }
 
 /* Cono de resplandor del motor - AJUSTADO A LA FORMA OVALADA */

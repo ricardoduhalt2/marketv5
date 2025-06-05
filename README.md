@@ -41,6 +41,13 @@ A modern NFT marketplace built with React, Web3, and AI technologies. This platf
 
 ## ✨ Latest Updates
 
+### v1.3.1 - UFO Interface Enhancements (June 4, 2025)
+- 🛸 Added a secondary dome to the UFO for a more complete design
+- ✨ Enhanced LED lighting with multi-color effects
+- 🎨 Improved UFO's visual balance and proportions
+- 💡 Brighter and more distinct LED indicators
+- 🌈 Each LED now features a unique color for better visibility
+
 ### v1.3.0 - Navigation & UI Refinements (May 30, 2025)
 - 🤖 Added animated robot head icon to BOT button
 - 🌈 Applied consistent gradient text effects to all navigation items
