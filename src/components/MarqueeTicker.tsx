@@ -18,14 +18,14 @@ const MarqueeTicker: React.FC<MarqueeTickerProps> = ({ nfts }) => {
   // Mapeo de IDs de NFT a nombres de artista
   const artistMap: {[key: string]: string} = {
     'TEM': 'Ms. Cosmic',
-    'GCC': 'Pinche Chucho',
-    'EVC': 'Daughter of the Son',
+    'GCC': '$Pinche $Chucho',
+    'EVC': '$Pinche $Chucho',
     'CMV': 'Daughter of the Son',
     'BBB': 'Daveed Benjamin',
     'IVT': 'ONA AOÉRA',
     'YSL': 'Tania Cuevas Martinez',
-    'PSA': 'Pinche Chucho',
-    'PLL': 'Pinche Chucho',
+    'PSA': '$Pinche $Chucho',
+    'PLL': '$Pinche $Chucho',
     'MOL': 'Char Puravida @peoplesSister',
     'HTC': 'Jolted',
     'FLC': 'IGLI',
@@ -45,7 +45,7 @@ const MarqueeTicker: React.FC<MarqueeTickerProps> = ({ nfts }) => {
       // Limpiar el nombre para extraer solo el título sin el artista
       let cleanName = nft.name;
       if (nft.id === 'EVC') {
-        cleanName = 'Entre la vida y el plástico';
+        cleanName = 'C0mMzoVeRLoAD';
       } else if (nft.id === 'CMV') {
         cleanName = 'C0mMzoVeRLoAD';
       }

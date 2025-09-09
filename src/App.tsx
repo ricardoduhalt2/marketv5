@@ -108,7 +108,7 @@ function App() {
             <MarqueeTicker nfts={[
               { id: 'TEM', name: 'Tides of the Eternal Mind' },
               { id: 'GCC', name: 'Galactic Clean-Up Crew' },
-              { id: 'EVC', name: 'Entre la vida y el plastico es de $pinche$chucho' },
+              { id: 'EVC', name: 'C0mMzoVeRLoAD' },
               { id: 'CMV', name: 'C0mMzoVeRLoAD by Daughter of the Son' },
               { id: 'BBB', name: 'Bit-Beats Bliss' },
               { id: 'IVT', name: 'I vow to take care of you' },

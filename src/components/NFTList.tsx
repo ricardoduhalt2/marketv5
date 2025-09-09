@@ -217,14 +217,14 @@ const NFTList = () => {
                           // Mapeo completo de IDs de NFT a nombres de artista
                           const artistMap: {[key: string]: string} = {
                             'TEM': 'Ms. Cosmic',
-                            'GCC': 'Pinche Chucho',
-                            'EVC': 'Daughter of the Son',
+                            'GCC': '$Pinche $Chucho',
+                            'EVC': '$Pinche $Chucho',
                             'CMV': 'Daughter of the Son',
                             'BBB': 'Daveed Benjamin',
                             'IVT': 'ONA AOÉRA',
                             'YSL': 'Tania Cuevas Martinez',
-                            'PSA': 'Pinche Chucho',
-                            'PLL': 'Pinche Chucho',
+                            'PSA': '$Pinche $Chucho',
+                            'PLL': '$Pinche $Chucho',
                             'MOL': 'Char Puravida @peoplesSister',
                             'HTC': 'Jolted',
                             'FLC': 'IGLI',
