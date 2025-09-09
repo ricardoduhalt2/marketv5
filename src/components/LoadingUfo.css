@@ -7,6 +7,8 @@
   align-items: center;
   justify-content: center;
   z-index: 10;
+  /* Optimize for performance */
+  will-change: transform;
 }
 
 /* UFO PRINCIPAL - MUCHO MÁS COMPACTO */
@@ -15,7 +17,9 @@
   width: 60px;
   height: 22px; /* Reducido drásticamente de 28px a 22px */
   transform-style: preserve-3d;
-  animation: loadingUfoFloat 4s ease-in-out infinite;
+  animation: loadingUfoFloat 3s ease-in-out infinite; /* Reduced duration */
+  /* Optimize for performance */
+  will-change: transform;
 }
 
 /* HALO DE ENERGÍA VERDE ETÉREA - MISMO EFECTO QUE EL MAIN UFO */
@@ -38,7 +42,9 @@
     transparent 100%
   );
   filter: blur(8px);
-  animation: etherealHaloPulse 4s ease-in-out infinite;
+  animation: etherealHaloPulse 3s ease-in-out infinite; /* Reduced duration */
+  /* Optimize for performance */
+  will-change: transform, opacity;
 }
 
 /* Segundo halo etéreo para crear capas - IGUAL QUE EL MAIN UFO */
@@ -58,7 +64,9 @@
     transparent 100%
   );
   filter: blur(12px);
-  animation: etherealHaloPulse 4s ease-in-out infinite 1s;
+  animation: etherealHaloPulse 3s ease-in-out infinite 0.5s; /* Reduced duration and delay */
+  /* Optimize for performance */
+  will-change: transform, opacity;
 }
 
 /* Tercer halo etéreo más interno - IGUAL QUE EL MAIN UFO */
@@ -78,7 +86,9 @@
     transparent 100%
   );
   filter: blur(6px);
-  animation: etherealHaloPulse 4s ease-in-out infinite 2s;
+  animation: etherealHaloPulse 3s ease-in-out infinite 1s; /* Reduced duration and delay */
+  /* Optimize for performance */
+  will-change: transform, opacity;
 }
 
 /* CÚPULA DEL UFO - MUCHO MÁS UNIDA */
@@ -102,6 +112,8 @@
     0 2px 8px rgba(0, 0, 0, 0.3),
     inset 0 1px 3px rgba(255, 255, 255, 0.4);
   z-index: 3;
+  /* Optimize for performance */
+  will-change: transform;
 }
 
 /* SUPERFICIE DE LA CÚPULA */
@@ -129,6 +141,8 @@
   );
   border-radius: 50%;
   filter: blur(1px);
+  /* Optimize for performance */
+  will-change: transform;
 }
 
 .loading-ufo-dome-reflection {
@@ -145,6 +159,8 @@
   );
   border-radius: 50%;
   filter: blur(0.5px);
+  /* Optimize for performance */
+  will-change: transform;
 }
 
 /* VENTANAS DE LA CÚPULA - AJUSTADAS PARA CÚPULA MÁS PEQUEÑA */
@@ -163,7 +179,9 @@
   box-shadow: 
     0 0 3px 1px rgba(255, 200, 50, 0.4),
     inset 0 0 2px rgba(255, 255, 255, 0.6);
-  animation: loadingWindowGlow 2s ease-in-out infinite;
+  animation: loadingWindowGlow 1.5s ease-in-out infinite; /* Reduced duration */
+  /* Optimize for performance */
+  will-change: transform, opacity;
 }
 
 .loading-ufo-dome-window:nth-child(4) {
@@ -176,13 +194,13 @@
   top: 40%; /* Ajustado para la cúpula más pequeña */
   left: 50%;
   transform: translateX(-50%);
-  animation-delay: 0.7s;
+  animation-delay: 0.5s; /* Reduced delay */
 }
 
 .loading-ufo-dome-window:nth-child(6) {
   top: 45%; /* Ajustado para la cúpula más pequeña */
   right: 25%;
-  animation-delay: 1.4s;
+  animation-delay: 1s; /* Reduced delay */
 }
 
 .loading-ufo-dome-surface {
@@ -239,7 +257,9 @@
   box-shadow: 
     0 0 3px 1px rgba(255, 200, 50, 0.6),
     inset 0 0 2px rgba(255, 255, 255, 0.8);
-  animation: loadingWindowGlow 2s ease-in-out infinite;
+  animation: loadingWindowGlow 1.5s ease-in-out infinite; /* Reduced duration */
+  /* Optimize for performance */
+  will-change: transform, opacity;
 }
 
 .loading-ufo-dome-window:nth-child(4) {
@@ -252,13 +272,13 @@
   top: 40%; /* Ajustado para la cúpula más pequeña */
   left: 50%;
   transform: translateX(-50%);
-  animation-delay: 0.7s;
+  animation-delay: 0.5s; /* Reduced delay */
 }
 
 .loading-ufo-dome-window:nth-child(6) {
   top: 45%; /* Ajustado para la cúpula más pequeña */
   right: 25%;
-  animation-delay: 1.4s;
+  animation-delay: 1s; /* Reduced delay */
 }
 
 /* CONECTOR DEL CUERPO - ELIMINADO PARA UNIÓN TOTAL */
@@ -277,6 +297,8 @@
   );
   border-radius: 1px;
   z-index: 2;
+  /* Optimize for performance */
+  will-change: transform;
 }
 
 /* SOMBRA DE LA CÚPULA - ELIMINADA PARA UNIÓN TOTAL */
@@ -305,6 +327,8 @@
     0 2px 6px rgba(0, 0, 0, 0.3),
     inset 0 1px 2px rgba(255, 255, 255, 0.3);
   z-index: 2;
+  /* Optimize for performance */
+  will-change: transform;
 }
 
 .loading-ufo-metallic-band {
@@ -321,6 +345,8 @@
     rgba(200, 210, 220, 0.8) 100%
   );
   border-radius: 1px;
+  /* Optimize for performance */
+  will-change: transform;
 }
 
 /* LUCES CORRIENTES */
@@ -350,7 +376,9 @@
   box-shadow: 
     0 0 3px 1px rgba(0, 150, 255, 0.6),
     0 0 6px 2px rgba(0, 100, 200, 0.4);
-  animation: loadingRunningLights 1.5s ease-in-out infinite;
+  animation: loadingRunningLights 1.2s ease-in-out infinite; /* Reduced duration */
+  /* Optimize for performance */
+  will-change: transform, opacity;
 }
 
 /* PARTE INFERIOR - TOTALMENTE UNIDA */
@@ -371,6 +399,8 @@
   border: 1px solid rgba(120, 130, 140, 0.6);
   border-top: none;
   z-index: 2;
+  /* Optimize for performance */
+  will-change: transform;
 }
 
 .loading-ufo-engine-glow-cone {
@@ -390,7 +420,9 @@
   );
   border-radius: 0 0 50% 50%;
   filter: blur(1px);
-  animation: loadingEngineGlow 2s ease-in-out infinite;
+  animation: loadingEngineGlow 1.5s ease-in-out infinite; /* Reduced duration */
+  /* Optimize for performance */
+  will-change: transform, opacity;
 }
 
 .loading-ufo-thruster-ports {
@@ -416,7 +448,9 @@
     rgba(0, 140, 255, 0.6) 100%
   );
   border-radius: 50%;
-  animation: loadingThrusterPulse 1.8s ease-in-out infinite;
+  animation: loadingThrusterPulse 1.5s ease-in-out infinite; /* Reduced duration */
+  /* Optimize for performance */
+  will-change: transform, opacity;
 }
 
 /* PARTÍCULAS DE ENERGÍA VERDE ETÉREAS PARA LOADING */
@@ -436,24 +470,26 @@
     0 0 6px 1px rgba(0, 255, 100, 0.3),
     0 0 12px 2px rgba(50, 255, 150, 0.2),
     0 0 18px 3px rgba(100, 255, 200, 0.1);
-  animation: loadingEtherealParticleFloat 4s ease-in-out infinite;
+  animation: loadingEtherealParticleFloat 3s ease-in-out infinite; /* Reduced duration */
   filter: blur(0.5px);
   z-index: 5;
+  /* Optimize for performance */
+  will-change: transform, opacity;
 }
 
-/* ANIMACIONES PARA EL UFO DE LOADING */
+/* ANIMACIONES PARA EL UFO DE LOADING - optimized for performance */
 @keyframes loadingUfoFloat {
   0%, 100% {
     transform: translateY(0px) rotate(0deg);
   }
   25% {
-    transform: translateY(-4px) rotate(1deg);
+    transform: translateY(-3px) rotate(0.5deg); /* Reduced movement */
   }
   50% {
-    transform: translateY(-6px) rotate(0deg);
+    transform: translateY(-4px) rotate(0deg); /* Reduced movement */
   }
   75% {
-    transform: translateY(-4px) rotate(-1deg);
+    transform: translateY(-3px) rotate(-0.5deg); /* Reduced movement */
   }
 }
 
@@ -465,8 +501,8 @@
   }
   50% {
     opacity: 0.5;
-    transform: scale(1.2) rotate(180deg);
-    filter: blur(8px) hue-rotate(15deg);
+    transform: scale(1.1) rotate(90deg); /* Reduced scale */
+    filter: blur(8px) hue-rotate(10deg); /* Reduced hue rotation */
   }
 }
 
@@ -479,18 +515,18 @@
   }
   25% {
     opacity: 0.6;
-    transform: scale(1.1) rotate(90deg);
-    filter: blur(10px) hue-rotate(15deg);
+    transform: scale(1.0) rotate(45deg); /* Reduced scale and rotation */
+    filter: blur(9px) hue-rotate(10deg); /* Reduced blur and hue rotation */
   }
   50% {
     opacity: 0.8;
-    transform: scale(1.3) rotate(180deg);
-    filter: blur(12px) hue-rotate(30deg);
+    transform: scale(1.1) rotate(90deg); /* Reduced scale and rotation */
+    filter: blur(10px) hue-rotate(15deg); /* Reduced blur and hue rotation */
   }
   75% {
     opacity: 0.6;
-    transform: scale(1.1) rotate(270deg);
-    filter: blur(10px) hue-rotate(15deg);
+    transform: scale(1.0) rotate(135deg); /* Reduced scale and rotation */
+    filter: blur(9px) hue-rotate(10deg); /* Reduced blur and hue rotation */
   }
 }
 
@@ -501,19 +537,19 @@
     filter: blur(0.5px) hue-rotate(0deg);
   }
   25% {
-    opacity: 0.5;
-    transform: translateY(-8px) translateX(-5px) scale(1.0) rotate(90deg);
-    filter: blur(1px) hue-rotate(10deg);
+    opacity: 0.4;
+    transform: translateY(-4px) translateX(-3px) scale(0.85) rotate(45deg); /* Reduced movement */
+    filter: blur(0.7px) hue-rotate(5deg); /* Reduced effects */
   }
   50% {
-    opacity: 0.7;
-    transform: translateY(-12px) translateX(0px) scale(1.2) rotate(180deg);
-    filter: blur(1.5px) hue-rotate(20deg);
+    opacity: 0.6;
+    transform: translateY(-6px) translateX(0px) scale(1.0) rotate(90deg); /* Reduced movement */
+    filter: blur(1px) hue-rotate(10deg); /* Reduced effects */
   }
   75% {
-    opacity: 0.5;
-    transform: translateY(-8px) translateX(5px) scale(1.0) rotate(270deg);
-    filter: blur(1px) hue-rotate(10deg);
+    opacity: 0.4;
+    transform: translateY(-4px) translateX(3px) scale(0.85) rotate(135deg); /* Reduced movement */
+    filter: blur(0.7px) hue-rotate(5deg); /* Reduced effects */
   }
 }
 
@@ -525,10 +561,10 @@
       inset 0 0 2px rgba(255, 255, 255, 0.6);
   }
   50% {
-    opacity: 1;
+    opacity: 0.9;
     box-shadow: 
-      0 0 6px 2px rgba(255, 200, 50, 0.8),
-      inset 0 0 3px rgba(255, 255, 255, 0.9);
+      0 0 4px 1px rgba(255, 200, 50, 0.6),
+      inset 0 0 2px rgba(255, 255, 255, 0.8);
   }
 }
 
@@ -540,10 +576,10 @@
       0 0 6px 2px rgba(0, 100, 200, 0.2);
   }
   50% {
-    opacity: 1;
+    opacity: 0.8;
     box-shadow: 
-      0 0 6px 2px rgba(0, 150, 255, 0.8),
-      0 0 12px 3px rgba(0, 100, 200, 0.6);
+      0 0 4px 1px rgba(0, 150, 255, 0.6),
+      0 0 8px 2px rgba(0, 100, 200, 0.4);
   }
 }
 
@@ -553,8 +589,8 @@
     transform: translateX(-50%) scale(0.8);
   }
   50% {
-    opacity: 0.8;
-    transform: translateX(-50%) scale(1.1);
+    opacity: 0.6;
+    transform: translateX(-50%) scale(0.95);
   }
 }
 
@@ -565,9 +601,9 @@
     box-shadow: 0 0 4px 1px rgba(0, 220, 255, 0.4);
   }
   50% {
-    opacity: 1;
-    transform: scale(1.2);
-    box-shadow: 0 0 8px 2px rgba(0, 220, 255, 0.8);
+    opacity: 0.8;
+    transform: scale(1.0);
+    box-shadow: 0 0 6px 1px rgba(0, 220, 255, 0.6);
   }
 }
 
@@ -593,7 +629,9 @@
     0 0 18px 6px rgba(100, 255, 200, 0.4);
   border-radius: 2px;
   z-index: 15;
-  animation: laserPulse 0.1s ease-in-out infinite alternate;
+  animation: laserPulse 0.08s ease-in-out infinite alternate; /* Reduced duration */
+  /* Optimize for performance */
+  will-change: transform, opacity;
 }
 
 /* Efecto de pulso del láser */
@@ -608,21 +646,21 @@
   }
   100% {
     opacity: 1;
-    width: 4px;
+    width: 3.5px; /* Reduced width change */
     box-shadow: 
-      0 0 8px 3px rgba(0, 255, 100, 1),
-      0 0 16px 6px rgba(50, 255, 150, 0.8),
-      0 0 24px 8px rgba(100, 255, 200, 0.6);
+      0 0 7px 2px rgba(0, 255, 100, 0.9),
+      0 0 14px 5px rgba(50, 255, 150, 0.7),
+      0 0 20px 7px rgba(100, 255, 200, 0.5);
   }
 }
 
 /* ESTADOS DEL UFO */
 .loading-ufo-main[data-state="moving"] {
-  animation: loadingUfoMoving 2s ease-in-out;
+  animation: loadingUfoMoving 1.5s ease-in-out; /* Reduced duration */
 }
 
 .loading-ufo-main[data-state="firingLaser"] {
-  animation: loadingUfoLaserCharge 0.5s ease-in-out;
+  animation: loadingUfoLaserCharge 0.3s ease-in-out; /* Reduced duration */
 }
 
 @keyframes loadingUfoMoving {
@@ -630,13 +668,13 @@
     transform: translateY(0px) rotate(0deg);
   }
   25% {
-    transform: translateY(-6px) rotate(3deg);
+    transform: translateY(-3px) rotate(1deg); /* Reduced movement */
   }
   50% {
-    transform: translateY(-10px) rotate(0deg);
+    transform: translateY(-5px) rotate(0deg); /* Reduced movement */
   }
   75% {
-    transform: translateY(-6px) rotate(-3deg);
+    transform: translateY(-3px) rotate(-1deg); /* Reduced movement */
   }
   100% {
     transform: translateY(0px) rotate(0deg);
@@ -649,11 +687,11 @@
     filter: brightness(1);
   }
   50% {
-    transform: scale(1.08) translateY(-4px);
-    filter: brightness(1.5);
+    transform: scale(1.04) translateY(-2px); /* Reduced scale and movement */
+    filter: brightness(1.3);
   }
   100% {
-    transform: scale(1.05) translateY(-2px);
-    filter: brightness(1.8);
+    transform: scale(1.02) translateY(-1px); /* Reduced scale and movement */
+    filter: brightness(1.5);
   }
 }

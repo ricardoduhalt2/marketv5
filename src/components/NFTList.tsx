@@ -219,7 +219,7 @@ const NFTList = () => {
                             'TEM': 'Ms. Cosmic',
                             'GCC': '$Pinche $Chucho',
                             'EVC': 'Daughter of the Son',
-                            'CMV': '$Pinche $Chucho',
+                            'CMV': 'Daughter of the Son',
                             'BBB': 'Daveed Benjamin',
                             'IVT': 'ONA AOÉRA',
                             'YSL': 'Tania Cuevas Martinez',

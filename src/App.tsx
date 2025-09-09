@@ -22,7 +22,7 @@ function App() {
     // Simulate resource loading
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 8000);
+    }, 3000);
 
     return () => clearTimeout(timer);
   }, []);

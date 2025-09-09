@@ -19,18 +19,18 @@ const LoadingUfo: React.FC<LoadingUfoProps> = ({ className = '' }) => {
   const [tilt, setTilt] = useState({ x: 0, z: 0 });
   const [laserActive, setLaserActive] = useState(false);
   const [laserHeight, setLaserHeight] = useState(0);
-  const [moveTarget, setMoveTarget] = useState<{ x: number, y: number } | null>(null);
   
   const actionTimeoutRef = useRef<number | null>(null);
   const animationFrameRef = useRef<number | null>(null);
+  const particleIntervalRef = useRef<number | null>(null);
 
-  // Luces del motor
-  const engineLights = [
+  // Luces del motor - memoized to prevent recreation
+  const engineLights = React.useMemo(() => [
     { id: 'engine1', intensity: 0.8, delay: 0 },
     { id: 'engine2', intensity: 0.6, delay: 0.3 },
     { id: 'engine3', intensity: 0.9, delay: 0.6 },
     { id: 'engine4', intensity: 0.7, delay: 0.9 },
-  ];
+  ], []);
 
   // Limpiar timeouts
   const clearActionTimeout = useCallback(() => {
@@ -67,16 +67,16 @@ const LoadingUfo: React.FC<LoadingUfoProps> = ({ className = '' }) => {
     // Animación del láser creciendo - MÁS RÁPIDA
     let height = 0;
     const laserGrowth = () => {
-      height += 8; // Aumentado de 5 a 8
+      height += 10; // Aumentado para más velocidad
       setLaserHeight(height);
-      if (height < 120) { // Aumentado de 100 a 120
+      if (height < 100) { // Reducido para menor duración
         requestAnimationFrame(laserGrowth);
       } else {
         // Mantener láser por menos tiempo
         setTimeout(() => {
           // Láser desapareciendo - MÁS RÁPIDO
           const laserShrink = () => {
-            height -= 12; // Aumentado de 8 a 12
+            height -= 15; // Aumentado para más velocidad
             setLaserHeight(Math.max(0, height));
             if (height > 0) {
               requestAnimationFrame(laserShrink);
@@ -86,11 +86,11 @@ const LoadingUfo: React.FC<LoadingUfoProps> = ({ className = '' }) => {
               // Volver a flotación más rápido
               setTimeout(() => {
                 setUfoState('floating');
-              }, 500); // Reducido de 1000 a 500
+              }, 300); // Reducido aún más
             }
           };
           laserShrink();
-        }, 800); // Reducido de 1500 a 800
+        }, 500); // Reducido de 800 a 500
       }
     };
     laserGrowth();
@@ -99,12 +99,11 @@ const LoadingUfo: React.FC<LoadingUfoProps> = ({ className = '' }) => {
   // Iniciar movimiento - MÁS RÁPIDO
   const startMovement = useCallback(() => {
     const target = generateMoveTarget();
-    setMoveTarget(target);
     setUfoState('moving');
     
     // Calcular tilt basado en dirección
-    const tiltX = target.x * 0.05; // Reducido para menos inclinación
-    const tiltZ = target.y * 0.03; // Reducido para menos inclinación
+    const tiltX = target.x * 0.03; // Reducido para menos inclinación
+    const tiltZ = target.y * 0.02; // Reducido para menos inclinación
     setTilt({ x: tiltX, z: tiltZ });
     
     // Simular llegada al destino - MÁS RÁPIDO
@@ -116,12 +115,12 @@ const LoadingUfo: React.FC<LoadingUfoProps> = ({ className = '' }) => {
       const nextAction = Math.random();
       if (nextAction < 0.5) {
         // 50% probabilidad de láser
-        setTimeout(() => startLaserSequence(), 200); // Reducido de 500 a 200
+        setTimeout(() => startLaserSequence(), 100); // Reducido aún más
       } else {
         // 50% volver a flotación
         setUfoState('floating');
       }
-    }, 1500); // Reducido de 2000 a 1500
+    }, 800); // Reducido de 1500 a 800
   }, [generateMoveTarget, startLaserSequence]);
 
   // Ciclo principal de comportamiento - MÁS ACTIVO
@@ -132,22 +131,22 @@ const LoadingUfo: React.FC<LoadingUfoProps> = ({ className = '' }) => {
         const action = Math.random();
         if (action < 0.7) {
           // 70% probabilidad de moverse
-          actionTimeoutRef.current = window.setTimeout(() => startMovement(), 800 + Math.random() * 1200); // Reducido significativamente
+          actionTimeoutRef.current = window.setTimeout(() => startMovement(), 500 + Math.random() * 800); // Reducido significativamente
         } else {
           // 30% probabilidad de láser directo
-          actionTimeoutRef.current = window.setTimeout(() => startLaserSequence(), 400 + Math.random() * 800); // Reducido significativamente
+          actionTimeoutRef.current = window.setTimeout(() => startLaserSequence(), 200 + Math.random() * 600); // Reducido significativamente
         }
       }
     };
 
-    const timeout = setTimeout(behaviorCycle, 500); // Reducido de 1000 a 500
+    const timeout = setTimeout(behaviorCycle, 300); // Reducido de 500 a 300
     return () => clearTimeout(timeout);
   }, [ufoState, startMovement, startLaserSequence]);
 
   // Animación del halo de energía
   useEffect(() => {
     const animateHalo = () => {
-      const time = Date.now() * 0.001;
+      const time = Date.now() * 0.002; // Aumentada la velocidad
       const intensity = 0.6 + Math.sin(time * 2) * 0.4;
       setGreenHaloIntensity(intensity);
       
@@ -165,25 +164,32 @@ const LoadingUfo: React.FC<LoadingUfoProps> = ({ className = '' }) => {
     };
   }, []);
 
-  // Generar partículas de energía
+  // Generar partículas de energía - optimizado para mejor rendimiento
   useEffect(() => {
     const generateParticles = () => {
       const newParticles = [];
-      for (let i = 0; i < 6; i++) {
-        const angle = (i / 6) * Math.PI * 2 + Date.now() * 0.001;
-        const radius = 35 + Math.sin(Date.now() * 0.002 + i) * 10;
+      const time = Date.now() * 0.003; // Aumentada la velocidad
+      
+      for (let i = 0; i < 4; i++) { // Reducido de 6 a 4 partículas
+        const angle = (i / 4) * Math.PI * 2 + time;
+        const radius = 30 + Math.sin(time * 0.7 + i) * 8; // Ajustado para mejor rendimiento
         newParticles.push({
           id: `particle-${i}`,
           x: Math.cos(angle) * radius,
           y: Math.sin(angle) * radius,
-          opacity: 0.3 + Math.sin(Date.now() * 0.003 + i) * 0.3
+          opacity: 0.3 + Math.sin(time + i) * 0.3
         });
       }
       setGreenEnergyParticles(newParticles);
     };
 
-    const interval = setInterval(generateParticles, 100);
-    return () => clearInterval(interval);
+    // Usar un intervalo más largo para menos cálculos
+    particleIntervalRef.current = window.setInterval(generateParticles, 150);
+    return () => {
+      if (particleIntervalRef.current) {
+        clearInterval(particleIntervalRef.current);
+      }
+    };
   }, []);
 
   // Cleanup
@@ -192,6 +198,9 @@ const LoadingUfo: React.FC<LoadingUfoProps> = ({ className = '' }) => {
       clearActionTimeout();
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
+      }
+      if (particleIntervalRef.current) {
+        clearInterval(particleIntervalRef.current);
       }
     };
   }, [clearActionTimeout]);
@@ -228,7 +237,7 @@ const LoadingUfo: React.FC<LoadingUfoProps> = ({ className = '' }) => {
         className="loading-ufo-main"
         style={{
           transform: `translate(${position.x}px, ${position.y}px) rotateX(${tilt.x}deg) rotateZ(${tilt.z}deg)`,
-          transition: ufoState === 'moving' ? 'transform 1.5s ease-in-out' : 'transform 0.3s ease-out'
+          transition: ufoState === 'moving' ? 'transform 1s ease-in-out' : 'transform 0.2s ease-out' // Acelerado
         }}
       >
         {/* Halo de energía verde etérea - MISMO EFECTO QUE EL MAIN UFO */}
@@ -263,11 +272,11 @@ const LoadingUfo: React.FC<LoadingUfoProps> = ({ className = '' }) => {
         <div className="loading-ufo-mid-section">
           <div className="loading-ufo-metallic-band" />
           <div className="loading-ufo-running-light-strip">
-            {[...Array(6)].map((_, i) => (
+            {[...Array(4)].map((_, i) => ( // Reducido de 6 a 4 luces
               <div
                 key={`runlight-${i}`}
                 className="loading-ufo-running-light"
-                style={{ animationDelay: `${i * 0.25}s` }}
+                style={{ animationDelay: `${i * 0.2}s` }} // Acelerado
               />
             ))}
           </div>
@@ -289,7 +298,7 @@ const LoadingUfo: React.FC<LoadingUfoProps> = ({ className = '' }) => {
                 style={{
                   opacity: light.intensity * (ufoState === 'moving' ? 1.3 : 1),
                   animationDelay: `${light.delay}s`,
-                  boxShadow: `0 0 ${6 + light.intensity * (ufoState === 'moving' ? 15 : 10)}px ${1 + light.intensity * (ufoState === 'moving' ? 5 : 3)}px rgba(0, 220, 255, ${0.2 + light.intensity * (ufoState === 'moving' ? 0.6 : 0.4)})`
+                  boxShadow: `0 0 ${4 + light.intensity * (ufoState === 'moving' ? 10 : 7)}px ${1 + light.intensity * (ufoState === 'moving' ? 3 : 2)}px rgba(0, 220, 255, ${0.2 + light.intensity * (ufoState === 'moving' ? 0.5 : 0.3)})`
                 }}
               />
             ))}

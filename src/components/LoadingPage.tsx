@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, memo } from 'react';
 import './LoadingPage.css';
 import { 
   INITIAL_TERMINAL_LINES, 
@@ -10,9 +10,13 @@ import {
 import StarsBackground from './StarsBackground';
 import LoadingUfo from './LoadingUfo';
 
-const SPARK_COUNT = 20;
-const SPARK_LIFESPAN_MIN = 0.3;
-const SPARK_LIFESPAN_MAX = 0.8;
+const SPARK_COUNT = 15; // Reducido de 20 a 15
+const SPARK_LIFESPAN_MIN = 0.2; // Reducido de 0.3 a 0.2
+const SPARK_LIFESPAN_MAX = 0.6; // Reducido de 0.8 a 0.6
+
+// Componentes memoizados para mejor rendimiento
+const MemoizedStarsBackground = memo(StarsBackground);
+const MemoizedLoadingUfo = memo(LoadingUfo);
 
 const LoadingPage: React.FC = () => {
   const [terminalLines, setTerminalLines] = useState<TerminalLine[]>([]);
@@ -24,10 +28,14 @@ const LoadingPage: React.FC = () => {
   const [sparks, setSparks] = useState<Spark[]>([]);
   const terminalContentRef = useRef<HTMLDivElement>(null);
 
-  // Efecto para el desplazamiento automático
+  // Efecto para el desplazamiento automático - optimizado con requestAnimationFrame
   useEffect(() => {
-    if (terminalContentRef.current) {
-      terminalContentRef.current.scrollTop = terminalContentRef.current.scrollHeight;
+    if (terminalLines.length > 0 && terminalContentRef.current) {
+      requestAnimationFrame(() => {
+        if (terminalContentRef.current) {
+          terminalContentRef.current.scrollTop = terminalContentRef.current.scrollHeight;
+        }
+      });
     }
   }, [terminalLines]);
 
@@ -36,7 +44,8 @@ const LoadingPage: React.FC = () => {
   const orangeRingRadius = baseRadius; // Anillo exterior naranja
   const blueRingRadius = baseRadius * 0.75; // Anillo interior azul (75% del exterior)
 
-  const orangeRingSegments = Array.from({ length: 8 }, (_, i) => {
+  // Memoizar segmentos y nodos para evitar recrearlos en cada render
+  const orangeRingSegments = React.useMemo(() => Array.from({ length: 8 }, (_, i) => {
     const angle = (i / 8) * 2 * Math.PI; 
     return {
       id: `segment-${i}`,
@@ -45,213 +54,45 @@ const LoadingPage: React.FC = () => {
       rotation: angle * (180 / Math.PI) + 90, 
       glitchDelay: `${Math.random() * 2}s`,
     };
-  });
+  }), [orangeRingRadius]);
 
-  const blueRingNodes = Array.from({ length: 3 }, (_, i) => {
+  const blueRingNodes = React.useMemo(() => Array.from({ length: 3 }, (_, i) => {
     const angle = (i / 3) * 2 * Math.PI;
     return {
       id: `node-${i}`,
       x: Math.cos(angle) * blueRingRadius,
       y: Math.sin(angle) * blueRingRadius,
     };
-  });
+  }), [blueRingRadius]);
 
-  useEffect(() => {
-    // Generate stars with more vibrant colors and realistic distribution
-    const newStars: any[] = [];
-    const starColors = [
-      { 
-        bg: 'bg-blue-400', 
-        shadow: 'shadow-[0_0_10px_2px_rgba(96,165,250,0.8)]', 
-        hex: '#60a5fa',
-        tailFade: 'rgba(96,165,250,0)'
-      },
-      { 
-        bg: 'bg-purple-400', 
-        shadow: 'shadow-[0_0_10px_2px_rgba(192,132,252,0.8)]', 
-        hex: '#c084fc',
-        tailFade: 'rgba(192,132,252,0)'
-      },
-      { 
-        bg: 'bg-pink-400', 
-        shadow: 'shadow-[0_0_10px_2px_rgba(244,114,182,0.8)]', 
-        hex: '#f472b6',
-        tailFade: 'rgba(244,114,182,0)'
-      },
-      { 
-        bg: 'bg-cyan-300', 
-        shadow: 'shadow-[0_0_10px_2px_rgba(103,232,249,0.8)]', 
-        hex: '#67e8f9',
-        tailFade: 'rgba(103,232,249,0)'
-      },
-      { 
-        bg: 'bg-yellow-300', 
-        shadow: 'shadow-[0_0_10px_2px_rgba(253,224,71,0.8)]', 
-        hex: '#fde047',
-        tailFade: 'rgba(253,224,71,0)'
-      },
-      { 
-        bg: 'bg-white', 
-        shadow: 'shadow-[0_0_10px_2px_rgba(255,255,255,0.8)]', 
-        hex: '#ffffff',
-        tailFade: 'rgba(255,255,255,0)'
-      }
-    ];
-
-    for (let i = 0; i < 100; i++) {
-      const visual = starColors[Math.floor(Math.random() * starColors.length)];
-      const size = Math.random() > 0.9 ? 'w-1.5 h-1.5' : 
-                  Math.random() > 0.7 ? 'w-1 h-1' : 'w-0.5 h-0.5';
-      
-      // Create clusters of stars for more realistic distribution
-      let x, y;
-      if (Math.random() > 0.3) {
-        // Cluster stars in certain areas
-        const clusterX = Math.random() * 80 + 10; // 10-90% to avoid edges
-        const clusterY = Math.random() * 80 + 10;
-        x = Math.max(0, Math.min(100, clusterX + (Math.random() * 20 - 10)));
-        y = Math.max(0, Math.min(100, clusterY + (Math.random() * 20 - 10)));
-      } else {
-        // Some random stars for variety
-        x = Math.random() * 100;
-        y = Math.random() * 100;
-      }
-
-      newStars.push({
-        id: i,
-        x: x,
-        y: y,
-        sizeClass: size,
-        colorClass: visual.bg,
-        shadowClass: visual.shadow,
-        animationDelay: `${Math.random() * 15}s`,
-        animationDuration: `${3 + Math.random() * 10}s`,
-      });
-    }
-    // setStars(newStars);
-
-    // Generate shooting stars with more realistic and varied trajectories
-    const newShootingStarsData: any[] = [];
-    const shootingStarColors = [
-      { 
-        hex: '#60a5fa', 
-        tailFade: 'rgba(96,165,250,0)',
-        bg: 'bg-blue-400',
-        shadow: 'shadow-[0_0_10px_2px_rgba(96,165,250,0.8)]'
-      }, // blue
-      { 
-        hex: '#c084fc', 
-        tailFade: 'rgba(192,132,252,0)',
-        bg: 'bg-purple-400',
-        shadow: 'shadow-[0_0_10px_2px_rgba(192,132,252,0.8)]'
-      }, // purple
-      { 
-        hex: '#f472b6', 
-        tailFade: 'rgba(244,114,182,0)',
-        bg: 'bg-pink-400',
-        shadow: 'shadow-[0_0_10px_2px_rgba(244,114,182,0.8)]'
-      }, // pink
-      { 
-        hex: '#67e8f9', 
-        tailFade: 'rgba(103,232,249,0)',
-        bg: 'bg-cyan-300',
-        shadow: 'shadow-[0_0_10px_2px_rgba(103,232,249,0.8)]'
-      }, // cyan
-      { 
-        hex: '#fde047', 
-        tailFade: 'rgba(253,224,71,0)',
-        bg: 'bg-yellow-300',
-        shadow: 'shadow-[0_0_10px_2px_rgba(253,224,71,0.8)]'
-      }, // yellow
-      { 
-        hex: '#ffffff', 
-        tailFade: 'rgba(255,255,255,0)',
-        bg: 'bg-white',
-        shadow: 'shadow-[0_0_10px_2px_rgba(255,255,255,0.8)]'
-      }  // white
-    ];
-
-    for (let i = 0; i < 10; i++) {
-      const visual = shootingStarColors[Math.floor(Math.random() * shootingStarColors.length)];
-      // More natural angle range
-      const angleDeg = -20 - Math.random() * 50; 
-      const angleRad = angleDeg * (Math.PI / 180);
-      
-      // Start from edges more often for better visibility
-      let sx, sy, tx, ty;
-      const startFromTop = Math.random() > 0.7;
-      const startFromLeft = Math.random() > 0.5;
-      
-      if (startFromTop) {
-        // Start from top
-        sx = startFromLeft ? -10 : 110;
-        sy = Math.random() * 40; // Top 40%
-      } else {
-        // Start from sides
-        sx = startFromLeft ? -10 : 110;
-        sy = Math.random() * 100;
-      }
-
-      // Calculate end point based on angle and start position
-      const distance = 120 + Math.random() * 80; // Longer trails
-      tx = sx + Math.cos(angleRad) * distance * (startFromLeft ? 1 : -1);
-      ty = sy + Math.sin(angleRad) * distance;
-      
-      // Create gradient with more vibrant colors
-      const gradient = `linear-gradient(
-        to right, 
-        ${visual.hex} 0%, 
-        ${visual.hex} 30%, 
-        ${visual.hex} 50%, 
-        ${visual.tailFade} 100%
-      )`;
-
-      newShootingStarsData.push({
-        id: Date.now() + i + Math.random(),
-        startX: `${sx}vw`,
-        startY: `${sy}vh`,
-        travelX: `${tx - sx}vw`,
-        travelY: `${ty - sy}vh`,
-        angle: `${angleDeg}deg`,
-        animationDelay: `${Math.random() * 15}s`,
-        animationDuration: `${1.5 + Math.random() * 2}s`,
-        headColorHex: visual.hex,
-        tailColorHexFade: visual.tailFade,
-        gradient: gradient,
-      });
-    }
-    // setShootingStars(newShootingStarsData);
-  }, []);
-
-  // Generate sparks effect
+  // Generate sparks effect - optimizado para mejor rendimiento
   useEffect(() => {
     const generateSparks = () => {
       const newSparks: Spark[] = [];
       
       for (let i = 0; i < SPARK_COUNT; i++) {
         const angle = Math.random() * Math.PI * 2;
-        const distance = 30 + Math.random() * 20; // Distance from center
+        const distance = 25 + Math.random() * 15; // Reducido el rango
         const dx = Math.cos(angle) * distance;
         const dy = Math.sin(angle) * distance;
         
-        // Añadir coordenadas x, y para cumplir con el tipo Spark
         newSparks.push({
           id: `spark-${Date.now()}-${i}`,
-          x: 0, // Se posicionarán en el centro y se animarán con transform
+          x: 0,
           y: 0,
           dx,
           dy,
-          size: 1 + Math.random() * 2, // 1-3px
+          size: 1 + Math.random() * 1.5, // Reducido el tamaño máximo
           duration: SPARK_LIFESPAN_MIN + Math.random() * (SPARK_LIFESPAN_MAX - SPARK_LIFESPAN_MIN),
-          delay: Math.random() * 0.5,
+          delay: Math.random() * 0.3, // Reducido el delay máximo
           color: ['bg-yellow-300', 'bg-orange-400', 'bg-red-500'][Math.floor(Math.random() * 3)]
         });
       }
       
       setSparks(newSparks);
       
-      // Schedule next spark generation
-      const timeout = 1000 + Math.random() * 2000; // 1-3 seconds
+      // Schedule next spark generation - más rápido
+      const timeout = 500 + Math.random() * 1000; // Reducido de 1-3 segundos a 0.5-1.5 segundos
       const timer = setTimeout(() => {
         generateSparks();
       }, timeout);
@@ -268,16 +109,16 @@ const LoadingPage: React.FC = () => {
     };
   }, []);
 
-  // Función para generar chispas
+  // Función para generar chispas - optimizado
   const generateSparks = useCallback(() => {
     const newSparks: Spark[] = [];
     const segment = orangeRingSegments[Math.floor(Math.random() * orangeRingSegments.length)];
     
     for (let i = 0; i < SPARK_COUNT; i++) {
       const angle = Math.atan2(segment.y, segment.x);
-      const spread = (Math.random() - 0.5) * 0.5;
+      const spread = (Math.random() - 0.5) * 0.3; // Reducido el spread
       const emissionAngle = angle + spread;
-      const speed = 34 + Math.random() * 34;
+      const speed = 25 + Math.random() * 25; // Reducida la velocidad máxima
       const duration = SPARK_LIFESPAN_MIN + Math.random() * (SPARK_LIFESPAN_MAX - SPARK_LIFESPAN_MIN);
       
       newSparks.push({
@@ -286,28 +127,29 @@ const LoadingPage: React.FC = () => {
         y: segment.y,
         dx: Math.cos(emissionAngle) * speed * duration,
         dy: Math.sin(emissionAngle) * speed * duration,
-        size: 1 + Math.random() * 2,
+        size: 1 + Math.random() * 1.5, // Reducido el tamaño máximo
         duration: duration,
-        delay: Math.random() * 0.5,
+        delay: Math.random() * 0.3, // Reducido el delay máximo
         color: 'bg-orange-400',
       });
     }
     setSparks(newSparks);
   }, [orangeRingSegments]);
 
-  // Efecto para generar chispas periódicamente
+  // Efecto para generar chispas periódicamente - más frecuente
   useEffect(() => {
     generateSparks();
-    const interval = setInterval(generateSparks, 2000);
+    const interval = setInterval(generateSparks, 1500); // Reducido de 2000 a 1500
     return () => clearInterval(interval);
   }, [generateSparks]);
 
-  // Función para el tipado de texto
+  // Función para el tipado de texto - acelerado
   const typeLine = useCallback((line: Omit<TerminalLine, 'id'>, onComplete: () => void) => {
     let charIndex = 0;
     setCurrentTypedLine("");
     setIsTypingDependency(true);
     
+    // Acelerar el tipado
     const typingInterval = setInterval(() => {
       if (charIndex < line.text.length) {
         setCurrentTypedLine(prev => prev + line.text[charIndex]);
@@ -319,11 +161,12 @@ const LoadingPage: React.FC = () => {
         setIsTypingDependency(false);
         onComplete();
       }
-    }, 20);
+    }, 5); // Reducido de 10 a 5 ms
     
     return () => clearInterval(typingInterval);
   }, [setCurrentTypedLine, setIsTypingDependency, setTerminalLines]);
 
+  // Procesamiento de líneas de terminal - acelerado
   useEffect(() => {
     let currentLineIdx = 0;
     let currentDependencyIdx = 0;
@@ -332,11 +175,12 @@ const LoadingPage: React.FC = () => {
     const processNext = () => {
       if (currentLineIdx < INITIAL_TERMINAL_LINES.length) {
         const line = INITIAL_TERMINAL_LINES[currentLineIdx];
+        // Acelerar el proceso
         timeoutId = setTimeout(() => {
           setTerminalLines(prev => [...prev, { ...line, id: prev.length }]);
           currentLineIdx++;
           processNext();
-        }, line.text === "" ? 150 : 300);
+        }, line.text === "" ? 30 : 50); // Acelerado
       } else if (currentDependencyIdx < DEPENDENCIES_TO_INSTALL.length) {
         const dep = DEPENDENCIES_TO_INSTALL[currentDependencyIdx];
         const lineToType: Omit<TerminalLine, 'id'> = {
@@ -369,17 +213,18 @@ const LoadingPage: React.FC = () => {
               setProcessingFinalMessages(true);
             }
             processNext();
-          }, dep.time / 2.5);
+          }, dep.time / 10); // Acelerado aún más
         });
       } else if (processingFinalMessages && currentFinalMessageIdx < FINAL_MESSAGES.length) {
         const line = FINAL_MESSAGES[currentFinalMessageIdx];
+        // Acelerar el proceso final
         timeoutId = setTimeout(() => {
           setTerminalLines(prev => [...prev, { ...line, id: prev.length }]);
           setCurrentFinalMessageIdx(prev => prev + 1);
           if (currentFinalMessageIdx + 1 < FINAL_MESSAGES.length) {
             processNext();
           }
-        }, line.text === "" ? 150 : 700);
+        }, line.text === "" ? 30 : 100); // Acelerado
       }
     };
 
@@ -387,19 +232,20 @@ const LoadingPage: React.FC = () => {
     return () => clearTimeout(timeoutId);
   }, [typeLine, processingFinalMessages, currentFinalMessageIdx]);
 
+  // Efecto de cursor - más rápido
   useEffect(() => {
-    const cursorInterval = setInterval(() => setShowCursor(prev => !prev), 500);
+    const cursorInterval = setInterval(() => setShowCursor(prev => !prev), 400); // Reducido de 500 a 400
     return () => clearInterval(cursorInterval);
   }, []);
 
   return (
     <div className="loading-page-container">
-      {/* Stars Background */}
-      <StarsBackground />
+      {/* Stars Background - memoizado */}
+      <MemoizedStarsBackground />
 
-      {/* UFO flotante en la esquina superior derecha */}
+      {/* UFO flotante en la esquina superior derecha - memoizado */}
       <div className="loading-ufo-wrapper">
-        <LoadingUfo />
+        <MemoizedLoadingUfo />
       </div>
 
       {/* Titles */}
@@ -480,7 +326,7 @@ const LoadingPage: React.FC = () => {
                 left: '50%',
                 top: '50%',
                 transform: `translate(-50%, -50%) translate(${segment.x * 0.95}px, ${segment.y * 0.95}px)`,
-                animationDelay: `${index * 0.1}s`,
+                animationDelay: `${index * 0.05}s`, // Reducido el delay
                 // @ts-ignore
                 '--glitch-color-1': 'rgba(52, 211, 153, 0.6)', 
                 '--glitch-color-2': 'rgba(234, 179, 8, 0.6)', 

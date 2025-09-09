@@ -92,14 +92,14 @@ export const nftData: NftData[] = [
   },
   {
     id: "CMV",
-    name: "Entre la Vida y el Plástico",
-    description: "Por $Pinche $Chucho. En el corazon de Sian Kaan esta imagen poderosa captura el contraste entre la vida marina y el devastador impacto de la contaminacion oceanica.",
-    image: "ipfs://Qmant6X4GE4o7bMDuYDCyGr3wRwUpTejAzBjgDJucWR6H5/0.jpg",
-    editionContractAddress: "0xDCfeBA9001D7296790ed2c5ea6d38B528BAB4d1c",
-    splitContractAddress: "0xA74645BFe396Fe28FF1B8C0218277fb77FE6e717",
-    price: "1001",
+    name: "C0mMzoVeRLoAD by Daughter of the Son",
+    description: "C0mMzoVeRLoAD by Daughter of the Son. Earth is ghetto. Comms can be intense. How many screens are too many screens? How many files are too many files? Windows? Multiple open. Close those tabs. Protect your holes. Life in 2025. Enjoy.",
+    image: "https://petgascoin.com/wp-content/uploads/2025/05/C0mMzoVeRLoAD.mp4",
+    editionContractAddress: "0xd988b058be7F2AfAa5dF95a17527ba14263Da394",
+    splitContractAddress: "0xB9dCbBe08c33475C990251B173149bb774916C0B",
+    price: "3557",
     currencySymbol: "POL",
-    tokenUri: "QmZCqas9VQ2hwtJTbhQN8snfV4hVM4rBvi99SWPXjxBhmj/0"
+    tokenUri: "QmXyPGVAHBSuR1MeQYZUhr6xo3Dhn1F4URU7Utedhj8fz5/0"
   },
   {
     id: "BBB",
