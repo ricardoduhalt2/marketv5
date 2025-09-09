@@ -19,8 +19,8 @@ const MarqueeTicker: React.FC<MarqueeTickerProps> = ({ nfts }) => {
   const artistMap: {[key: string]: string} = {
     'TEM': 'Ms. Cosmic',
     'GCC': '$Pinche $Chucho',
-    'EVC': '$Pinche $Chucho',
-    'CMV': 'Daughter of the Son',
+    'EVC': 'Daughter of the Son',
+    'CMV': '$Pinche $Chucho',
     'BBB': 'Daveed Benjamin',
     'IVT': 'ONA AOÉRA',
     'YSL': 'Tania Cuevas Martinez',
@@ -47,7 +47,7 @@ const MarqueeTicker: React.FC<MarqueeTickerProps> = ({ nfts }) => {
       if (nft.id === 'EVC') {
         cleanName = 'C0mMzoVeRLoAD';
       } else if (nft.id === 'CMV') {
-        cleanName = 'C0mMzoVeRLoAD';
+        cleanName = 'Entre la Vida y el Plástico';
       }
 
       if (!uniqueIds.has(nft.id)) {

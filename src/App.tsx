@@ -109,7 +109,7 @@ function App() {
               { id: 'TEM', name: 'Tides of the Eternal Mind' },
               { id: 'GCC', name: 'Galactic Clean-Up Crew' },
               { id: 'EVC', name: 'C0mMzoVeRLoAD' },
-              { id: 'CMV', name: 'C0mMzoVeRLoAD by Daughter of the Son' },
+              { id: 'CMV', name: 'Entre la Vida y el Plástico' },
               { id: 'BBB', name: 'Bit-Beats Bliss' },
               { id: 'IVT', name: 'I vow to take care of you' },
               { id: 'YSL', name: 'Yo Soy Libertad' },

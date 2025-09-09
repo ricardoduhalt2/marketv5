@@ -218,8 +218,8 @@ const NFTList = () => {
                           const artistMap: {[key: string]: string} = {
                             'TEM': 'Ms. Cosmic',
                             'GCC': '$Pinche $Chucho',
-                            'EVC': '$Pinche $Chucho',
-                            'CMV': 'Daughter of the Son',
+                            'EVC': 'Daughter of the Son',
+                            'CMV': '$Pinche $Chucho',
                             'BBB': 'Daveed Benjamin',
                             'IVT': 'ONA AOÉRA',
                             'YSL': 'Tania Cuevas Martinez',
